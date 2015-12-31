@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0595502E1C35E97D0032A4AE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0595502D1C35E97D0032A4AE /* main.swift */; };
+		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
+		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +25,8 @@
 
 /* Begin PBXFileReference section */
 		0595502A1C35E97D0032A4AE /* ccmach */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ccmach; sourceTree = BUILT_PRODUCTS_DIR; };
-		0595502D1C35E97D0032A4AE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		059550341C35EA100032A4AE /* ObjectDoc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectDoc.framework; sourceTree = "<group>"; };
+		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +44,7 @@
 		059550211C35E97D0032A4AE = {
 			isa = PBXGroup;
 			children = (
+				059550341C35EA100032A4AE /* ObjectDoc.framework */,
 				0595502C1C35E97D0032A4AE /* ccmach */,
 				0595502B1C35E97D0032A4AE /* Products */,
 			);
@@ -57,7 +61,7 @@
 		0595502C1C35E97D0032A4AE /* ccmach */ = {
 			isa = PBXGroup;
 			children = (
-				0595502D1C35E97D0032A4AE /* main.swift */,
+				059550361C35EAA80032A4AE /* main.mm */,
 			);
 			path = ccmach;
 			sourceTree = "<group>";
@@ -118,7 +122,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0595502E1C35E97D0032A4AE /* main.swift in Sources */,
+				059550371C35EAA80032A4AE /* main.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,13 +207,26 @@
 		059550321C35E97D0032A4AE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks /Users/landonf/Documents/Code/Personal/ccmach";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		059550331C35E97D0032A4AE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks /Users/landonf/Documents/Code/Personal/ccmach";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
