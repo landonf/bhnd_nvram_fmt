@@ -14,15 +14,24 @@
 #import <ObjectDoc/PLClang.h>
 
 #import <string>
+#import <vector>
 
 extern "C" {
 #import "/Users/landonf/Documents/Code/FreeBSD/freebsd/sys/dev/bhnd/bcmsrom_tbl.h"
 }
 
+
+
 struct nvar {
     NSString *name;
-    NSArray *tokens;
-    nvar (NSString *n, NSArray *t) : name(n), tokens(t) {}
+    uint32_t revmask;
+    uint32_t flags;
+    NSArray *off_tokens;
+    uint16_t valmask;
+    nvar () {}
+    nvar (NSString *n, uint32_t _revmask, uint32_t _flags, NSArray *_off_tokens,
+        uint16_t _valmask) : name(n), revmask(_revmask), flags(_flags),
+        off_tokens(_off_tokens), valmask(_valmask) {}
 };
 
 static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
@@ -104,8 +113,8 @@ compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
     return v;
 }
 
-static void
-extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c) {
+static bool
+extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     NSMutableArray *tokens = [[tu tokensForSourceRange: c.extent] mutableCopy];
     
     if (tokens.count == 0)
@@ -151,21 +160,18 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c) {
 
     /* Skip terminating entry */
     if (nameToken.kind == PLClangTokenKindIdentifier && [nameToken.spelling isEqual: @"NULL"])
-        return;
+        return false;
 
 //    nvar n((NSString *)get_literal(tu, name), tokens);
 
     NSString *name = (NSString *) get_literal(tu, nameToken);
     uint32_t revmask = compute_literal(tu, grouped[1]);
     uint32_t flags = compute_literal(tu, grouped[2]);
-    NSString *offset = [((NSArray *)grouped[3]) componentsJoinedByString:@""];
+    NSArray *offset_tokens = (NSArray *) grouped[3];
     uint32_t valmask = compute_literal(tu, grouped[4]);
 
-    printf("%s 0x%x 0x%x %s 0x%x\n", name.UTF8String, revmask, flags, offset.UTF8String, valmask);
-
-    int ctz = __builtin_ctz(revmask);
-    printf("min-ver = %u\n", (1<<ctz));
-    printf("max-ver = %u\n", revmask);
+    *nout = nvar(name, revmask, flags, offset_tokens, valmask);
+    return true;
 }
 
 static int
@@ -238,6 +244,7 @@ ar_main(int argc, char * const argv[])
         return PLClangCursorVisitContinue;
     }];
 
+    auto nvars = std::make_shared<std::vector<nvar>>();
     PLClangCursor *tbl = api[@"pci_sromvars"];
     if (tbl == nil)
         errx(EXIT_FAILURE, "missing pci_sromvars");
@@ -248,7 +255,9 @@ ar_main(int argc, char * const argv[])
 
         [cursor visitChildrenUsingBlock: ^PLClangCursorVisitResult(PLClangCursor *cursor) {
             if (cursor.kind == PLClangCursorKindInitializerListExpression) {
-                extract_struct(tu, cursor);
+                nvar n;
+                if (extract_struct(tu, cursor, &n))
+                    nvars->push_back(n);
             }
                 
             return PLClangCursorVisitContinue;
@@ -256,6 +265,16 @@ ar_main(int argc, char * const argv[])
         
         return PLClangCursorVisitContinue;
     }];
+    
+    for (const auto &n : *nvars) {
+        NSString *offset = [n.off_tokens componentsJoinedByString:@""];
+        
+        printf("%s:\t0x%x 0x%x %s 0x%x\n", n.name.UTF8String, n.revmask, n.flags, offset.UTF8String, n.valmask);
+        
+        int ctz = __builtin_ctz(n.revmask);
+        printf("\tmin-ver = %u\n", (1<<ctz));
+        printf("\tmax-ver = %u\n", n.revmask);
+    }
 
     return (0);
 }
