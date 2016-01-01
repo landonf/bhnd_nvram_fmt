@@ -33,6 +33,24 @@ struct nvar {
     nvar (NSString *n, uint32_t _revmask, uint32_t _flags, uint16_t _off, NSArray *_off_tokens,
         uint16_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off),
         off_tokens(_off_tokens), valmask(_valmask) {}
+    
+    uint16_t unaligned_off() const {
+        if (valmask & 0xFF00)
+            return off;
+        else
+            return off+sizeof(uint8_t);
+    }
+    
+    size_t width() const {
+        size_t w = 2;
+        if (!(valmask & 0xFF00))
+            w -= 1;
+
+        if (!(valmask & 0x00FF))
+            w -= 1;
+        
+        return w;
+    }
 };
 
 static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
@@ -286,7 +304,7 @@ ar_main(int argc, char * const argv[])
     for (const auto &n : *nvars) {
         NSString *offset = [n.off_tokens componentsJoinedByString:@""];
         
-        printf("%s:\t0x%x 0x%x %s(0x%04hX) 0x%x\n", n.name.UTF8String, n.revmask, n.flags, offset.UTF8String, n.off, n.valmask);
+        printf("%s:\t0x%x 0x%x %s(0x%04hX) 0x%x (roff=0x%04hX, bytes=%zu)\n", n.name.UTF8String, n.revmask, n.flags, offset.UTF8String, n.off, n.valmask, n.unaligned_off(), n.width());
         
         int ctz = __builtin_ctz(n.revmask);
         printf("\tmin-ver = %u\n", (1<<ctz));
