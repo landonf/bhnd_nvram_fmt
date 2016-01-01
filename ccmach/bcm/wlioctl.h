@@ -118,7 +118,7 @@ typedef struct {
 #if defined(NDIS) && (NDISVER >= 0x0620)
 	LARGE_INTEGER	sys_time;		/* current system time */
 #else
-	int64		sys_time;		/* current system time */
+	int64_t		sys_time;		/* current system time */
 #endif
 	wl_dc_info_t	dc_info;
 } assoc_decision_t;

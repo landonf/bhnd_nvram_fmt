@@ -20,6 +20,7 @@ extern "C" {
 #import "bcm/bcmsrom_tbl.h"
 }
 
+
 struct spromvar {
     NSString *name;
     uint32_t revmask;
@@ -73,7 +74,7 @@ resolve_pre(PLClangTranslationUnit *tu, PLClangToken *t) {
     NSArray *tokens = [tu tokensForSourceRange: def.extent];
     
     if (tokens.count < 2)
-        errx(1, "macro def %s missing expected token count", t.spelling.UTF8String);
+        errx(EXIT_FAILURE, "macro def %s missing expected token count", t.spelling.UTF8String);
 
     return tokens[1];
 }
@@ -121,7 +122,7 @@ compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
     char op = '\0';
 
     if (tokens.count == 0)
-        errx(1, "empty token list");
+        errx(EXIT_FAILURE, "empty token list");
 
     for (__strong PLClangToken *t in tokens) {
         if (t.kind == PLClangTokenKindIdentifier)
@@ -153,7 +154,7 @@ compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
                 op = t.spelling.UTF8String[0];
                 break;
             default:
-                errx(1, "Unsupported token type!");
+                errx(EXIT_FAILURE, "Unsupported token type!");
         }
     }
 
@@ -364,6 +365,8 @@ ar_main(int argc, char * const argv[])
         int ctz = __builtin_ctz(revmask);
         printf("\tmin-ver = %u\n", (1<<ctz));
         printf("\tmax-ver = %u\n", revmask);
+        
+        // TODO - produce output tables.
     }
 
     return (0);
