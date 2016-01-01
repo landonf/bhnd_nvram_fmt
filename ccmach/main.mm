@@ -26,11 +26,12 @@ struct nvar {
     NSString *name;
     uint32_t revmask;
     uint32_t flags;
+    uint16_t off;
     NSArray *off_tokens;
     uint16_t valmask;
     nvar () {}
-    nvar (NSString *n, uint32_t _revmask, uint32_t _flags, NSArray *_off_tokens,
-        uint16_t _valmask) : name(n), revmask(_revmask), flags(_flags),
+    nvar (NSString *n, uint32_t _revmask, uint32_t _flags, uint16_t _off, NSArray *_off_tokens,
+        uint16_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off),
         off_tokens(_off_tokens), valmask(_valmask) {}
 };
 
@@ -87,7 +88,8 @@ static uint32_t
 compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
 {
     uint32_t v = 0;
-    
+    char op = '\0';
+
     if (tokens.count == 0)
         errx(1, "empty token list");
 
@@ -98,12 +100,27 @@ compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
         switch (t.kind) {
             case PLClangTokenKindLiteral: {
                 NSNumber *n = (NSNumber *) get_literal(tu, t);
-                v |= [n unsignedIntegerValue];
+                uint32_t nv = (uint32_t) [n unsignedIntegerValue];
+                switch (op) {
+                    case '\0':
+                        v = nv;
+                        break;
+                    case '|':
+                        v |= nv;
+                        break;
+                    case '+':
+                        v += nv;
+                        break;
+                    case '-':
+                        v -= nv;
+                        break;
+                    default:
+                        errx(EXIT_FAILURE, "unsupported op %c", op);
+                }
                 break;
             }
             case PLClangTokenKindPunctuation:
-                if (![t.spelling isEqualToString: @"|"])
-                    errx(1, "I only support OR, sorry: %s", t.spelling.UTF8String);
+                op = t.spelling.UTF8String[0];
                 break;
             default:
                 errx(1, "Unsupported token type!");
@@ -116,7 +133,6 @@ compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
 static bool
 extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     NSMutableArray *tokens = [[tu tokensForSourceRange: c.extent] mutableCopy];
-    
     if (tokens.count == 0)
         errx(EXIT_FAILURE, "zero length");
 
@@ -167,10 +183,11 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     NSString *name = (NSString *) get_literal(tu, nameToken);
     uint32_t revmask = compute_literal(tu, grouped[1]);
     uint32_t flags = compute_literal(tu, grouped[2]);
-    NSArray *offset_tokens = (NSArray *) grouped[3];
+    NSArray *off_tokens = (NSArray *) grouped[3];
+    uint16_t off = compute_literal(tu, off_tokens);
     uint32_t valmask = compute_literal(tu, grouped[4]);
 
-    *nout = nvar(name, revmask, flags, offset_tokens, valmask);
+    *nout = nvar(name, revmask, flags, off, off_tokens, valmask);
     return true;
 }
 
@@ -269,11 +286,13 @@ ar_main(int argc, char * const argv[])
     for (const auto &n : *nvars) {
         NSString *offset = [n.off_tokens componentsJoinedByString:@""];
         
-        printf("%s:\t0x%x 0x%x %s 0x%x\n", n.name.UTF8String, n.revmask, n.flags, offset.UTF8String, n.valmask);
+        printf("%s:\t0x%x 0x%x %s(0x%04hX) 0x%x\n", n.name.UTF8String, n.revmask, n.flags, offset.UTF8String, n.off, n.valmask);
         
         int ctz = __builtin_ctz(n.revmask);
         printf("\tmin-ver = %u\n", (1<<ctz));
         printf("\tmax-ver = %u\n", n.revmask);
+        if (n.flags & SRFL_MORE)
+            printf("\t");
     }
 
     return (0);
