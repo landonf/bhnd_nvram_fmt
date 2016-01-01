@@ -20,7 +20,19 @@ extern "C" {
 #import "/Users/landonf/Documents/Code/FreeBSD/freebsd/sys/dev/bhnd/bcmsrom_tbl.h"
 }
 
-
+struct spromvar {
+    NSString *name;
+    uint32_t revmask;
+    uint32_t flags;
+    uint16_t off;
+    NSArray *off_tokens;
+    uint16_t valmask;
+    size_t width;
+    spromvar () {}
+    spromvar (NSString *n, uint32_t _revmask, uint32_t _flags, uint16_t _off, NSArray *_off_tokens,
+          uint16_t _valmask, size_t _width) : name(n), revmask(_revmask), flags(_flags), off(_off),
+    off_tokens(_off_tokens), valmask(_valmask), width(_width) {}
+};
 
 struct nvar {
     NSString *name;
@@ -300,17 +312,46 @@ ar_main(int argc, char * const argv[])
         
         return PLClangCursorVisitContinue;
     }];
-    
-    for (const auto &n : *nvars) {
-        NSString *offset = [n.off_tokens componentsJoinedByString:@""];
+
+    for (size_t i = 0; i < nvars->size(); i++) {
+        nvar *n = &(*nvars)[i];
+
+        NSString *name = n->name;
+        uint32_t revmask = n->revmask;
+        uint32_t flags = n->flags;
+        uint16_t offset = n->unaligned_off();
+        size_t width = n->width();
+        uint32_t valmask = n->valmask;
+
+        /* Try to unify continuations; the only time this seems to fail
+         * is with the early boards that used a sparse 32-bit boardflag
+         * layout */
+        while (n->flags & SRFL_MORE) {
+            i++;
+            n = &(*nvars)[i];
+
+            if (n->unaligned_off() != (offset + (width / sizeof(uint16_t)))) {
+                warnx("%s: sparse continuation (%hu, %hu, %zu)", name.UTF8String, n->unaligned_off(), offset, width);
+                i--;
+                break;
+            }
+
+            if (n->revmask != 0)
+                errx(EXIT_FAILURE, "%s: continuation has revmask", name.UTF8String);
+
+            if (n->valmask != 0xFFFF)
+                errx(EXIT_FAILURE, "%s: unsupported valmask", name.UTF8String);
+
+            width += n->width();
+        }
+
+        NSString *offstr = [n->off_tokens componentsJoinedByString:@""];
         
-        printf("%s:\t0x%x 0x%x %s(0x%04hX) 0x%x (roff=0x%04hX, bytes=%zu)\n", n.name.UTF8String, n.revmask, n.flags, offset.UTF8String, n.off, n.valmask, n.unaligned_off(), n.width());
+        printf("%s:\t0x%x 0x%x %s(0x%08hX) 0x%x (bytes=%zu)\n", name.UTF8String, revmask, flags, offstr.UTF8String, offset, valmask, width);
         
-        int ctz = __builtin_ctz(n.revmask);
+        int ctz = __builtin_ctz(revmask);
         printf("\tmin-ver = %u\n", (1<<ctz));
-        printf("\tmax-ver = %u\n", n.revmask);
-        if (n.flags & SRFL_MORE)
-            printf("\t");
+        printf("\tmax-ver = %u\n", revmask);
     }
 
     return (0);
