@@ -17,7 +17,7 @@
 #import <vector>
 
 extern "C" {
-#import "/Users/landonf/Documents/Code/FreeBSD/freebsd/sys/dev/bhnd/bcmsrom_tbl.h"
+#import "bcm/bcmsrom_tbl.h"
 }
 
 struct spromvar {
@@ -336,8 +336,8 @@ ar_main(int argc, char * const argv[])
                 break;
             }
 
-            if (n->revmask != 0)
-                errx(EXIT_FAILURE, "%s: continuation has revmask", name.UTF8String);
+            if (n->revmask != 0 && n->revmask != revmask)
+                errx(EXIT_FAILURE, "%s: continuation has non-matching revmask", name.UTF8String);
 
             if (n->valmask != 0xFFFF)
                 errx(EXIT_FAILURE, "%s: unsupported valmask", name.UTF8String);
