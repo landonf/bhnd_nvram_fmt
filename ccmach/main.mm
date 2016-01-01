@@ -163,7 +163,9 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c) {
 
     printf("%s 0x%x 0x%x %s 0x%x\n", name.UTF8String, revmask, flags, offset.UTF8String, valmask);
 
-
+    int ctz = __builtin_ctz(revmask);
+    printf("min-ver = %u\n", (1<<ctz));
+    printf("max-ver = %u\n", revmask);
 }
 
 static int
