@@ -142,23 +142,26 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c) {
             [curgroup addObject: t];
         }
     }
+    [grouped addObject: curgroup];
 
-    if (grouped.count != 4)
+    if (grouped.count != 5)
         errx(EXIT_FAILURE, "invalid length");
     
-    PLClangToken *name = tokens.firstObject;
+    PLClangToken *nameToken = tokens.firstObject;
 
     /* Skip terminating entry */
-    if (name.kind == PLClangTokenKindIdentifier && [name.spelling isEqual: @"NULL"])
+    if (nameToken.kind == PLClangTokenKindIdentifier && [nameToken.spelling isEqual: @"NULL"])
         return;
 
-    nvar n((NSString *)get_literal(tu, name), tokens);
+//    nvar n((NSString *)get_literal(tu, name), tokens);
 
-    uint32_t mask = compute_literal(tu, grouped[1]);
+    NSString *name = (NSString *) get_literal(tu, nameToken);
+    uint32_t revmask = compute_literal(tu, grouped[1]);
     uint32_t flags = compute_literal(tu, grouped[2]);
     NSString *offset = [((NSArray *)grouped[3]) componentsJoinedByString:@""];
+    uint32_t valmask = compute_literal(tu, grouped[4]);
 
-    printf("%s 0x%x 0x%x %s\n", n.name.UTF8String, mask, flags, offset.UTF8String);
+    printf("%s 0x%x 0x%x %s 0x%x\n", name.UTF8String, revmask, flags, offset.UTF8String, valmask);
 
 
 }
