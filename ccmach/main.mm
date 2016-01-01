@@ -323,8 +323,8 @@ ar_main(int argc, char * const argv[])
         size_t width = n->width();
         uint32_t valmask = n->valmask;
 
-        /* Try to unify continuations; the only time this seems to fail
-         * is with the early boards that used a sparse 32-bit boardflag
+        /* Try to unify continuations; the only time this seems to
+         * fail is with the early boards that used a sparse 32-bit boardflag
          * layout */
         while (n->flags & SRFL_MORE) {
             i++;
@@ -347,7 +347,19 @@ ar_main(int argc, char * const argv[])
 
         NSString *offstr = [n->off_tokens componentsJoinedByString:@""];
         
-        printf("%s:\t0x%x 0x%x %s(0x%08hX) 0x%x (bytes=%zu)\n", name.UTF8String, revmask, flags, offstr.UTF8String, offset, valmask, width);
+        const char *type = "???";
+        switch (width) {
+            case 1:
+                type = "u8";
+                break;
+            case 2:
+                type = "u16";
+                break;
+            case 4:
+                type = "u32";
+                break;
+        }
+        printf("%s:\t0x%x 0x%x %s(0x%08hX) 0x%x (%s%s)\n", name.UTF8String, revmask, flags, offstr.UTF8String, offset, valmask, type, (flags & SRFL_ARRAY) ? "[]" : "");
         
         int ctz = __builtin_ctz(revmask);
         printf("\tmin-ver = %u\n", (1<<ctz));
