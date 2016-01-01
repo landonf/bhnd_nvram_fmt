@@ -115,15 +115,18 @@ typedef struct bhnd_nvram_var {
 #define	BHND_SPROM_COMPAT_REV_EQ(_rev)	{_rev, _rev}
 #define	BHND_SPROM_COMPAT_REV_GTE(_rev)	{_rev, BHND_SPROMREV_MAX}
 
-#define _BHND_SPROM_ELEM_DECL(...)					\
+#define BHND_SPROM_ARRAY_ELEM(...)						\
 {									\
 	.segs		= _BHND_NV_VA_ARRAY(sprom_vseg, __VA_ARGS__),	\
 	.num_segs	=						\
 	    nitems(_BHND_NV_VA_ARRAY(sprom_vseg, __VA_ARGS__))		\
 }
 
-#define	BHND_SPROM_VAR(_compat, ...)		\
-	_BHND_SPROM_VAR_DECL(_compat, _BHND_SPROM_ELEM_DECL(__VA_ARGS__))
+#define	BHND_SPROM_MAPPING(_compat, ...)		\
+	_BHND_SPROM_VAR_DECL(_compat, BHND_SPROM_ARRAY_ELEM(__VA_ARGS__))
+
+#define	BHND_SPROM_ARRAY_MAPPING(_compat, ...)		\
+	_BHND_SPROM_VAR_DECL(_compat, __VA_ARGS__)
 
 #define	BHND_SPROM_OFFSET(_offset, _type, _mask, _shift)	\
 	{ _offset, sizeof(_type), ((_type) (_mask)), _shift }
@@ -139,7 +142,14 @@ BHND_SPROM_VAR(REV_GTE(1),
 
 #define	nitems(x)	(sizeof((x)) / sizeof((x)[0]))
 const struct bhnd_nvram_var nvram_vars[] = {
-	BHND_NVRAM_VAR(poodle, UINT, SFMT_HEX, VF_DFLT, BHND_SPROM_VAR(
-		REV_GTE(1), BHND_SPROM_OFFSET(0xFFEE, uint32_t, -1, 0)
-	))
+	BHND_NVRAM_VAR(poodle, UINT, SFMT_HEX, VF_DFLT,
+		BHND_SPROM_MAPPING(REV_GTE(1),
+			BHND_SPROM_OFFSET(0xFFEE, uint32_t, -1, 0)
+		)
+	),
+	BHND_NVRAM_ARRAY_VAR(puddles, UINT, SFMT_HEX, VF_DFLT, 5,
+		BHND_SPROM_ARRAY_MAPPING(REV_EQ(1),
+			BHND_SPROM_ARRAY_ELEM(BHND_SPROM_OFFSET(0xFFEE, uint32_t, -1, 0))
+		)
+	)
 };
