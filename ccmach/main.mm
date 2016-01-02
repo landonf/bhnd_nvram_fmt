@@ -8,18 +8,23 @@
 
 #include <stdio.h>
 
-#import <err.h>
-#import <getopt.h>
+#include <err.h>
+#include <getopt.h>
+
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <iostream>
+#include <iomanip>
+
 #import <ObjectDoc/ObjectDoc.h>
 #import <ObjectDoc/PLClang.h>
 
-#import <string>
-#import <vector>
-#import <unordered_map>
-
 extern "C" {
-#import "bcm/bcmsrom_tbl.h"
+#include "bcm/bcmsrom_tbl.h"
 }
+
+using namespace std;
 
 /* A parsed SPROM record from the vendor header file */
 struct nvar {
@@ -424,11 +429,7 @@ ar_main(int argc, char * const argv[])
         std::string name = n->name.UTF8String;
         uint32_t revmask = n->revmask;
         uint32_t flags = n->flags;
-        uint16_t offset = n->unaligned_off();
-        size_t width = n->width();
-        uint32_t valmask = n->valmask;
 
-        warnx("%s", name.c_str());
         if (name.length() == 0)
             errx(EXIT_FAILURE, "variable has zero-length name");
 
@@ -491,64 +492,77 @@ ar_main(int argc, char * const argv[])
 
         /* Handle array/sparse continuation records */
         std::vector<bhnd_sprom_value> vals;
-        if (clean_nvars[i].flags & SRFL_ARRAY) {
-            do {
-                auto c = &clean_nvars[i];
-                bhnd_sprom_value val;
+        bhnd_sprom_value base_val;
+        bhnd_sprom_vseg base_seg = {
+            n->unaligned_off(),
+            n->width(),
+            n->valmask,
+            static_cast<size_t>(__builtin_ctz(n->valmask))
+        };
+
+        base_val.segs.push_back(base_seg);
+        while (n->flags & SRFL_MORE) {
+            i++;
+            n = &clean_nvars[i];
+            
+            base_val.segs.push_back({
+                n->unaligned_off(),
+                n->width(),
+                n->valmask,
+                static_cast<size_t>(__builtin_ctz(n->valmask))
+            });
+        }
+        vals.push_back(base_val);
+
+        while (n->flags & SRFL_ARRAY) {
+            bhnd_sprom_value val;
+
+            i++;
+            n = &clean_nvars[i];
+
+            val.segs.push_back({
+                n->unaligned_off(),
+                n->width(),
+                n->valmask,
+                static_cast<size_t>(__builtin_ctz(n->valmask))
+            });
+
+            while (n->flags & SRFL_MORE) {
+                i++;
+                n = &clean_nvars[i];
                 
                 val.segs.push_back({
-                    c->unaligned_off(),
-                    c->width(),
-                    c->valmask,
-                    0 /* TODO: Shift */
+                    n->unaligned_off(),
+                    n->width(),
+                    n->valmask,
+                    static_cast<size_t>(__builtin_ctz(n->valmask))
                 });
-                
-                while (c->flags & SRFL_MORE) {
-                    i++;
-                    auto c = &clean_nvars[i];
-
-                    val.segs.push_back({
-                        c->unaligned_off(),
-                        c->width(),
-                        c->valmask,
-                        0 /* TODO: Shift */
-                    });
-                }
-
-                vals.push_back(val);
-                i++;
-            } while (clean_nvars[i].flags & SRFL_ARRAY);
-        } else {
+            }
             
-            while (clean_nvars[i].flags & SRFL_MORE) {
-                i++;
+            vals.push_back(val);
+        }
+
+        int ctz = __builtin_ctz(revmask);
+        uint16_t first_ver = (1UL << ctz);
+        uint16_t last_ver = revmask | (((~revmask) << (sizeof(revmask)*8 - ctz)) >> (sizeof(revmask)*8 - ctz));
+        
+        v->sprom_descs.push_back({{first_ver, last_ver}, vals});
+    }
+
+    for (const auto &v : vars) {
+        cout << hex << uppercase << setfill('0');
+        cout << v->name << ": " << "\n";
+        for (const auto &t : v->sprom_descs) {
+            cout << "\trevs " << setw(4) << "0x" << t.compat.first << " - " << "0x" << t.compat.last << "\n";
+            for (const auto &val : t.values) {
+                cout << "\tvn:" << "\n";
+                for (const auto &seg : val.segs) {
+                    cout << "\t\tseg " << "0x" << setw(4) << seg.offset << dec << " width " << seg.width << hex << " mask 0x" << setw(8) << seg.mask << " shift " << dec << seg.shift << "\n";
+                }
             }
         }
-        
-        v->sprom_descs.push_back({{0,0}, vals});
-
-#if 0
-        NSString *offstr = [n->off_tokens componentsJoinedByString:@""];
-        
-        const char *type = "???";
-        switch (width) {
-            case 1:
-                type = "u8";
-                break;
-            case 2:
-                type = "u16";
-                break;
-            case 4:
-                type = "u32";
-                break;
-        }
-        printf("%s:\t0x%x 0x%x %s(0x%08hX) 0x%x (%s%s)\n", name.c_str(), revmask, flags, offstr.UTF8String, offset, valmask, type, (flags & SRFL_ARRAY) ? "[]" : "");
-        
-        int ctz = __builtin_ctz(revmask);
-        printf("\tmin-ver = %u\n", (1<<ctz));
-        printf("\tmax-ver = %u\n", revmask);
-#endif
     }
+
 
     return (0);
 }
