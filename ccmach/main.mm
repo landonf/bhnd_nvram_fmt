@@ -26,7 +26,8 @@ extern "C" {
 
 using namespace std;
 
-static uint32_t compute_literal(PLClangTranslationUnit *tu, NSArray *tokens);
+static uint32_t     compute_literal(PLClangTranslationUnit *tu, NSArray *tokens);
+static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
 /** An offset symbol */
 struct symbolic_offset {
@@ -43,12 +44,44 @@ struct symbolic_offset {
         /** bcmsrom offsets assume 16-bit pointer arithmetic */
         raw_byte_offset = raw_value * sizeof(uint16_t);
     }
+    
+    std::string byte_adjusted_string_rep () {
+        NSMutableArray *strs = [NSMutableArray array];
+    
+        for (PLClangToken *t in tokens) {
+            switch (t.kind) {
+                case PLClangTokenKindIdentifier:
+                case PLClangTokenKindPunctuation:
+                    [strs addObject: t.spelling];
+                    break;
+                case PLClangTokenKindLiteral: {
+                    NSNumber *n = (NSNumber *) get_literal(tu, t);
+                    u_int off = [n unsignedIntValue];
+                    NSString *soff = [NSString stringWithFormat: @"%u", off*2];
+                    [strs addObject: soff];
+                    break;
+                } default:
+                    errx(EXIT_FAILURE, "unsupported token %s", t.description.UTF8String);
+            }
+        }
+
+        return [strs componentsJoinedByString:@""].UTF8String;
+    }
 
     bool isSimple() const {
-        // TODO
-        return false;
+        return (tokens.count == 1);
     };
 };
+
+namespace std {
+    std::string to_string(const struct symbolic_offset &off) {
+        std::string ret;
+        
+        ret = [off.tokens componentsJoinedByString: @" "].UTF8String;
+
+        return ret;
+    }
+}
 
 /* A parsed SPROM record from the vendor header file */
 struct nvar {
@@ -417,6 +450,10 @@ ar_main(int argc, char * const argv[])
         uint16_t offset = n->byte_off();
         size_t width = n->width();
         uint32_t valmask = n->valmask;
+    
+        if (!n->off.isSimple()) {
+            cout << to_string(n->off) << " -> " << n->off.byte_adjusted_string_rep() << "\n";
+        }
 
         /* Unify unnecessary continuations */
         nvar *c = n;
@@ -574,7 +611,7 @@ ar_main(int argc, char * const argv[])
         
         v->sprom_descs.push_back({{first_ver, last_ver}, vals});
     }
-
+#if 0
     for (const auto &v : vars) {
         printf("%s:\n", v->name.c_str());
         for (const auto &t : v->sprom_descs) {
@@ -589,7 +626,7 @@ ar_main(int argc, char * const argv[])
             }
         }
     }
-
+#endif
 
     return (0);
 }
