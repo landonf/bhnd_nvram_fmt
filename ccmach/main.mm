@@ -191,7 +191,7 @@ struct bhnd_sprom_vseg {
     size_t      offset;	/**< byte offset within SPROM */
     size_t		width;	/**< 1, 2, or 4 bytes */
     uint32_t	mask;	/**< mask to be applied to the value */
-    size_t		shift;	/**< shift to be applied to the value */
+    ssize_t		shift;	/**< shift to be applied to the value on extraction. if negative, left shift. if positive, right shift. */
 };
 
 /** SPROM value descriptor */
@@ -586,10 +586,11 @@ ar_main(int argc, char * const argv[])
             n->byte_off(),
             n->width(),
             n->valmask,
-            static_cast<size_t>(__builtin_ctz(n->valmask))
+            static_cast<ssize_t>(__builtin_ctz(n->valmask))
         };
 
         base_val.segs.push_back(base_seg);
+        size_t more_width = n->width();
         while (n->flags & SRFL_MORE) {
             i++;
             n = &clean_nvars[i];
@@ -598,8 +599,10 @@ ar_main(int argc, char * const argv[])
                 n->byte_off(),
                 n->width(),
                 n->valmask,
-                static_cast<size_t>(__builtin_ctz(n->valmask))
+                static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
             });
+
+            more_width += n->width();
         }
         vals.push_back(base_val);
 
@@ -613,9 +616,10 @@ ar_main(int argc, char * const argv[])
                 n->byte_off(),
                 n->width(),
                 n->valmask,
-                static_cast<size_t>(__builtin_ctz(n->valmask))
+                static_cast<ssize_t>(__builtin_ctz(n->valmask))
             });
 
+            more_width = n->width();
             while (n->flags & SRFL_MORE) {
                 i++;
                 n = &clean_nvars[i];
@@ -624,8 +628,10 @@ ar_main(int argc, char * const argv[])
                     n->byte_off(),
                     n->width(),
                     n->valmask,
-                    static_cast<size_t>(__builtin_ctz(n->valmask))
+                    static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
                 });
+                
+                more_width += n->width();
             }
             
             vals.push_back(val);
@@ -638,10 +644,7 @@ ar_main(int argc, char * const argv[])
         v->sprom_descs.push_back({{first_ver, last_ver}, vals});
     }
 
-    for (const auto &np : consts) {
-        printf("k: %s\n", np.first.c_str());
-    }
-#if 0
+#if 1
     for (const auto &v : vars) {
         printf("%s:\n", v->name.c_str());
         for (const auto &t : v->sprom_descs) {
@@ -650,7 +653,7 @@ ar_main(int argc, char * const argv[])
             for (const auto &val : t.values) {
                 printf("\t\t%s[%zu]\n", v->name.c_str(), idx);
                 for (const auto &seg : val.segs) {
-                    printf("\t\t  seg offset=0x%04zX width=%zu mask=0x%08X shift=%zu\n", seg.offset, seg.width, seg.mask, seg.shift);
+                    printf("\t\t  seg offset=0x%04zX width=%zu mask=0x%08X shift=%zd\n", seg.offset, seg.width, seg.mask, seg.shift);
                 }
                 idx++;
             }
