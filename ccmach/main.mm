@@ -43,7 +43,8 @@ struct symbolic_offset {
     NSArray                *tokens;
     uint16_t                raw_value;
     size_t                  raw_byte_offset;
-    
+    NSString               *virtual_base = nil;
+
     symbolic_offset() {}
 
     symbolic_offset(PLClangTranslationUnit *_tu, NSArray *_tokens) : tu(_tu), tokens(_tokens) {
@@ -69,7 +70,12 @@ struct symbolic_offset {
 
     std::string byte_adjusted_string_rep () {
         NSMutableArray *strs = [NSMutableArray array];
-    
+
+        if (virtual_base != nil) {
+            [strs addObject: virtual_base];
+            [strs addObject: @"+"];
+        }
+
         for (PLClangToken *t in tokens) {
             switch (t.kind) {
                 case PLClangTokenKindIdentifier:
