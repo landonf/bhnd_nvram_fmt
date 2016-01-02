@@ -273,8 +273,6 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     if (nameToken.kind == PLClangTokenKindIdentifier && [nameToken.spelling isEqual: @"NULL"])
         return false;
 
-//    nvar n((NSString *)get_literal(tu, name), tokens);
-
     NSString *name = (NSString *) get_literal(tu, nameToken);
     uint32_t revmask = compute_literal(tu, grouped[1]);
     uint32_t flags = compute_literal(tu, grouped[2]);

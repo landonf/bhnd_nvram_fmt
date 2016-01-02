@@ -492,7 +492,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks /Users/landonf/Documents/Code/Personal/ccmach";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks $(PROJECT_DIR)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -506,7 +506,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 				);
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks /Users/landonf/Documents/Code/Personal/ccmach";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks $(PROJECT_DIR)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
