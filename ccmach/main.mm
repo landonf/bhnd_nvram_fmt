@@ -384,6 +384,7 @@ ar_main(int argc, char * const argv[])
         nvar *n = &(*nvars)[i];
 
         std::string name = n->name.UTF8String;
+        uint32_t flags = n->flags;
         uint16_t offset = n->unaligned_off();
         size_t width = n->width();
         uint32_t valmask = n->valmask;
@@ -392,7 +393,7 @@ ar_main(int argc, char * const argv[])
         nvar *c = n;
         while (c->flags & SRFL_MORE) {
             i++;
-            n = &(*nvars)[i];
+            c = &(*nvars)[i];
 
             /* Can't unify sparse continuations */
             if (c->unaligned_off() != (offset + (width / sizeof(uint16_t)))) {
@@ -410,9 +411,10 @@ ar_main(int argc, char * const argv[])
             width += c->width();
             valmask <<= c->width()*8;
             valmask |= c->valmask;
+            flags &= ~SRFL_MORE;
         }
 
-        clean_nvars.emplace_back(n->name, n->revmask, n->flags, n->off, n->off_tokens, valmask);
+        clean_nvars.emplace_back(n->name, n->revmask, flags, n->off, n->off_tokens, valmask);
     }
     
     std::unordered_map<std::string, std::shared_ptr<bhnd_nvram_var>> var_table;
@@ -420,11 +422,6 @@ ar_main(int argc, char * const argv[])
 
     for (size_t i = 0; i < clean_nvars.size(); i++) {
         nvar *n = &clean_nvars[i];
-        while (clean_nvars[i].flags & SRFL_MORE)
-            i++;
-        
-        while (clean_nvars[i].flags & SRFL_ARRAY)
-            i++;
     
         std::string name = n->name.UTF8String;
         uint32_t revmask = n->revmask;
@@ -432,6 +429,10 @@ ar_main(int argc, char * const argv[])
         uint16_t offset = n->unaligned_off();
         size_t width = n->width();
         uint32_t valmask = n->valmask;
+
+        warnx("%s", name.c_str());
+        if (name.length() == 0)
+            errx(EXIT_FAILURE, "variable has zero-length name");
 
         /* Generate the basic bhnd_nvram_var record */
         auto v = std::make_shared<bhnd_nvram_var>();
@@ -454,7 +455,7 @@ ar_main(int argc, char * const argv[])
             v->type = BHND_NVRAM_DT_UINT;
             v->fmt = BHND_NVRAM_SFMT_HEX;
         } else {
-            warnx("%s: unknown type (0x%x)!", name.c_str(), flags);
+            /* Default behavior */
             v->type = BHND_NVRAM_DT_UINT;
             v->fmt = BHND_NVRAM_SFMT_HEX;
         }
@@ -470,13 +471,11 @@ ar_main(int argc, char * const argv[])
         if (flags & SRFL_NOVAR)
             v->flags |= BHND_NVRAM_VF_MFGINT;
 
+        /* Compare against previous variable with this name, or
+         * register the new variable */
         if (var_table.count(name) == 0) {
-            // TODO - we won't have zero-length names once we
-            // properly handle arrays and sparse continuations.
-            if (name.length() > 0) {
-                vars.push_back(v);
-                var_table.insert({name, v});
-            }
+            vars.push_back(v);
+            var_table.insert({name, v});
         } else {
             auto orig = var_table.at(name);
 
@@ -491,7 +490,45 @@ ar_main(int argc, char * const argv[])
 
             v = orig;
         }
+
+        /* Handle array/sparse continuation records */
+        std::vector<bhnd_sprom_value> vals;
+        if (clean_nvars[i].flags & SRFL_ARRAY) {
+            do {
+                auto c = &clean_nvars[i];
+                bhnd_sprom_value val;
+                
+                val.segs.push_back({
+                    c->unaligned_off(),
+                    c->width(),
+                    c->valmask,
+                    0 /* TODO: Shift */
+                });
+                
+                while (c->flags & SRFL_MORE) {
+                    i++;
+                    auto c = &clean_nvars[i];
+
+                    val.segs.push_back({
+                        c->unaligned_off(),
+                        c->width(),
+                        c->valmask,
+                        0 /* TODO: Shift */
+                    });
+                }
+
+                vals.push_back(val);
+                i++;
+            } while (clean_nvars[i].flags & SRFL_ARRAY);
+        } else {
+            
+            while (clean_nvars[i].flags & SRFL_MORE) {
+                i++;
+            }
+        }
         
+        v->sprom_descs.push_back({{0,0}, vals});
+
 #if 0
         NSString *offstr = [n->off_tokens componentsJoinedByString:@""];
         
