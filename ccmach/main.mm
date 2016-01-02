@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <iostream>
 #include <iomanip>
 
@@ -29,7 +30,14 @@ using namespace std;
 static uint32_t     compute_literal(PLClangTranslationUnit *tu, NSArray *tokens);
 static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
-/** An offset symbol */
+/** A symbolic constant definition */
+struct symbolic_constant {
+    PLClangTranslationUnit *tu;
+    PLClangToken           *token;
+    std::string name() const { return token.spelling.UTF8String; }
+};
+
+/** A symbolic offset definition */
 struct symbolic_offset {
     PLClangTranslationUnit *tu;
     NSArray                *tokens;
@@ -44,7 +52,21 @@ struct symbolic_offset {
         /** bcmsrom offsets assume 16-bit pointer arithmetic */
         raw_byte_offset = raw_value * sizeof(uint16_t);
     }
-    
+
+    vector<symbolic_constant> referenced_constants () {
+        vector<symbolic_constant> ret;
+        for (PLClangToken *t in tokens) {
+            switch (t.kind) {
+                case PLClangTokenKindIdentifier:
+                    ret.push_back({tu, t});
+                    break;
+                default:
+                    break;
+            }
+        }
+        return ret;
+    }
+
     std::string byte_adjusted_string_rep () {
         NSMutableArray *strs = [NSMutableArray array];
     
@@ -450,10 +472,6 @@ ar_main(int argc, char * const argv[])
         uint16_t offset = n->byte_off();
         size_t width = n->width();
         uint32_t valmask = n->valmask;
-    
-        if (!n->off.isSimple()) {
-            cout << to_string(n->off) << " -> " << n->off.byte_adjusted_string_rep() << "\n";
-        }
 
         /* Unify unnecessary continuations */
         nvar *c = n;
@@ -485,10 +503,18 @@ ar_main(int argc, char * const argv[])
     
     std::unordered_map<std::string, std::shared_ptr<bhnd_nvram_var>> var_table;
     std::vector<std::shared_ptr<bhnd_nvram_var>> vars;
+    std::unordered_map<std::string, symbolic_constant> consts;
 
     for (size_t i = 0; i < clean_nvars.size(); i++) {
         nvar *n = &clean_nvars[i];
-    
+        
+        /* Record symbolic constants that we'll need to preserve */
+        auto refconst = n->off.referenced_constants();
+        for (const auto &rc : refconst) {
+            if (consts.count(rc.name()) == 0)
+                consts.insert({rc.name(), rc});
+        }
+
         std::string name = n->name.UTF8String;
         uint32_t revmask = n->revmask;
         uint32_t flags = n->flags;
@@ -610,6 +636,10 @@ ar_main(int argc, char * const argv[])
         uint16_t last_ver = revmask | (((~revmask) << (sizeof(revmask)*8 - ctz)) >> (sizeof(revmask)*8 - ctz));
         
         v->sprom_descs.push_back({{first_ver, last_ver}, vals});
+    }
+
+    for (const auto &np : consts) {
+        printf("k: %s\n", np.first.c_str());
     }
 #if 0
     for (const auto &v : vars) {
