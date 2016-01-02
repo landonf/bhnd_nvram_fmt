@@ -15,37 +15,24 @@
 
 #import <string>
 #import <vector>
+#import <unordered_map>
 
 extern "C" {
 #import "bcm/bcmsrom_tbl.h"
 }
 
-
-struct spromvar {
-    NSString *name;
-    uint32_t revmask;
-    uint32_t flags;
-    uint16_t off;
-    NSArray *off_tokens;
-    uint16_t valmask;
-    size_t width;
-    spromvar () {}
-    spromvar (NSString *n, uint32_t _revmask, uint32_t _flags, uint16_t _off, NSArray *_off_tokens,
-          uint16_t _valmask, size_t _width) : name(n), revmask(_revmask), flags(_flags), off(_off),
-    off_tokens(_off_tokens), valmask(_valmask), width(_width) {}
-};
-
+/* A parsed SPROM record from the vendor header file */
 struct nvar {
     NSString *name;
     uint32_t revmask;
     uint32_t flags;
     uint16_t off;
     NSArray *off_tokens;
-    uint16_t valmask;
+    uint32_t valmask;
     nvar () {}
     nvar (NSString *n, uint32_t _revmask, uint32_t _flags, uint16_t _off, NSArray *_off_tokens,
-        uint16_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off),
-        off_tokens(_off_tokens), valmask(_valmask) {}
+          uint32_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off),
+    off_tokens(_off_tokens), valmask(_valmask) {}
     
     uint16_t unaligned_off() const {
         if (valmask & 0xFF00)
@@ -55,16 +42,93 @@ struct nvar {
     }
     
     size_t width() const {
-        size_t w = 2;
-        if (!(valmask & 0xFF00))
+        size_t w = 4;
+        if (!(valmask & 0xFF000000))
             w -= 1;
-
-        if (!(valmask & 0x00FF))
+        
+        if (!(valmask & 0x00FF0000))
+            w -= 1;
+        
+        if (!(valmask & 0x0000FF00))
+            w -= 1;
+        
+        if (!(valmask & 0x000000FF))
             w -= 1;
         
         return w;
     }
 };
+
+
+/*
+ * A copy of our output target's types, modified to support generating
+ * output code, allow use of std::vector instead of C arrays, etc.
+ */
+
+/** NVRAM primitive data types */
+typedef enum {
+    BHND_NVRAM_DT_UINT,	/**< unsigned integer */
+    BHND_NVRAM_DT_SINT,	/**< signed integer */
+    BHND_NVRAM_DT_MAC48,	/**< MAC-48 address */
+    BHND_NVRAM_DT_LEDDC,	/**< LED PWM duty-cycle */
+    BHND_NVRAM_DT_ASCII	/**< ASCII character */
+} bhnd_nvram_dt;
+
+/** NVRAM data type string representations */
+typedef enum {
+    BHND_NVRAM_SFMT_HEX,	/**< hex string format */
+    BHND_NVRAM_SFMT_SDEC,	/**< signed decimal format */
+    BHND_NVRAM_SFMT_CCODE,	/**< country code format (ascii string) */
+    BHND_NVRAM_SFMT_MACADDR,	/**< mac address (canonical form, hex octets,
+                                 seperated with ':') */
+} bhnd_nvram_sfmt;
+
+/** NVRAM variable flags */
+enum {
+    BHND_NVRAM_VF_DFLT	= 0,
+    BHND_NVRAM_VF_ARRAY	= (1<<0),	/**< variable is an array */
+    BHND_NVRAM_VF_MFGINT	= (1<<1),	/**< mfg-internal variable; should not be externally visible */
+    BHND_NVRAM_VF_IGNALL1	= (1<<2)	/**< hide variable if its value has all bits set. */
+};
+
+#define	BHND_SPROMREV_MAX	UINT16_MAX	/**< maximum supported SPROM revision */
+
+/** SPROM revision compatibility declaration */
+struct bhnd_sprom_compat {
+    uint16_t	first;	/**< first compatible SPROM revision */
+    uint16_t	last;	/**< last compatible SPROM revision, or BHND_SPROMREV_MAX */
+};
+
+/** SPROM value segment descriptor */
+struct bhnd_sprom_vseg {
+    uint16_t	offset;	/**< byte offset within SPROM */
+    size_t		width;	/**< 1, 2, or 4 bytes */
+    uint32_t	mask;	/**< mask to be applied to the value */
+    size_t		shift;	/**< shift to be applied to the value */
+};
+
+/** SPROM value descriptor */
+struct bhnd_sprom_value {
+    std::vector<bhnd_sprom_vseg>	segs;		/**< segment(s) containing this value */
+};
+
+/** SPROM-specific variable definition */
+struct bhnd_sprom_var {
+    const bhnd_sprom_compat	 compat;	/**< sprom compatibility declaration */
+    std::vector<bhnd_sprom_value> values;	/**< value descriptor(s) */
+};
+
+/** NVRAM variable definition */
+struct bhnd_nvram_var {
+    std::string		name;		/**< variable name */
+    bhnd_nvram_dt		 type;		/**< base data type */
+    bhnd_nvram_sfmt		 fmt;		/**< string format */
+    uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
+    size_t			 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
+    
+    std::vector<bhnd_sprom_var>	sprom_descs;	/**< SPROM-specific variable descriptors */
+};
+
 
 static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
@@ -314,38 +378,121 @@ ar_main(int argc, char * const argv[])
         return PLClangCursorVisitContinue;
     }];
 
+
+    std::vector<nvar> clean_nvars;
     for (size_t i = 0; i < nvars->size(); i++) {
         nvar *n = &(*nvars)[i];
 
-        NSString *name = n->name;
+        std::string name = n->name.UTF8String;
+        uint16_t offset = n->unaligned_off();
+        size_t width = n->width();
+        uint32_t valmask = n->valmask;
+
+        /* Unify unnecessary continuations */
+        nvar *c = n;
+        while (c->flags & SRFL_MORE) {
+            i++;
+            n = &(*nvars)[i];
+
+            /* Can't unify sparse continuations */
+            if (c->unaligned_off() != (offset + (width / sizeof(uint16_t)))) {
+                warnx("%s: sparse continuation (%hu, %hu, %zu)", name.c_str(), c->unaligned_off(), offset, width);
+                i--;
+                break;
+            }
+
+            if (c->revmask != 0 && c->revmask != n->revmask)
+                errx(EXIT_FAILURE, "%s: continuation has non-matching revmask", name.c_str());
+
+            if (c->valmask != 0xFFFF)
+                errx(EXIT_FAILURE, "%s: unsupported valmask", name.c_str());
+
+            width += c->width();
+            valmask <<= c->width()*8;
+            valmask |= c->valmask;
+        }
+
+        clean_nvars.emplace_back(n->name, n->revmask, n->flags, n->off, n->off_tokens, valmask);
+    }
+    
+    std::unordered_map<std::string, std::shared_ptr<bhnd_nvram_var>> var_table;
+    std::vector<std::shared_ptr<bhnd_nvram_var>> vars;
+
+    for (size_t i = 0; i < clean_nvars.size(); i++) {
+        nvar *n = &clean_nvars[i];
+        while (clean_nvars[i].flags & SRFL_MORE)
+            i++;
+        
+        while (clean_nvars[i].flags & SRFL_ARRAY)
+            i++;
+    
+        std::string name = n->name.UTF8String;
         uint32_t revmask = n->revmask;
         uint32_t flags = n->flags;
         uint16_t offset = n->unaligned_off();
         size_t width = n->width();
         uint32_t valmask = n->valmask;
 
-        /* Try to unify continuations; the only time this seems to
-         * fail is with the early boards that used a sparse 32-bit boardflag
-         * layout */
-        while (n->flags & SRFL_MORE) {
-            i++;
-            n = &(*nvars)[i];
-
-            if (n->unaligned_off() != (offset + (width / sizeof(uint16_t)))) {
-                warnx("%s: sparse continuation (%hu, %hu, %zu)", name.UTF8String, n->unaligned_off(), offset, width);
-                i--;
-                break;
-            }
-
-            if (n->revmask != 0 && n->revmask != revmask)
-                errx(EXIT_FAILURE, "%s: continuation has non-matching revmask", name.UTF8String);
-
-            if (n->valmask != 0xFFFF)
-                errx(EXIT_FAILURE, "%s: unsupported valmask", name.UTF8String);
-
-            width += n->width();
+        /* Generate the basic bhnd_nvram_var record */
+        auto v = std::make_shared<bhnd_nvram_var>();
+        v->name = name;
+        
+        /* Determine fmt and type */
+        if (flags & SRFL_CCODE) {
+            v->type = BHND_NVRAM_DT_ASCII;
+            v->fmt = BHND_NVRAM_SFMT_CCODE;
+        } else if (flags & SRFL_ETHADDR) {
+            v->type = BHND_NVRAM_DT_MAC48;
+            v->fmt = BHND_NVRAM_SFMT_MACADDR;
+        } else if (flags & SRFL_LEDDC) {
+            v->type = BHND_NVRAM_DT_LEDDC;
+            v->fmt = BHND_NVRAM_SFMT_HEX;
+        } else if (flags & SRFL_PRSIGN) {
+            v->type = BHND_NVRAM_DT_SINT;
+            v->fmt = BHND_NVRAM_SFMT_SDEC;
+        } else if (flags & SRFL_PRHEX) {
+            v->type = BHND_NVRAM_DT_UINT;
+            v->fmt = BHND_NVRAM_SFMT_HEX;
+        } else {
+            warnx("%s: unknown type (0x%x)!", name.c_str(), flags);
+            v->type = BHND_NVRAM_DT_UINT;
+            v->fmt = BHND_NVRAM_SFMT_HEX;
         }
+        
+        /* Apply flags */
+        v->flags = 0;
+        if (flags & SRFL_NOFFS)
+            v->flags |= BHND_NVRAM_VF_IGNALL1;
+        
+        if (flags & SRFL_ARRAY)
+            v->flags |= BHND_NVRAM_VF_ARRAY;
+        
+        if (flags & SRFL_NOVAR)
+            v->flags |= BHND_NVRAM_VF_MFGINT;
 
+        if (var_table.count(name) == 0) {
+            // TODO - we won't have zero-length names once we
+            // properly handle arrays and sparse continuations.
+            if (name.length() > 0) {
+                vars.push_back(v);
+                var_table.insert({name, v});
+            }
+        } else {
+            auto orig = var_table.at(name);
+
+            if (orig->type != v->type)
+                errx(EXIT_FAILURE, "%s: type mismatch (%u vs %u)", name.c_str(), orig->type, v->type);
+
+            if (orig->fmt != v->fmt)
+                errx(EXIT_FAILURE, "fmt mismatch");
+
+            if (orig->flags != v->flags)
+                errx(EXIT_FAILURE, "flag mismatch");
+
+            v = orig;
+        }
+        
+#if 0
         NSString *offstr = [n->off_tokens componentsJoinedByString:@""];
         
         const char *type = "???";
@@ -360,13 +507,12 @@ ar_main(int argc, char * const argv[])
                 type = "u32";
                 break;
         }
-        printf("%s:\t0x%x 0x%x %s(0x%08hX) 0x%x (%s%s)\n", name.UTF8String, revmask, flags, offstr.UTF8String, offset, valmask, type, (flags & SRFL_ARRAY) ? "[]" : "");
+        printf("%s:\t0x%x 0x%x %s(0x%08hX) 0x%x (%s%s)\n", name.c_str(), revmask, flags, offstr.UTF8String, offset, valmask, type, (flags & SRFL_ARRAY) ? "[]" : "");
         
         int ctz = __builtin_ctz(revmask);
         printf("\tmin-ver = %u\n", (1<<ctz));
         printf("\tmax-ver = %u\n", revmask);
-        
-        // TODO - produce output tables.
+#endif
     }
 
     return (0);
