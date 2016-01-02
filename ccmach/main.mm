@@ -26,26 +26,52 @@ extern "C" {
 
 using namespace std;
 
+static uint32_t compute_literal(PLClangTranslationUnit *tu, NSArray *tokens);
+
+/** An offset symbol */
+struct symbolic_offset {
+    PLClangTranslationUnit *tu;
+    NSArray                *tokens;
+    uint16_t                raw_value;
+    size_t                  raw_byte_offset;
+    
+    symbolic_offset() {}
+
+    symbolic_offset(PLClangTranslationUnit *_tu, NSArray *_tokens) : tu(_tu), tokens(_tokens) {
+        raw_value = compute_literal(tu, tokens);
+        
+        /** bcmsrom offsets assume 16-bit pointer arithmetic */
+        raw_byte_offset = raw_value * sizeof(uint16_t);
+    }
+
+    bool isSimple() const {
+        // TODO
+        return false;
+    };
+};
+
 /* A parsed SPROM record from the vendor header file */
 struct nvar {
     NSString *name;
     uint32_t revmask;
     uint32_t flags;
-    uint16_t off;
-    NSArray *off_tokens;
+    symbolic_offset off;
     uint32_t valmask;
     nvar () {}
-    nvar (NSString *n, uint32_t _revmask, uint32_t _flags, uint16_t _off, NSArray *_off_tokens,
-          uint32_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off),
-    off_tokens(_off_tokens), valmask(_valmask) {}
-    
-    uint16_t unaligned_off() const {
-        if (valmask & 0xFF00)
-            return off;
-        else
-            return off+sizeof(uint8_t);
+    nvar (NSString *n,
+          uint32_t _revmask,
+          uint32_t _flags,
+          symbolic_offset _off,
+          uint32_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off), valmask(_valmask) {}
+
+    size_t byte_off() const {
+        size_t offset = off.raw_byte_offset;
+        if (!(valmask & 0xFF00))
+            offset += sizeof(uint8_t);
+        
+        return offset;
     }
-    
+
     size_t width() const {
         size_t w = 4;
         if (!(valmask & 0xFF000000))
@@ -63,6 +89,7 @@ struct nvar {
         return w;
     }
 };
+
 
 
 /*
@@ -106,7 +133,7 @@ struct bhnd_sprom_compat {
 
 /** SPROM value segment descriptor */
 struct bhnd_sprom_vseg {
-    uint16_t	offset;	/**< byte offset within SPROM */
+    size_t      offset;	/**< byte offset within SPROM */
     size_t		width;	/**< 1, 2, or 4 bytes */
     uint32_t	mask;	/**< mask to be applied to the value */
     size_t		shift;	/**< shift to be applied to the value */
@@ -281,11 +308,10 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     NSString *name = (NSString *) get_literal(tu, nameToken);
     uint32_t revmask = compute_literal(tu, grouped[1]);
     uint32_t flags = compute_literal(tu, grouped[2]);
-    NSArray *off_tokens = (NSArray *) grouped[3];
-    uint16_t off = compute_literal(tu, off_tokens);
+    symbolic_offset off(tu, (NSArray *) grouped[3]);
     uint32_t valmask = compute_literal(tu, grouped[4]);
 
-    *nout = nvar(name, revmask, flags, off, off_tokens, valmask);
+    *nout = nvar(name, revmask, flags, off, valmask);
     return true;
 }
 
@@ -388,7 +414,7 @@ ar_main(int argc, char * const argv[])
 
         std::string name = n->name.UTF8String;
         uint32_t flags = n->flags;
-        uint16_t offset = n->unaligned_off();
+        uint16_t offset = n->byte_off();
         size_t width = n->width();
         uint32_t valmask = n->valmask;
 
@@ -399,8 +425,8 @@ ar_main(int argc, char * const argv[])
             c = &(*nvars)[i];
 
             /* Can't unify sparse continuations */
-            if (c->unaligned_off() != (offset + (width / sizeof(uint16_t)))) {
-                warnx("%s: sparse continuation (%hu, %hu, %zu)", name.c_str(), c->unaligned_off(), offset, width);
+            if (c->byte_off() != offset + width) {
+                warnx("%s: sparse continuation (%zx, %hu, %zu)", name.c_str(), c->byte_off(), offset, width);
                 i--;
                 break;
             }
@@ -417,7 +443,7 @@ ar_main(int argc, char * const argv[])
             flags &= ~SRFL_MORE;
         }
 
-        clean_nvars.emplace_back(n->name, n->revmask, flags, n->off, n->off_tokens, valmask);
+        clean_nvars.emplace_back(n->name, n->revmask, flags, n->off, valmask);
     }
     
     std::unordered_map<std::string, std::shared_ptr<bhnd_nvram_var>> var_table;
@@ -494,7 +520,7 @@ ar_main(int argc, char * const argv[])
         std::vector<bhnd_sprom_value> vals;
         bhnd_sprom_value base_val;
         bhnd_sprom_vseg base_seg = {
-            n->unaligned_off(),
+            n->byte_off(),
             n->width(),
             n->valmask,
             static_cast<size_t>(__builtin_ctz(n->valmask))
@@ -506,7 +532,7 @@ ar_main(int argc, char * const argv[])
             n = &clean_nvars[i];
             
             base_val.segs.push_back({
-                n->unaligned_off(),
+                n->byte_off(),
                 n->width(),
                 n->valmask,
                 static_cast<size_t>(__builtin_ctz(n->valmask))
@@ -521,7 +547,7 @@ ar_main(int argc, char * const argv[])
             n = &clean_nvars[i];
 
             val.segs.push_back({
-                n->unaligned_off(),
+                n->byte_off(),
                 n->width(),
                 n->valmask,
                 static_cast<size_t>(__builtin_ctz(n->valmask))
@@ -532,7 +558,7 @@ ar_main(int argc, char * const argv[])
                 n = &clean_nvars[i];
                 
                 val.segs.push_back({
-                    n->unaligned_off(),
+                    n->byte_off(),
                     n->width(),
                     n->valmask,
                     static_cast<size_t>(__builtin_ctz(n->valmask))
@@ -550,15 +576,16 @@ ar_main(int argc, char * const argv[])
     }
 
     for (const auto &v : vars) {
-        cout << hex << uppercase << setfill('0');
-        cout << v->name << ": " << "\n";
+        printf("%s:\n", v->name.c_str());
         for (const auto &t : v->sprom_descs) {
-            cout << "\trevs " << setw(4) << "0x" << t.compat.first << " - " << "0x" << t.compat.last << "\n";
+            printf("\trevs 0x%04X - 0x%04X\n", t.compat.first, t.compat.last);
+            size_t idx = 0;
             for (const auto &val : t.values) {
-                cout << "\tvn:" << "\n";
+                printf("\t\t%s[%zu]\n", v->name.c_str(), idx);
                 for (const auto &seg : val.segs) {
-                    cout << "\t\tseg " << "0x" << setw(4) << seg.offset << dec << " width " << seg.width << hex << " mask 0x" << setw(8) << seg.mask << " shift " << dec << seg.shift << "\n";
+                    printf("\t\t  seg offset=0x%04zX width=%zu mask=0x%08X shift=%zu\n", seg.offset, seg.width, seg.mask, seg.shift);
                 }
+                idx++;
             }
         }
     }
