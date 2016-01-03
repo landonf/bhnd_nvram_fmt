@@ -224,6 +224,11 @@ struct bhnd_nvram_var {
     size_t			 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
     
     std::vector<bhnd_sprom_var>	sprom_descs;	/**< SPROM-specific variable descriptors */
+    
+    
+    bool operator < (const bhnd_nvram_var &other) const {
+        return ([@(name.c_str()) compare:@(other.name.c_str()) options:NSNumericSearch] == NSOrderedAscending);
+    }
 };
 
 
@@ -499,20 +504,21 @@ private:
                 errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
             uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
 
-            for (auto &n : *nvars) {
-                for (uint32_t i = 0; i < max; i++) {
+            for (uint32_t i = 0; i < max; i++) {
+                for (const auto &n : *nvars) {
                     NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
                     PLClangCursor *c = api[path];
                     if (c == nil)
                         errx(EXIT_FAILURE, "missing %s", path.UTF8String);
                     
-                    auto gn = n;
-                    gn.name = [n.name stringByAppendingFormat: @"%u", i];
+                    nvar gn = n;
+                    if ([n.name length] > 0)
+                        gn.name = [n.name stringByAppendingFormat: @"%u", i];
+                    
                     gn.off.virtual_base = path;
                     generated->push_back(gn);
                 }
             }
-
         }
 
         return generated;
@@ -745,6 +751,10 @@ public:
             
             v->sprom_descs.push_back({{first_ver, last_ver}, vals});
         }
+
+        sort(vars.begin(), vars.end(), [](const shared_ptr<bhnd_nvram_var> &lhs, const shared_ptr<bhnd_nvram_var> &rhs) {
+            return *lhs < *rhs;
+        });
 
     #if 1
         for (const auto &v : vars) {
