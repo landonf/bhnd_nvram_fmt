@@ -1,0 +1,47 @@
+uint boardflags {
+	sfmt	hex;
+	sprom {
+		2-3	u16@0x72;
+		4-7	u16@0x72|u16@0x38;
+		8-15	u16@0x72|u16@0x7A;
+		16-31	u32@0x44;
+		32-255	u32@0x4A;
+		>= 256	u32@0x84;
+	}
+}
+
+leddc ledvariable {
+	sfmt	hex;
+}
+
+ccode cc {
+	sfmt	ascii;
+}
+
+private sint signedvar {
+	sfmt	sdec;
+}
+
+mac48 macaddr {
+	sfmt	macaddr;
+	sprom {
+		revs 256-2047	u8@0x8C (count=48);
+		revs 32-255	u8@0x52 (count=48);
+		revs 16-31	u8@0x4C (count=48);
+		revs 8-15	u8@0x4A (count=48);
+		revs >= 2048	u8@0x90 (count=48);
+	}
+}
+
+
+uint noiselvl5ga2[] {
+	sfmt	hex;
+	sprom {
+		>= 2048	{
+			u8@0x1BE (mask=0x7C00, shift=10),
+			u8@0x1C0 (mask=0x7C00, shift=10),
+			u8@0x1C2 (mask=0x7C00, shift=10),
+			u8@0x1C4 (mask=0x7C00, shift=10);
+		}
+	}
+}

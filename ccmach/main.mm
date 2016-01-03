@@ -648,7 +648,7 @@ ar_main(int argc, char * const argv[])
     for (const auto &v : vars) {
         printf("%s:\n", v->name.c_str());
         for (const auto &t : v->sprom_descs) {
-            printf("\trevs 0x%04X - 0x%04X\n", t.compat.first, t.compat.last);
+            printf("\trevs %u - %u\n", t.compat.first, t.compat.last);
             size_t idx = 0;
             for (const auto &val : t.values) {
                 printf("\t\t%s[%zu]\n", v->name.c_str(), idx);
