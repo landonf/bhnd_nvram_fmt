@@ -17,6 +17,12 @@ BEGIN {
 	# Maximum revision
 	REV_MAX = 65535
 
+	# Format Constants
+	SFMT["hex"]	= "BHND_NVRAM_SFMT_HEX"
+	SFMT["sdec"]	= "BHND_NVRAM_SFMT_SDEC"
+	SFMT["ascii"]	= "BHND_NVRAM_SFMT_ASCII"
+	SFMT["macaddr"]	= "BHND_NVRAM_SFMT_MACADDR"
+
 	# Common Regexs
 	TYPES_REGEX = "(uint|sint|leddc|ccode|mac48)"
 	IDENT_REGEX = "[A-Za-z][A-Za-z0-9]*"
@@ -272,7 +278,7 @@ $1 == "revs" && allow_def("revs") {
 	}
 
 	_revstr = "{" _revstr "}"
-	debug(_revstr)
+	debug("revs " _revstr " {")
 	open_block($1, "", _bstart)
 }
 
@@ -303,10 +309,14 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 
 # variable parameters
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
-	if ($1 == "sfmt")
-		debug($1 "=" $2)
-	else
+	if ($1 == "sfmt") {
+		if (!$2 in SFMT) {
+			error("invalid sfmt '" $2 "'")
+		}
+		debug($1 "=" SFMT[$2])
+	} else {
 		error("unknown parameter " $1)
+	}
 	next
 }
 
