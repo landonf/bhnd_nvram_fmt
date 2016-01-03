@@ -78,18 +78,20 @@ function getline_matching (regex)
 }
 
 # Find opening brace and adjust block depth
-# Returns 1 if the current line should be discarded
-# XXX does not properly handle additional content on the current line
-# Need to trim current line
-function open_block (type, name, check_first)
+# If optional is true and no open brace is found, 0 is returned. Otherwise, 1.
+function open_block (type, name, check_first, optional)
 {
 	if (check_first == "{" || getline_matching("^[ \t]*{") > 0) {
 		depth++
 		push(BLOCK_START, NR)
 		push(BLOCK_NAME, name)
 		push(BLOCK_TYPE, type)
-		return
+		return 1
 	}
+
+	if (optional)
+		return 0
+
 	error("found '"$1 "' instead of expected '{' for '" name "'")
 }
 
@@ -247,16 +249,20 @@ $1 == "}" && in_block("sprom") {
 # revs block
 $1 == "revs" && allow_def("revs") {
 	if ($2 ~ "[0-9]*-[0-9*]") {
-		print "range",$2
-		open_block($1, "", $3)
+		_block = open_block($1, "", $3, 1)
 	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
 		print "range",$2,$3
-		open_block($1, "", $4)
+		_block = open_block($1, "", $4, 1)
 	} else if ($2 ~ "[1-9][0-9]*") {
 		print "equality",$2
-		open_block($1, "", $3)
+		_block = open_block($1, "", $3, 1)
 	} else {
 		error("invalid rev designator")
+	}
+
+	# Single line behavior
+	if (!_block) {
+		print "do single line match on",$1,$2,$3,$4
 	}
 
 	next
@@ -281,9 +287,16 @@ $1 == "private" && $2 ~ TYPES_REGEX && allow_def("var") {
 }
 
 # Variable definition
-$1 ~ TYPES_REGEX && allow_def("var") {
-	type = $1
-	name = $2
+($1 ~ TYPES_REGEX || $2 ~ TYPES_REGEX) && allow_def("var") {
+	if ($1 !~ TYPES_REGEX) {
+		type = $2
+		name = $3
+		open_block("var", name, $4)
+	} else {
+		type = $1
+		name = $2
+		open_block("var", name, $3)
+	}
 
 	# Check for and remove array[] specifier
 	if (sub(/\[\]$/, "", name) > 0)
@@ -292,7 +305,6 @@ $1 ~ TYPES_REGEX && allow_def("var") {
 	print type,name,array
 #	//printf("%s %s %s\n", type, name, array)
 
-	open_block("var", name, $3)
 	next
 }
 
