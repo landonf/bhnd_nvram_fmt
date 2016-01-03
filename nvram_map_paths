@@ -57,11 +57,11 @@ uint boardflags {
 	}
 }
 
-leddc ledvariable {
+led ledvariable {
 	sfmt	hex
 }
 
-ccode cc {
+cc ccode {
 	sfmt	ascii
 }
 

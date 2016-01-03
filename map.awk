@@ -23,8 +23,15 @@ BEGIN {
 	SFMT["ascii"]	= "BHND_NVRAM_SFMT_ASCII"
 	SFMT["macaddr"]	= "BHND_NVRAM_SFMT_MACADDR"
 
+	# Data Type Constants
+	DTYPE["uint"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["sint"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["mac48"]	= "BHND_NVRAM_DT_MAC48"
+	DTYPE["led"]	= "BHND_NVRAM_DT_LEDDC"
+	DTYPE["cc"]	= "BHND_NVRAM_DT_CCODE"
+
 	# Common Regexs
-	TYPES_REGEX = "(uint|sint|leddc|ccode|mac48)"
+	TYPES_REGEX = "(uint|sint|led|cc|mac48)"
 	IDENT_REGEX = "[A-Za-z][A-Za-z0-9]*"
 
 	# Internal variable names
@@ -236,7 +243,7 @@ $1 == "struct" && allow_def("struct") {
 	if (sub(/\[\]$/, "", $2) == 0)
 		error("expected '" $2 "[]', not '" $2 "'")
 
-	if ($2 !~ "^"IDENT_REGEX"$")
+	if ($2 !~ "^"IDENT_REGEX"$" || $2 ~ "^"TYPES_REGEX"$")
 		error("invalid identifier '" $2 "'")
 
 	debug("struct " $2 " {")
@@ -296,6 +303,9 @@ $1 == "private" && $2 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 
 # variable block
 $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
+	if (!$1 in DTYPE)
+		error("unknown type '" $1 "'")
+
 	type = $1
 	name = $2
 	debug(type " " name " {")
@@ -305,6 +315,7 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 		array = 1
 
 	open_block("var", name, $3)
+	debug("type=" DTYPE[type])
 }
 
 # variable parameters
@@ -348,6 +359,7 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 $1 && allow_def("var") {
 	error("unknown type '" $1 "'")
 }
+
 
 # Generic parse failure
 {
