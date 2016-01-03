@@ -36,11 +36,6 @@ NR == 1 {
 	print " */"
 }
 
-# Save the unmodified source line
-{
-	SRCLINE = $0
-}
-
 function usage ()
 {
 	print "usage: bhnd_nvram_map.awk <input map>"
