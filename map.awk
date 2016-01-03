@@ -87,7 +87,7 @@ function debug (msg)
 {
 	if (!DEBUG)
 		return
-	for (i = 0; i < depth; i++)
+	for (_di = 0; _di < depth; _di++)
 		printf("\t") > "/dev/stderr"
 	print msg > "/dev/stderr"
 }
@@ -289,9 +289,23 @@ $1 == "revs" && allow_def("revs") {
 	open_block($1, "", _bstart)
 }
 
-# revs offset definition
+# offset definition
 $1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+,?" && in_block("revs") {
 	debug("offset="$1)
+	_off[0] = $1
+	_off_elems = 1
+
+	while ($0 ~ ",[ \t]$") {
+		next_line()
+		_off[_off_elems++] = $1
+	}
+
+	for (i = 1; i < NF; i++)
+		debug(i"="$i)
+
+	for (i = 0; i < _off_elems; i++)
+		debug("elem[" i "]="_off[i])
+
 	next
 }
 
