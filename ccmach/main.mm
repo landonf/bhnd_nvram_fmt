@@ -27,7 +27,7 @@ extern "C" {
 
 using namespace std;
 
-static uint32_t     compute_literal(PLClangTranslationUnit *tu, NSArray *tokens);
+static uint32_t     compute_literal_u32(PLClangTranslationUnit *tu, NSArray *tokens);
 static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
 /** A symbolic constant definition */
@@ -48,18 +48,22 @@ struct symbolic_offset {
     symbolic_offset() {}
 
     symbolic_offset(PLClangTranslationUnit *_tu, NSArray *_tokens) : tu(_tu), tokens(_tokens) {
-        raw_value = compute_literal(tu, tokens);
+        raw_value = compute_literal_u32(tu, tokens);
         
         /** bcmsrom offsets assume 16-bit pointer arithmetic */
         raw_byte_offset = raw_value * sizeof(uint16_t);
     }
 
-    vector<symbolic_constant> referenced_constants () {
-        vector<symbolic_constant> ret;
+    vector<string> referenced_constants () {
+        vector<string> ret;
+        
+        if (virtual_base)
+            ret.push_back(virtual_base.UTF8String);
+        
         for (PLClangToken *t in tokens) {
             switch (t.kind) {
                 case PLClangTokenKindIdentifier:
-                    ret.push_back({tu, t});
+                    ret.push_back(t.spelling.UTF8String);
                     break;
                 default:
                     break;
@@ -227,11 +231,16 @@ static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
 static PLClangToken *
 resolve_pre(PLClangTranslationUnit *tu, PLClangToken *t) {
-    PLClangCursor *def = t.cursor.referencedCursor;
+    PLClangCursor *def;
+    if (t.cursor.referencedCursor != nil)
+        def = t.cursor.referencedCursor;
+    else
+        def = t.cursor;
+
     NSArray *tokens = [tu tokensForSourceRange: def.extent];
     
     if (tokens.count < 2)
-        errx(EXIT_FAILURE, "macro def %s missing expected token count", t.spelling.UTF8String);
+        errx(EXIT_FAILURE, "macro def %s unsupported token count %lu", t.spelling.UTF8String, (unsigned long)tokens.count);
 
     return tokens[1];
 }
@@ -273,7 +282,7 @@ get_literal(PLClangTranslationUnit *tu, PLClangToken *t) {
 }
 
 static uint32_t
-compute_literal(PLClangTranslationUnit *tu, NSArray *tokens)
+compute_literal_u32(PLClangTranslationUnit *tu, NSArray *tokens)
 {
     uint32_t v = 0;
     char op = '\0';
@@ -367,10 +376,10 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
         return false;
 
     NSString *name = (NSString *) get_literal(tu, nameToken);
-    uint32_t revmask = compute_literal(tu, grouped[1]);
-    uint32_t flags = compute_literal(tu, grouped[2]);
+    uint32_t revmask = compute_literal_u32(tu, grouped[1]);
+    uint32_t flags = compute_literal_u32(tu, grouped[2]);
     symbolic_offset off(tu, (NSArray *) grouped[3]);
-    uint32_t valmask = compute_literal(tu, grouped[4]);
+    uint32_t valmask = compute_literal_u32(tu, grouped[4]);
 
     *nout = nvar(name, revmask, flags, off, valmask);
     return true;
@@ -449,6 +458,66 @@ private:
         return result;
     }
 
+    shared_ptr<vector<nvar>> extract_nvars (NSString *symbol) {
+        auto nvars = std::make_shared<std::vector<nvar>>();
+        
+        /* Fetch all sromvars */
+        PLClangCursor *tbl = api[symbol];
+        if (tbl == nil)
+            errx(EXIT_FAILURE, "missing %s", symbol.UTF8String);
+        for (PLClangCursor *init in get_array_inits(tbl)) {
+            nvar n;
+            if (extract_struct(tu, init, &n))
+                nvars->push_back(n);
+        }
+        
+        /* Coalesce continuations */
+        return coalesce(nvars);
+    }
+
+    NSArray *get_tokens (PLClangCursor *cursor) {
+        return [tu tokensForSourceRange: cursor.extent];
+    }
+
+    shared_ptr<vector<nvar>> generate_path_vars () {
+        auto nvars = extract_nvars(@"perpath_pci_sromvars");
+        auto generated = make_shared<vector<nvar>>();
+
+        struct pathcfg {
+            NSString *path_pfx;
+            NSString *path_num;
+        } pathcfgs[] = {
+            { @"SROM11_PATH", @"MAX_PATH_SROM_11" },
+            { @"SROM8_PATH", @"MAX_PATH_SROM" },
+            { @"SROM4_PATH", @"MAX_PATH_SROM" },
+            { nil, nil }
+        };
+
+        for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
+            PLClangCursor *maxCursor = api[cfg->path_num];
+            if (maxCursor == nil)
+                errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
+            uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
+
+            for (auto &n : *nvars) {
+                for (uint32_t i = 0; i < max; i++) {
+                    NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
+                    PLClangCursor *c = api[path];
+                    if (c == nil)
+                        errx(EXIT_FAILURE, "missing %s", path.UTF8String);
+                    
+                    auto gn = n;
+                    gn.name = [n.name stringByAppendingFormat: @"%u", i];
+                    gn.off.virtual_base = path;
+                    generated->push_back(gn);
+                }
+            }
+
+        }
+
+        return generated;
+    }
+
 public:
     Extractor(int argc, char * const argv[]) {
         NSError *error;
@@ -521,22 +590,16 @@ public:
         api = symbols;
 
         /* Fetch all PCI sromvars */
-        auto nvars = std::make_shared<std::vector<nvar>>();
-        PLClangCursor *tbl = api[@"pci_sromvars"];
-        if (tbl == nil)
-            errx(EXIT_FAILURE, "missing pci_sromvars");
-        for (PLClangCursor *init in get_array_inits(tbl)) {
-            nvar n;
-            if (extract_struct(tu, init, &n))
-                nvars->push_back(n);
-        }
+        auto nvars = extract_nvars(@"pci_sromvars");
 
-        /* Coalesce continuations */
-        nvars = coalesce(nvars);
-        
-        std::unordered_map<std::string, std::shared_ptr<bhnd_nvram_var>> var_table;
-        std::vector<std::shared_ptr<bhnd_nvram_var>> vars;
-        std::unordered_map<std::string, symbolic_constant> consts;
+        /* Fetch+generate the per-path nvars */
+        auto path_nvars = generate_path_vars();
+        nvars->reserve(nvars->size() + path_nvars->size());
+        nvars->insert(nvars->end(), path_nvars->begin(), path_nvars->end());
+
+        unordered_map<string, shared_ptr<bhnd_nvram_var>> var_table;
+        vector<shared_ptr<bhnd_nvram_var>> vars;
+        unordered_set<string> consts;
 
         for (size_t i = 0; i < nvars->size(); i++) {
             nvar *n = &(*nvars)[i];
@@ -544,8 +607,8 @@ public:
             /* Record symbolic constants that we'll need to preserve */
             auto refconst = n->off.referenced_constants();
             for (const auto &rc : refconst) {
-                if (consts.count(rc.name()) == 0)
-                    consts.insert({rc.name(), rc});
+                if (consts.count(rc) == 0)
+                    consts.insert(rc);
             }
 
             std::string name = n->name.UTF8String;
@@ -591,7 +654,7 @@ public:
             
             if (flags & SRFL_NOVAR)
                 v->flags |= BHND_NVRAM_VF_MFGINT;
-
+            
             /* Compare against previous variable with this name, or
              * register the new variable */
             if (var_table.count(name) == 0) {
@@ -606,8 +669,14 @@ public:
                 if (orig->fmt != v->fmt)
                     errx(EXIT_FAILURE, "fmt mismatch");
 
-                if (orig->flags != v->flags)
-                    errx(EXIT_FAILURE, "flag mismatch");
+                if (orig->flags != v->flags) {
+                    /* VF_ARRAY mismatch is OK, but nothing else is */
+                    if ((orig->flags & ~BHND_NVRAM_VF_ARRAY) != (v->flags & ~BHND_NVRAM_VF_ARRAY))
+                        errx(EXIT_FAILURE, "%s: flag mismatch (0x%X vs. 0x%X)", name.c_str(), orig->flags, v->flags);
+
+                    /* Promote to an array */
+                    orig->flags |= BHND_NVRAM_VF_ARRAY;
+                }
 
                 v = orig;
             }
