@@ -62,16 +62,16 @@ function error(msg) {
 # Advance to the next non-comment input record
 function next_line() {
 	do {
-		ret = getline
-	} while (ret > 0 && $0 ~ /^[ \t]*#.*/) # skip comment lines
-	return ret
+		_result = getline
+	} while (_result > 0 && $0 ~ /^[ \t]*#.*/) # skip comment lines
+	return _result
 }
 
 # Advance to the next input record and verify that it matches @p regex
 function getline_matching(regex) {
-	ret = next_line()
-	if (ret <= 0)
-		return ret
+	_result = next_line()
+	if (_result <= 0)
+		return _result
 
 	if ($0 ~ regex)
 		return 1
@@ -138,9 +138,12 @@ function find_block_close(check_first) {
 /[^ \t]}/ { gsub(/{/, OFS"}", $0) }	# }
 /}[^ \t]/ { gsub(/{/, "}"OFS, $0) }
 
-# Block definition
-$1 == "block[]" {
-	find_block_open($2)
+# Struct definition
+$1 == "struct" && $2 !~ /\[\]$/ {
+	error("expected '" $2 "[]', not '" $2 "'")
+}
+$1 == "struct" && $2 ~ /\[\]$/ {
+	find_block_open($3)
 	if (getline_matching("^[ \t]*sprom[ \t]") <= 0) {
 		error("expected 'sprom' definitions")
 	} else {
@@ -160,6 +163,7 @@ $1 == "block[]" {
 	find_block_close($1)
 	next
 }
+
 
 # Detect private variable definitions
 $1 == "private" {

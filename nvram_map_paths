@@ -1,22 +1,34 @@
-# comment
-block[] {
+#
+# Defines a common variable/data layout, as well as the base offsets within
+# the PCI SPROM at which instances of the structure are encoded.
+#
+# Any variables defined within a `struct` block will be interpreted relative to
+# the provided array of SPROM base addresses.
+#
+# To produce SPROM variable names matching those used in the Broadcom HND
+# ASCII 'key=value\0' NVRAM, the index number of the variable's
+# struct instance will be appended (e.g., given a variable of noiselvl5ga, the
+# generated variable instances will be named noiselvl5ga0, noiselvl5ga1,
+# noiselvl5ga2, noiselvl5ga3 ...)
+#
+struct pathvars[] {
     sprom {
         revs 2-3 {
-            @0x1BE,
-            @0x2BE,
-            @0x3BE,
-            @0x4BE
+            pathvars@0x1BE,
+            pathvars@0x2BE,
+            pathvars@0x3BE,
+            pathvars@0x4BE
         }
         revs 4-8 {
-            @0x1000,
-            @0x2000,
-            @0x3000,
-            @0x4000
+            pathvars@0x1000,
+            pathvars@0x2000,
+            pathvars@0x3000,
+            pathvars@0x4000
         }
         revs >= 11 {
-            @0x1000,
-            @0x2000,
-            @0x3000
+            pathvars@0x1000,
+            pathvars@0x2000,
+            pathvars@0x3000
         }
     }
 
