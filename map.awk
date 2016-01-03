@@ -43,6 +43,7 @@ function find_block_open(check_first) {
 	if (check_first == "{") {
 		BLOCK_START = NR
 		depth++
+		return
 	}
 
 	if (getline_matching("^[ \t]*{") > 0) {
@@ -57,8 +58,10 @@ function find_block_open(check_first) {
 
 # Find closing brace and adjust block depth
 function find_block_close(check_first) {
-	if (check_first == "}")
+	if (check_first == "}") {
 		depth--
+		return
+	}
 
 	if (getline_matching("^[ \t]*}") > 0) {
 		depth--

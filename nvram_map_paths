@@ -1,7 +1,5 @@
 # comment
-block[]
-{
-}
+block[] {
     sprom {
         revs 2-3 {
             @0x1BE,
