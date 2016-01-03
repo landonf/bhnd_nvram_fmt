@@ -14,6 +14,9 @@ BEGIN {
 	# Enable debug output
 	DEBUG = 1
 
+	# Maximum revision
+	REV_MAX = 65535
+
 	# Common Regexs
 	TYPES_REGEX = "(uint|sint|leddc|ccode|mac48)"
 	IDENT_REGEX = "[A-Za-z][A-Za-z0-9]*"
@@ -242,18 +245,35 @@ $1 == "sprom" && allow_def("sprom") {
 
 # revs block
 $1 == "revs" && allow_def("revs") {
+	_revstr = ""
+	_bstart = $3
+
 	if ($2 ~ "[0-9]*-[0-9*]") {
-		debug("revs " $2 " {")
-		open_block($1, "", $3)
+		_revstr = $2
+		sub("-", ",", _revstr)
 	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
-		debug("revs " $2 "-" $3 " {")
-		open_block($1, "", $4)
+		if ($2 == ">") {
+			_revstr = int($3)+1","REV_MAX
+		} else if ($2 == ">=") {
+			_revstr = $3","REV_MAX
+		} else if ($2 == "<" && int($3) > 0) {
+			_revstr = "0,"int($3)-1
+		} else if ($2 == "<=") {
+			_revstr = "0,"$3
+		} else {
+			error("invalid revision descriptor")
+		}
+
+		_bstart = $4
 	} else if ($2 ~ "[1-9][0-9]*") {
-		debug("revs " $2 " {")
-		open_block($1, "", $3)
+		_revstr = $2 "," $2
 	} else {
-		error("invalid rev designator")
+		error("invalid revision descriptor")
 	}
+
+	_revstr = "{" _revstr "}"
+	debug(_revstr)
+	open_block($1, "", _bstart)
 }
 
 # revs offset definition
