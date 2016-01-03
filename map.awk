@@ -290,7 +290,7 @@ $1 == "revs" && allow_def("revs") {
 }
 
 # revs offset definition
-$1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+[,;]?" && in_block("revs") {
+$1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+,?" && in_block("revs") {
 	debug("offset="$1)
 	next
 }
@@ -331,8 +331,8 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	next
 }
 
-# Ignore comments
-/^[ \t]*#.*/ {
+# Skip comment and blank lines
+/^#/ || /^$/ {
 	next
 }
 
@@ -348,11 +348,6 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 # Report unbalanced '}'
 /}/ && in_block("NONE") {
 	error("unbalanced '}'")
-}
-
-# Ignore blank lines
-/^[ \t]*$/ {
-	next
 }
 
 # Invalid variable type
