@@ -68,7 +68,6 @@ function next_line ()
 {
 	do {
 		_result = getline
-		SRCLINE = $0
 	} while (_result > 0 && $0 ~ /^[ \t]*#.*/) # skip comment lines
 	return _result
 }
@@ -235,19 +234,19 @@ $1 == "revs" && allow_def("revs") {
 	}
 }
 
-# offset definition
+# revs offset definition
 $1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+[,;]?" && in_block("revs") {
 	dprint("offset="$1)
 	next
 }
 
-# Detect private variable flag
+# private variable block
 $1 == "private" && $2 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	sub("^private"FS, "", $0)
 	_private = 1
 }
 
-# Variable definition
+# variable block
 $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	type = $1
 	name = $2
@@ -260,7 +259,7 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	open_block("var", name, $3)
 }
 
-# Variable parameters
+# variable parameters
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	if ($1 == "sfmt")
 		dprint($1 "=" $2)
@@ -269,6 +268,12 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	next
 }
 
+# Ignore comments
+/^[ \t]*#.*/ {
+	next
+}
+
+# Close blocks
 /}/ && !in_block("NONE") {
 	while (!in_block("NONE") && $0 ~ "}") {
 		close_block();
@@ -277,14 +282,9 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	next
 }
 
-# Extra '}'
+# Report unbalanced '}'
 /}/ && in_block("NONE") {
 	error("unbalanced '}'")
-}
-
-# Ignore comments
-/^[ \t]*#.*/ {
-	next
 }
 
 # Ignore blank lines
@@ -292,12 +292,12 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	next
 }
 
-# Variable definition fallback case
+# Invalid variable type
 $1 && allow_def("var") {
 	error("unknown type '" $1 "'")
 }
 
-# Fallback case
+# Generic parse failure
 {
 	error("unrecognized statement")
 }
