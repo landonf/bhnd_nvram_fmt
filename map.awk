@@ -3,12 +3,21 @@
 #-
 #Copyright...
 
+
 BEGIN {
 	if (ARGC != 2)
 		usage()
 
 	depth = 0
 	symbols[depth,"_file"] = FILENAME
+
+	# Common Regexs
+	TYPES_REGEX = "(uint|sint|leddc|ccode|mac48)"
+
+	# Internal variable names
+	BLOCK_TYPE = "_block_type"
+	BLOCK_NAME = "_block_name"
+	BLOCK_START = "_block_start"
 }
 
 NR == 1 {
@@ -19,56 +28,44 @@ NR == 1 {
 	print " */"
 }
 
-function lookup(name) {
-	for (i = 0; i < depth; i++) {
-		if ((depth-i,name) in symbols)
-			return symbols[depth-i,name]
-	}
-
-	error("'" name "' is undefined")
+# Save the unmodified source line
+{
+	SRCLINE = $0
 }
 
-function push(name, value) {
-	symbols[depth,name] = value
-}
-
-function set(name, value) {
-	for (i = 0; i < depth; i++) {
-		if ((depth-i,name) in symbols) {
-			symbols[depth-i,name] = value
-			return
-		}
-	}
-
-	# No existing value
-	push(name, value)
-}
-
-function usage() {
+function usage ()
+{
 	print "usage: bhnd_nvram_map.awk <input map>"
 	exit 1
 }
 
-function warn(msg) {
+# Print a warning to stderr
+function warn (msg)
+{
 	print "warning:", msg, "at", FILENAME, "line", NR > "/dev/stderr"
 }
 
-function error(msg) {
-	print "error:", msg, "at", FILENAME, "line", NR ":\n\t" $0 \
+# Print a compiler error to stderr
+function error (msg)
+{
+	print "error:", msg, "at", FILENAME, "line", NR ":\n\t" SRCLINE \
 	    > "/dev/stderr"
 	exit 1
 }
 
 # Advance to the next non-comment input record
-function next_line() {
+function next_line ()
+{
 	do {
 		_result = getline
+		SRCLINE = $0
 	} while (_result > 0 && $0 ~ /^[ \t]*#.*/) # skip comment lines
 	return _result
 }
 
 # Advance to the next input record and verify that it matches @p regex
-function getline_matching(regex) {
+function getline_matching (regex)
+{
 	_result = next_line()
 	if (_result <= 0)
 		return _result
@@ -80,27 +77,31 @@ function getline_matching(regex) {
 }
 
 # Find opening brace and adjust block depth
-function find_block_open(check_first) {
-	if (check_first == "{") {
+# Returns 1 if the current line should be discarded
+# XXX does not properly handle additional content on the current line
+# Need to trim current line
+function open_block (type, name, check_first)
+{
+	if (check_first == "{" || getline_matching("^[ \t]*{") > 0) {
 		depth++
-		push("_block_start", NR)
-		return
-	}
-
-	if (getline_matching("^[ \t]*{") > 0) {
-		depth++
-		push("_block_start", NR)
-		sub("{", "", $0)
-		return
+		push(BLOCK_START, NR)
+		push(BLOCK_NAME, name)
+		push(BLOCK_TYPE, type)
+		if (check_first != "{") {
+			sub("{", "", $0)
+			return 0
+		}
+		return 1
 	}
 
 	error("found '"$1 "' instead of expected '{'")
 }
 
 # Find closing brace and adjust block depth
-function find_block_close(check_first) {
+function close_block (check_first)
+{
 	# drop all symbols defined at this depth
-	block_start = lookup("_block_start")
+	block_start = lookup(BLOCK_START)
 	for (s in symbols) {
 		if (s ~ "^"depth"[^0-9]")
 			delete symbols[s]
@@ -120,6 +121,77 @@ function find_block_close(check_first) {
 	error("expected '}' (block opened on line " block_start ")")
 }
 
+# Look up a variable with `name` (and optional `default` value if not found)
+# in the current symbol table. If `default` is not specified and the
+# variable is not defined, a compiler error will be emitted.
+function lookup (name, default)
+{
+	for (i = 0; i < depth; i++) {
+		if ((depth-i,name) in symbols)
+			return symbols[depth-i,name]
+	}
+
+	if (default)
+		return default
+	else
+		error("'" name "' is undefined")
+}
+
+# Define a new variable in the symbol table's current scope,
+# with the given value
+function push (name, value)
+{
+	symbols[depth,name] = value
+}
+
+# Set an existing variable's value in the symbol table; if not yet defined,
+# a new variable will be defined within the current scope.
+function set (name, value)
+{
+	for (i = 0; i < depth; i++) {
+		if ((depth-i,name) in symbols) {
+			symbols[depth-i,name] = value
+			return
+		}
+	}
+
+	# No existing value
+	push(name, value)
+}
+
+# Evaluates to true if immediately within a block scope of the given type
+function in_block (type)
+{
+	return (type == lookup(BLOCK_TYPE, "NONE"))
+}
+
+# Evaluates to true if within an immediate or non-immediate block scope of the
+# given type
+function in_nested_block (type)
+{
+	for (i = 0; i < depth; i++) {
+		if ((depth-i,BLOCK_TYPE) in symbols) {
+			if (symbols[depth-i,BLOCK_TYPE] == type)
+				return 1
+		}
+	}
+	return 0
+}
+
+# Evaluates to true if definitions of the given type are permitted within
+# the current scope
+function allow_def (type)
+{
+	if (type == "var" || type == "sprom") {
+		return (in_block("NONE") || in_block("struct"))
+	} else if (type == "struct") {
+		return (in_block("NONE"))
+	} else if (type == "revs") {
+		return (in_block("sprom"))
+	}
+
+	error("unknown type '" type "'")
+}
 
 # Ignore comments
 /^[ \t]*#.*/ {
@@ -131,6 +203,14 @@ function find_block_close(check_first) {
 	next
 }
 
+# Parser limitations require that open/close blocks stand alone
+(/{/ && !/{[ \t]*$/) {
+	error("'{' must be the last character on a line")
+}
+(/}/ && !/[ \t]*}[ \t*]$/) {
+	error("'}' must be the only non-whitespace character on a line")
+}
+
 # Ensure that operators/punctuators are correctly detected as fields
 # by inserting OFS as appropriate
 /[^ \t]{/ { gsub(/{/, OFS"{", $0) }	# {
@@ -138,41 +218,46 @@ function find_block_close(check_first) {
 /[^ \t]}/ { gsub(/{/, OFS"}", $0) }	# }
 /}[^ \t]/ { gsub(/{/, "}"OFS, $0) }
 
-# Struct definition
-$1 == "struct" && $2 !~ /\[\]$/ {
-	error("expected '" $2 "[]', not '" $2 "'")
+# struct definition
+$1 == "struct" && allow_def("struct") {
+	# Remove array[] specifier
+	if (sub(/\[\]$/, "", $2) == 0)
+		error("expected '" $2 "[]', not '" $2 "'")
+
+	if (open_block($1, $2, $3))
+		next
 }
-$1 == "struct" && $2 ~ /\[\]$/ {
-	find_block_open($3)
-	if (getline_matching("^[ \t]*sprom[ \t]") <= 0) {
-		error("expected 'sprom' definitions")
+
+# sprom block
+$1 == "sprom" && allow_def("sprom") {
+	if (open_block($1, "", $2))
+		next
+}
+
+# revs block
+$1 == "revs" && allow_def("revs") {
+	if ($2 ~ "[0-9]*-[0-9*]") {
+		print "range",$2
+	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
+		print "range",$2,$3
+	} else if ($2 ~ "[1-9][0-9]*") {
+		print "equality",$2
 	} else {
-		find_block_open($2)
-
-		while (getline_matching("^[ \t]*revs[ \t]") > 0) {
-			while (getline_matching("^[ \t]*@") > 0) {
-
-			}
-		}
-
-		find_block_close($1)
+		error("invalid rev designator")
 	}
 
-
-
-	find_block_close($1)
-	next
+	if (open_block($1, "", $3))
+		next
 }
 
-
 # Detect private variable definitions
-$1 == "private" {
+$1 == "private" && $2 ~ TYPES_REGEX && allow_def("var") {
 	sub("private"RS, "", $0)
-	private = 1
+	_private = 1
 }
 
 # Variable definition
-$1 ~ "(uint|sint|leddc|ccode|mac48)" {
+$1 ~ TYPES_REGEX && allow_def("var") {
 	type = $1
 	name = $2
 
@@ -186,7 +271,7 @@ $1 ~ "(uint|sint|leddc|ccode|mac48)" {
 	next
 }
 
-$1 {
+$1 && allow_def("var") {
 	error("unknown type '" $1 "'")
 }
 

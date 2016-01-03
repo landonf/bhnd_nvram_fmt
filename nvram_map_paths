@@ -12,37 +12,37 @@
 # noiselvl5ga2, noiselvl5ga3 ...)
 #
 struct pathvars[] {
-    sprom {
-        revs 2-3 {
-            pathvars@0x1BE,
-            pathvars@0x2BE,
-            pathvars@0x3BE,
-            pathvars@0x4BE
-        }
-        revs 4-8 {
-            pathvars@0x1000,
-            pathvars@0x2000,
-            pathvars@0x3000,
-            pathvars@0x4000
-        }
-        revs >= 11 {
-            pathvars@0x1000,
-            pathvars@0x2000,
-            pathvars@0x3000
-        }
-    }
+	sprom {
+		revs 2-3 {
+			pathvars@0x1BE,
+			pathvars@0x2BE,
+			pathvars@0x3BE,
+			pathvars@0x4BE;
+		}
+		revs 4-8 {
+			pathvars@0x1000,
+			pathvars@0x2000,
+			pathvars@0x3000,
+			pathvars@0x4000;
+		}
+		revs >= 11 {
+			pathvars@0x1000,
+			pathvars@0x2000,
+			pathvars@0x3000;
+		}
+	}
 
-    uint noiselvl5ga[] {
-        sfmt	hex;
-        sprom {
-            revs >= 2048 {
-                u8@0x1BE (mask=0x7C00, shift=10),
-                u8@0x1C0 (mask=0x7C00, shift=10),
-                u8@0x1C2 (mask=0x7C00, shift=10),
-                u8@0x1C4 (mask=0x7C00, shift=10);
-            }
-        }
-    }
+	uint noiselvl5ga[] {
+		sfmt	hex;
+		sprom {
+			revs >= 2048 {
+				u8@0x1BE (mask=0x7C00, shift=10),
+				u8@0x1C0 (mask=0x7C00, shift=10),
+				u8@0x1C2 (mask=0x7C00, shift=10),
+				u8@0x1C4 (mask=0x7C00, shift=10);
+			}
+		}
+	}
 }
 
 uint boardflags {
