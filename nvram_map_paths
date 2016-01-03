@@ -11,7 +11,7 @@
 # generated variable instances will be named noiselvl5ga0, noiselvl5ga1,
 # noiselvl5ga2, noiselvl5ga3 ...)
 #
-struct pathvars[] {
+struct pathvars[] { 
 	sprom {
 		revs 2-3 {
 			pathvars@0x1BE,

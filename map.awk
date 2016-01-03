@@ -49,7 +49,7 @@ function warn (msg)
 function error (msg)
 {
 	print "error:", msg, "at", FILENAME, "line", NR ":\n\t" SRCLINE \
-	    > "/dev/stderr"
+	   > "/dev/stderr"
 	exit 1
 }
 
@@ -87,14 +87,9 @@ function open_block (type, name, check_first)
 		push(BLOCK_START, NR)
 		push(BLOCK_NAME, name)
 		push(BLOCK_TYPE, type)
-		if (check_first != "{") {
-			sub("{", "", $0)
-			return 0
-		}
-		return 1
+		return
 	}
-
-	error("found '"$1 "' instead of expected '{'")
+	error("found '"$1 "' instead of expected '{' for '" name "'")
 }
 
 # Find closing brace and adjust block depth
@@ -114,25 +109,24 @@ function close_block (check_first)
 
 	if (getline_matching("^[ \t]*}") > 0) {
 		depth--
-		sub("}", "", $0)
 		return
 	}
 
 	error("expected '}' (block opened on line " block_start ")")
 }
 
-# Look up a variable with `name` (and optional `default` value if not found)
-# in the current symbol table. If `default` is not specified and the
+# Look up a variable with `name` (and optional default value if not found)
+# in the current symbol table. If deflt is not specified and the
 # variable is not defined, a compiler error will be emitted.
-function lookup (name, default)
+function lookup (name, deflt)
 {
 	for (i = 0; i < depth; i++) {
 		if ((depth-i,name) in symbols)
 			return symbols[depth-i,name]
 	}
 
-	if (default)
-		return default
+	if (deflt)
+		return deflt
 	else
 		error("'" name "' is undefined")
 }
@@ -204,10 +198,10 @@ function allow_def (type)
 }
 
 # Parser limitations require that open/close blocks stand alone
-(/{/ && !/{[ \t]*$/) {
+(/{/ && /{[ \t]*[^ \t]/) {
 	error("'{' must be the last character on a line")
 }
-(/}/ && !/[ \t]*}[ \t*]$/) {
+(/}/ && /[ \t]*}[ \t*][^ \t]/) {
 	error("'}' must be the only non-whitespace character on a line")
 }
 
@@ -224,14 +218,16 @@ $1 == "struct" && allow_def("struct") {
 	if (sub(/\[\]$/, "", $2) == 0)
 		error("expected '" $2 "[]', not '" $2 "'")
 
-	if (open_block($1, $2, $3))
-		next
+	open_block($1, $2, $3)
+	print "STRUCT"
+	next
 }
 
 # sprom block
 $1 == "sprom" && allow_def("sprom") {
-	if (open_block($1, "", $2))
-		next
+	open_block($1, "", $2)
+	print "SPROM"
+	next
 }
 
 # revs block
@@ -246,8 +242,7 @@ $1 == "revs" && allow_def("revs") {
 		error("invalid rev designator")
 	}
 
-	if (open_block($1, "", $3))
-		next
+	open_block($1, "", $3)
 }
 
 # Detect private variable definitions
