@@ -117,12 +117,17 @@ function find_block_close(check_first) {
 		return
 	}
 
-	error("expected '}' (closing block opened on line " block_start ")")
+	error("expected '}' (block opened on line " block_start ")")
 }
 
 
 # Ignore comments
 /^[ \t]*#.*/ {
+	next
+}
+
+# Ignore blank lines
+/^[ \t]*$/ {
 	next
 }
 
@@ -136,6 +141,22 @@ function find_block_close(check_first) {
 # Block definition
 $1 == "block[]" {
 	find_block_open($2)
+	if (getline_matching("^[ \t]*sprom[ \t]") <= 0) {
+		error("expected 'sprom' definitions")
+	} else {
+		find_block_open($2)
+
+		while (getline_matching("^[ \t]*revs[ \t]") > 0) {
+			while (getline_matching("^[ \t]*@") > 0) {
+
+			}
+		}
+
+		find_block_close($1)
+	}
+
+
+
 	find_block_close($1)
 	next
 }
@@ -152,10 +173,8 @@ $1 ~ "(uint|sint|leddc|ccode|mac48)" {
 	name = $2
 
 	# Check for and remove array[] specifier
-	if (name ~ /\[\]$/) {
-		sub(/\[\]$/, "", name);
+	if (sub(/\[\]$/, "", name) > 0)
 		array = 1
-	}
 
 	print type,name,array
 #	//printf("%s %s %s\n", type, name, array)
