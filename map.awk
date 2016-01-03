@@ -11,6 +11,9 @@ BEGIN {
 	depth = 0
 	symbols[depth,"_file"] = FILENAME
 
+	# Enable debug output
+	DEBUG = 1
+
 	# Common Regexs
 	TYPES_REGEX = "(uint|sint|leddc|ccode|mac48)"
 	IDENT_REGEX = "[A-Za-z][A-Za-z0-9]*"
@@ -61,6 +64,31 @@ function errorx (msg)
 {
 	print "error:", msg > "/dev/stderr"
 	exit 1
+}
+
+# Print a debug output message
+function debug (msg)
+{
+	if (!DEBUG)
+		return
+	for (i = 0; i < depth; i++)
+		printf("\t") > "/dev/stderr"
+	print msg > "/dev/stderr"
+}
+
+# Print to output file with the correct indentation and no implicit newline
+function oprinti (str)
+{
+	for (i = 0; i < depth; i++)
+		printf("\t")
+	printf("%s", str)
+}
+
+
+# Print to output file with no implicit newline
+function oprint (str)
+{
+	printf("%s", str)
 }
 
 # Advance to the next non-comment input record
@@ -193,12 +221,6 @@ function allow_def (type)
 	error("unknown type '" type "'")
 }
 
-function dprint(msg) {
-	for (i = 0; i < depth; i++)
-		printf("\t")
-	print msg
-}
-
 # struct definition
 $1 == "struct" && allow_def("struct") {
 	# Remove array[] specifier
@@ -208,26 +230,26 @@ $1 == "struct" && allow_def("struct") {
 	if ($2 !~ "^"IDENT_REGEX"$")
 		error("invalid identifier '" $2 "'")
 
-	dprint("struct " $2 " {")
+	debug("struct " $2 " {")
 	open_block($1, $2, $3)
 }
 
 # sprom block
 $1 == "sprom" && allow_def("sprom") {
-	dprint("sprom {")
+	debug("sprom {")
 	open_block($1, "", $2)
 }
 
 # revs block
 $1 == "revs" && allow_def("revs") {
 	if ($2 ~ "[0-9]*-[0-9*]") {
-		dprint("revs " $2 " {")
+		debug("revs " $2 " {")
 		open_block($1, "", $3)
 	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
-		dprint("revs " $2 "-" $3 " {")
+		debug("revs " $2 "-" $3 " {")
 		open_block($1, "", $4)
 	} else if ($2 ~ "[1-9][0-9]*") {
-		dprint("revs " $2 " {")
+		debug("revs " $2 " {")
 		open_block($1, "", $3)
 	} else {
 		error("invalid rev designator")
@@ -236,7 +258,7 @@ $1 == "revs" && allow_def("revs") {
 
 # revs offset definition
 $1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+[,;]?" && in_block("revs") {
-	dprint("offset="$1)
+	debug("offset="$1)
 	next
 }
 
@@ -250,7 +272,7 @@ $1 == "private" && $2 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	type = $1
 	name = $2
-	dprint(type " " name " {")
+	debug(type " " name " {")
 
 	# Check for and remove array[] specifier
 	if (sub(/\[\]$/, "", name) > 0)
@@ -262,7 +284,7 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 # variable parameters
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	if ($1 == "sfmt")
-		dprint($1 "=" $2)
+		debug($1 "=" $2)
 	else
 		error("unknown parameter " $1)
 	next
@@ -277,7 +299,7 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 /}/ && !in_block("NONE") {
 	while (!in_block("NONE") && $0 ~ "}") {
 		close_block();
-		dprint("}")
+		debug("}")
 	}
 	next
 }
