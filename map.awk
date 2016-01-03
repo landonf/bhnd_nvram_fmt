@@ -280,23 +280,17 @@ $1 == "}" && in_block("revs") {
 	next
 }
 
-# Detect private variable definitions
+# Detect private variable flag
 $1 == "private" && $2 ~ TYPES_REGEX && allow_def("var") {
-	sub("private"RS, "", $0)
+	sub("^private"FS, "", $0)
 	_private = 1
 }
 
 # Variable definition
-($1 ~ TYPES_REGEX || $2 ~ TYPES_REGEX) && allow_def("var") {
-	if ($1 !~ TYPES_REGEX) {
-		type = $2
-		name = $3
-		open_block("var", name, $4)
-	} else {
-		type = $1
-		name = $2
-		open_block("var", name, $3)
-	}
+$1 ~ TYPES_REGEX && allow_def("var") {
+	type = $1
+	name = $2
+	open_block("var", name, $3)
 
 	# Check for and remove array[] specifier
 	if (sub(/\[\]$/, "", name) > 0)
