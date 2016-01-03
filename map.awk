@@ -13,6 +13,7 @@ BEGIN {
 
 	# Common Regexs
 	TYPES_REGEX = "(uint|sint|leddc|ccode|mac48)"
+	IDENT_REGEX = "[A-Za-z][A-Za-z0-9]*"
 
 	# Internal variable names
 	BLOCK_TYPE = "_block_type"
@@ -177,7 +178,8 @@ function in_nested_block (type)
 function allow_def (type)
 {
 	if (type == "var" || type == "sprom") {
-		return (in_block("NONE") || in_block("struct"))
+		return (in_block("NONE") || in_block("struct") ||
+		    in_block("var"))
 	} else if (type == "struct") {
 		return (in_block("NONE"))
 	} else if (type == "revs") {
@@ -219,14 +221,26 @@ $1 == "struct" && allow_def("struct") {
 		error("expected '" $2 "[]', not '" $2 "'")
 
 	open_block($1, $2, $3)
-	print "STRUCT"
+	print "STRUCT",lookup(BLOCK_NAME)
+	next
+}
+
+$1 == "}" && in_block("struct") {
+	# TODO: Define struct
+	close_block($1)
 	next
 }
 
 # sprom block
 $1 == "sprom" && allow_def("sprom") {
 	open_block($1, "", $2)
-	print "SPROM"
+	print "SPROM {}"
+	next
+}
+
+$1 == "}" && in_block("sprom") {
+	# TODO: Define SPROM
+	close_block($1)
 	next
 }
 
@@ -234,15 +248,30 @@ $1 == "sprom" && allow_def("sprom") {
 $1 == "revs" && allow_def("revs") {
 	if ($2 ~ "[0-9]*-[0-9*]") {
 		print "range",$2
+		open_block($1, "", $3)
 	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
 		print "range",$2,$3
+		open_block($1, "", $4)
 	} else if ($2 ~ "[1-9][0-9]*") {
 		print "equality",$2
+		open_block($1, "", $3)
 	} else {
 		error("invalid rev designator")
 	}
 
-	open_block($1, "", $3)
+	next
+}
+
+# offset definition
+$1 ~ IDENT_REGEX && in_block("revs") {
+	print "offset="$1
+	next
+}
+
+$1 == "}" && in_block("revs") {
+	# TODO: Define REV
+	close_block($1)
+	next
 }
 
 # Detect private variable definitions
@@ -263,7 +292,25 @@ $1 ~ TYPES_REGEX && allow_def("var") {
 	print type,name,array
 #	//printf("%s %s %s\n", type, name, array)
 
+	open_block("var", name, $3)
 	next
+}
+
+# Variable parameters
+$1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block("var") {
+	if ($1 == "sfmt")
+		print $1"="$2
+	next
+}
+
+$1 == "}" && in_block("var") {
+	# TODO: Define var
+	close_block($1)
+	next
+}
+
+$1 == "}" {
+	error("unbalanced '}'")
 }
 
 $1 && allow_def("var") {

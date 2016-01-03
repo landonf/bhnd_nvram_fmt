@@ -48,12 +48,12 @@ struct pathvars[] {
 uint boardflags {
 	sfmt	hex;
 	sprom {
-		revs 2-3	u16@0x72;
-		revs 4-7	u16@0x72|u16@0x38;
-		revs 8-15	u16@0x72|u16@0x7A;
-		revs 16-31	u32@0x44;
-		revs 32-255	u32@0x4A;
-		revs >= 256	u32@0x84;
+		revs 2-3	{ u16@0x72; }
+		revs 4-7	{ u16@0x72|u16@0x38; }
+		revs 8-15	{ u16@0x72|u16@0x7A; }
+		revs 16-31	{ u32@0x44; }
+		revs 32-255	{ u32@0x4A; }
+		revs >= 256	{ u32@0x84; }
 	}
 }
 
@@ -72,11 +72,11 @@ private sint private_signedvar {
 mac48 macaddr {
 	sfmt	macaddr;
 	sprom {
-		revs 256-2047	u8@0x8C (count=48);
-		revs 32-255	u8@0x52 (count=48);
-		revs 16-31	u8@0x4C (count=48);
-		revs 8-15	u8@0x4A (count=48);
-		revs >= 2048	u8@0x90 (count=48);
+		revs 256-2047	{ u8@0x8C (count=48); }
+		revs 32-255	{ u8@0x52 (count=48); }
+		revs 16-31	{ u8@0x4C (count=48); }
+		revs 8-15	{ u8@0x4A (count=48); }
+		revs >= 2048	{ u8@0x90 (count=48); }
 	}
 }
 
