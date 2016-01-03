@@ -199,13 +199,6 @@ function allow_def (type)
 	error("unknown type '" type "'")
 }
 
-# Ensure that operators/punctuators are correctly detected as fields
-# by inserting OFS as appropriate
-/[^ \t]{/ { gsub(/{/, OFS"{", $0) }	# {
-/{[^ \t]/ { gsub(/{/, "{"OFS, $0) }
-/[^ \t]}/ { gsub(/{/, OFS"}", $0) }	# }
-/}[^ \t]/ { gsub(/{/, "}"OFS, $0) }
-
 function dprint(msg) {
 	for (i = 0; i < depth; i++)
 		printf("\t")
