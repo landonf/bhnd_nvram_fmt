@@ -99,7 +99,7 @@ function open_block (type, name, check_first)
 		push(BLOCK_START, NR)
 		push(BLOCK_NAME, name)
 		push(BLOCK_TYPE, type)
-			print "open:",lookup(BLOCK_TYPE),lookup(BLOCK_NAME)
+		#print "open:",lookup(BLOCK_TYPE),lookup(BLOCK_NAME)
 
 		sub("^[^{]+{", "", $0)
 		return 1
@@ -115,7 +115,7 @@ function close_block ()
 		error("internal error - no closing brace")
 
 	# drop all symbols defined at this depth
-	print "close:",lookup(BLOCK_TYPE),lookup(BLOCK_NAME)
+	#print "close:",lookup(BLOCK_TYPE),lookup(BLOCK_NAME)
 	for (s in symbols) {
 		if (s ~ "^"depth"[^0-9]")
 			delete symbols[s]
@@ -206,6 +206,12 @@ function allow_def (type)
 /[^ \t]}/ { gsub(/{/, OFS"}", $0) }	# }
 /}[^ \t]/ { gsub(/{/, "}"OFS, $0) }
 
+function dprint(msg) {
+	for (i = 0; i < depth; i++)
+		printf("\t")
+	print msg
+}
+
 # struct definition
 $1 == "struct" && allow_def("struct") {
 	# Remove array[] specifier
@@ -215,26 +221,26 @@ $1 == "struct" && allow_def("struct") {
 	if ($2 !~ "^"IDENT_REGEX"$")
 		error("invalid identifier '" $2 "'")
 
+	dprint("struct " $2 " {")
 	open_block($1, $2, $3)
-	print "STRUCT {}"
 }
 
 # sprom block
 $1 == "sprom" && allow_def("sprom") {
+	dprint("sprom {")
 	open_block($1, "", $2)
-	print "SPROM {}"
-	next
 }
 
 # revs block
 $1 == "revs" && allow_def("revs") {
 	if ($2 ~ "[0-9]*-[0-9*]") {
+		dprint("revs " $2 " {")
 		open_block($1, "", $3)
 	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
-		print "range",$2,$3
+		dprint("revs " $2 "-" $3 " {")
 		open_block($1, "", $4)
 	} else if ($2 ~ "[1-9][0-9]*") {
-		print "equality",$2
+		dprint("revs " $2 " {")
 		open_block($1, "", $3)
 	} else {
 		error("invalid rev designator")
@@ -243,7 +249,7 @@ $1 == "revs" && allow_def("revs") {
 
 # offset definition
 $1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+[,;]?" && in_block("revs") {
-	print "offset="$1
+	dprint("offset="$1)
 	next
 }
 
@@ -257,22 +263,19 @@ $1 == "private" && $2 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	type = $1
 	name = $2
-	open_block("var", name, $3)
+	dprint(type " " name " {")
 
 	# Check for and remove array[] specifier
 	if (sub(/\[\]$/, "", name) > 0)
 		array = 1
 
-	print type,name,array
-#	//printf("%s %s %s\n", type, name, array)
-
-	next
+	open_block("var", name, $3)
 }
 
 # Variable parameters
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	if ($1 == "sfmt")
-		print $1"="$2
+		dprint($1 "=" $2)
 	else
 		error("unknown parameter " $1)
 	next
@@ -281,6 +284,7 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 /}/ && !in_block("NONE") {
 	while (!in_block("NONE") && $0 ~ "}") {
 		close_block();
+		dprint("}")
 	}
 	next
 }

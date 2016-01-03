@@ -91,4 +91,4 @@ uint noiselvl5ga2[] {
 			u8@0x1C4 (mask=0x7C00, shift=10);
 		}
 	}
-
+}
