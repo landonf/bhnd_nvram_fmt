@@ -485,6 +485,7 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 
 	vars[name,DEF_LINE] = NR
 	vars[name,VAR_TYPE] = type
+	vars[name,NUM_REVS] = 0
 
 	open_block("var", name)
 
