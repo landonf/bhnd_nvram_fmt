@@ -185,16 +185,10 @@ function close_block ()
 	if ($0 !~ "}")
 		error("internal error - no closing brace")
 
-	if (in_block("struct")) {
-		debug("complete-struct (revs=" get("num_rev")")")
-	} else if (in_block("var")) {
+	if (in_block("var")) {
 		if (in_nested_block("struct")) {
-			for (_cbi = 0; _cbi < get("num_rev"); _cbi++) {
-				debug("rev-desc[" _cbi "]=" get("rev_desc,"_cbi))
-				for (_cbj = 0; _cbj < get("num_rev_addrs,"_cbi); _cbj++) {
-					debug("addr["_cbj"]=" get("rev_addr,"_cbi","_cbj))
-				}
-			}
+			debug("struct-var (revs=" 	structs[get("sname"),num_rev] ")")
+		} else {
 		}
 		debug("complete-var")
 	}
@@ -235,8 +229,7 @@ function push (name, value)
 }
 
 # Set an existing variable's value in the symbol table; if not yet defined,
-# a new variable will be defined within the nearest enclosing struct or var
-# scope
+# will trigger an error
 function set (name, value, scope)
 {
 	for (i = 0; i < depth; i++) {
@@ -245,18 +238,6 @@ function set (name, value, scope)
 			return
 		}
 	}
-
-	# No existing value; define in the nearest lexical scope
-	for (i = 0; i < depth; i++) {
-		if ((depth-i,BLOCK_NAME) in symbols &&
-		    (symbols[depth-i,BLOCK_TYPE] == "struct" ||
-		     symbols[depth-i,BLOCK_TYPE] == "var"))
-		{
-			symbols[depth-i,name] = value
-			return
-		}
-	}
-
 	# No existing value, cannot define
 	error("'" name "' is undefined")
 }
@@ -301,27 +282,38 @@ function allow_def (type)
 
 # struct definition
 $1 == "struct" && allow_def("struct") {
+	name = $2
+
 	# Remove array[] specifier
-	if (sub(/\[\]$/, "", $2) == 0)
-		error("expected '" $2 "[]', not '" $2 "'")
+	if (sub(/\[\]$/, "", name) == 0)
+		error("expected '" name "[]', not '" name "'")
 
-	if ($2 !~ "^"IDENT_REGEX"$" || $2 ~ "^"TYPES_REGEX"$")
-		error("invalid identifier '" $2 "'")
+	if (name !~ "^"IDENT_REGEX"$" || name ~ "^"TYPES_REGEX"$")
+		error("invalid identifier '" name "'")
 
-	debug("struct " $2 " {")
-	open_block($1, $2)
+	# Add top-level state 
+	if (name in structs) 
+		error("struct identifier previously defined on line " \
+		    structs[name])
+	structs[name] = NR
+	structs[name,"num_rev"] = 0
 
-	# Declare our struct variables
-	push("num_rev", 0)
+	# Open the block 
+	debug("struct " name " {")
+	open_block($1, name)
+
+	# Declare our local variables
+	push("sname", name)
 }
 
 # struct rev descriptor
 $1 == "revs" && allow_def("struct_revs") {
-	_revi = get("num_rev")
-	set("rev_desc,"_revi, parse_revdesc())
-	set("num_rev_addrs," _revi, 1) # XXX
-	set("rev_addr,"_revi","0, "0xDEADBEEF")
-	set("num_rev", _revi+1)
+	_sname = get("sname")
+	_rev_idx = structs[_sname,"num_rev"]
+	structs[_sname, "num_rev"]++
+
+	for (_df in structs)
+		debug("k="_df ",v="structs[_df])
 
 	debug("struct_revs " _revstr " []")
 	next
