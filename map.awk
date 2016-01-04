@@ -442,10 +442,10 @@ function parse_offset_segment ()
 
 # revision offset definition
 $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
-	# parse one offset, or a sequence of array offsets
+	# parse all offsets
 	do {
 		debug("[")
-		# parse all segments -- they may span lines
+		# parse all segments
 		do {
 			parse_offset_segment()
 			_more_seg = ($1 == "|")
