@@ -332,11 +332,10 @@ $1 == "revs" && allow_def("struct_revs") {
 	structs[id,NUM_REVS]++
 	structs[id,REVDESC,rev_idx] = parse_revdesc()
 
-	base_idx = match($0, "\\[[^]]*\\]")
-	if (base_idx == 0)
+	if (match($0, "\\[[^]]*\\]") <= 0)
 		error("expected base address array")
 
-	addrs_str = substr($0, base_idx+1, RLENGTH-2)
+	addrs_str = substr($0, RSTART+1, RLENGTH-2)
 	num_addrs = split(addrs_str, addrs, ",[ \t]*")
 	structs[id,ST_NUM_BASE_ADDRS] = num_addrs
 	for (i = 1; i <= num_addrs; i++) {
@@ -363,18 +362,44 @@ $1 == "revs" && allow_def("revs") {
 	open_block($1, null)
 }
 
-# offset definition
-$1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
-	#if (!in_nested_block("struct")) {
-		debug($1 " " $2 " " $3)
-	#} else {
-	#	debug("o=" $1)
-	#}
+function parse_offset ()
+{
+	type=$1
+	offset=$2
 
-#	parse_offset()
+	if (type !~ "^"WIDTHS_REGEX"$")
+		error("unknown field width '" $1 "'")
+
+	if (offset !~ "^"HEX_REGEX"$")
+		error("invalid offset value '" $2 "'")
+
+	if (match($1, "\\["INT_REGEX"\\]$") > 0) {
+		type = substr($1, 1, RSTART)
+		count = substr($1, RSTART+1, RLENGTH-2)
+	} else {
+		count = 1
+	}
+
+	debug($3)
+
+	debug("type=" type ",offset=" offset ",count=" count)
+}
+
+# revision offset definition
+$1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
+
+	parse_offset()
+	_offstr = $0
+	while ($(NF) == "|") {
+		next_line()
+		sub("^[ \t]+", "", $0)
+		_offstr = _offstr OFS $0
+	}
+	debug(_offstr)
 
 	while ($(NF) == "," || $(NF) == "|") {
 		next_line()
+		debug($0)
 #		parse_offset()
 	}
 
