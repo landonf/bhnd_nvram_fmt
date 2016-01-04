@@ -41,7 +41,7 @@ BEGIN {
 }
 
 END {
-	if (depth > 0) {
+	if (!_EARLY_EXIT && depth > 0) {
 		block_start = lookup(BLOCK_START)
 		errorx("missing '}' for block opened on line " block_start "")
 	}
@@ -70,15 +70,14 @@ function warn (msg)
 # Print a compiler error to stderr
 function error (msg)
 {
-	print "error:", msg, "at", FILENAME, "line", NR ":\n\t" $0 \
-	   > "/dev/stderr"
-	exit 1
+	errorx(msg " at " FILENAME " line " NR ":\n\t" $0)
 }
 
 # Print an error message without including the source line information
 function errorx (msg)
 {
 	print "error:", msg > "/dev/stderr"
+	_EARLY_EXIT=1
 	exit 1
 }
 
@@ -289,22 +288,22 @@ $1 == "revs" && allow_def("revs") {
 	open_block($1, "", _bstart)
 }
 
+function parse_offset () {
+	if ($1 !~ "^"IDENT_REGEX"@0x[A-Za-z0-9]+")
+		error("expected offset descriptor")
+
+	for (i = 0; i <= NF; i++)
+		debug("off["i"]="$i)
+}
+
 # offset definition
 $1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+,?" && in_block("revs") {
-	debug("offset="$1)
-	_off[0] = $1
-	_off_elems = 1
+	parse_offset()
 
-	while ($0 ~ ",[ \t]$") {
+	while ($(NR-1) ~ ",$") {
 		next_line()
-		_off[_off_elems++] = $1
+		parse_offset()
 	}
-
-	for (i = 1; i < NF; i++)
-		debug(i"="$i)
-
-	for (i = 0; i < _off_elems; i++)
-		debug("elem[" i "]="_off[i])
 
 	next
 }

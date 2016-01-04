@@ -26,9 +26,7 @@ struct pathvars[] {
 			pathvars@0x4000
 		}
 		revs >= 11 {
-			pathvars@0x1000,
-			pathvars@0x2000,
-			pathvars@0x3000
+			pathvars@0x1000, pathvars@0x2000, pathvars@0x3000
 		}
 	}
 
@@ -86,7 +84,7 @@ uint boardflags {
 	sprom {
 		revs 2-3	{ u16@0x72 }
 		revs 4-7	{ u16@0x72 | u16@0x38 (shift=-16) }
-		revs 8-15	{ u16@0x72 | u16@0x7A (shift=-16) }
+		revs 8-15	{ u16@0x72|u16@0x7A (shift=-16) }
 		revs 16-31	{ u32@0x44 }
 		revs 32-255	{ u32@0x4A }
 		revs >= 256	{ u32@0x84 }
