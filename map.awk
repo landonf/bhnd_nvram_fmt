@@ -185,14 +185,17 @@ function close_block ()
 	if ($0 !~ "}")
 		error("internal error - no closing brace")
 
-	_block_type = get(BLOCK_TYPE)
-	if (_block_type == "struct") {
-		debug("complete-struct (revs=" get("num_revs")")")
-		for (_cbi = 0; _cbi < get("num_revs"); _cbi++) {
-			debug("requesting " "rev_addrs,"_cbi)
-			debug("addrs=" get("rev_addrs,"_cbi))
+	if (in_block("struct")) {
+		debug("complete-struct (revs=" get("num_rev")")")
+	} else if (in_block("var")) {
+		if (in_nested_block("struct")) {
+			for (_cbi = 0; _cbi < get("num_rev"); _cbi++) {
+				debug("rev-desc[" _cbi "]=" get("rev_desc,"_cbi))
+				for (_cbj = 0; _cbj < get("num_rev_addrs,"_cbi); _cbj++) {
+					debug("addr["_cbj"]=" get("rev_addr,"_cbi","_cbj))
+				}
+			}
 		}
-	} else if (_block_type == "var") {
 		debug("complete-var")
 	}
 
@@ -309,17 +312,18 @@ $1 == "struct" && allow_def("struct") {
 	open_block($1, $2)
 
 	# Declare our struct variables
-	push("num_revs", 0)
-	push("num_vars", 0)
-	push("rev_addrs", null)
+	push("num_rev", 0)
 }
 
 # struct rev descriptor
 $1 == "revs" && allow_def("struct_revs") {
-	_revstr = parse_revdesc()
+	_revi = get("num_rev")
+	set("rev_desc,"_revi, parse_revdesc())
+	set("num_rev_addrs," _revi, 1) # XXX
+	set("rev_addr,"_revi","0, "0xDEADBEEF")
+	set("num_rev", _revi+1)
+
 	debug("struct_revs " _revstr " []")
-	set("rev_addrs," get("num_revs"), 0x0)
-	set("num_revs", get("num_revs")+1)
 	next
 }
 
