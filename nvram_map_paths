@@ -78,7 +78,7 @@ uint boardflags {
 			u16 0x38 (<<16)
 		}
 		revs 8-15 {
-			u16 0x92 | u16 0x7A (<<16)
+			u16 0x92 | u16 0x7A (<< 16)
 		}
 		revs 16-31	{ u32 0x44 }
 		revs 32-255	{ u32 0x4A }

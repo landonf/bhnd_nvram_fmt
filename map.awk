@@ -37,6 +37,11 @@ BEGIN {
 	WMASK["u16"]	= "0xFFFF"
 	WMASK["u32"]	= "0xFFFFFFFF"
 
+	# Byte sizes for standard widths
+	WBYTES["u8"]	= "1"
+	WBYTES["u16"]	= "2"
+	WBYTES["u32"]	= "4"
+
 	# Common Regexs
 	INT_REGEX	= "[1-9][0-9]*"
 	HEX_REGEX	= "0x[A-Fa-f0-9]+"
@@ -151,6 +156,20 @@ function getline_matching (regex)
 		return 1
 
 	return -1
+}
+
+# Shift the current fields left by `n`. If all fields are consumed and
+# the optional do_getline argument is true, read the next line.
+function shiftf (n, do_getline)
+{
+	if (n > NF) error("shift past end of line")
+	for (_si = 1; _si <= NF-n; _si++) {
+		$(_si) = $(_si+n)
+	}
+	NF = NF - n
+
+	if (NF == 0 && do_getline)
+		next_line()
 }
 
 # Parse a revision descriptor from the current line
@@ -367,7 +386,7 @@ $1 == "revs" && allow_def("revs") {
 	open_block($1, null)
 }
 
-function parse_offset ()
+function parse_offset_segment ()
 {
 	type=$1
 	offset=$2
@@ -378,31 +397,38 @@ function parse_offset ()
 	if (offset !~ "^"HEX_REGEX"$")
 		error("invalid offset value '" $2 "'")
 
-	# parse byte count[], if any
+	# extract byte count[] and width
 	if (match(type, "\\["INT_REGEX"\\]$") > 0) {
 		count = substr(type, RSTART+1, RLENGTH-2)
 		type = substr(type, 1, RSTART-1)
 	} else {
 		count = 1
 	}
+	width = WBYTES[type]
 
 	# parse attributes
+	shiftf(2)
 	mask=WMASK[type]
 	shift=0
 
-	if ($3 ~ "^\\(") {
+	if ($1 ~ "^\\(") {
+		# extract attribute list
 		if (match($0, "\\([^|\(\)]*\\)") <= 0)
 			error("expected attribute list")
-
 		attr_str = substr($0, RSTART+1, RLENGTH-2)
+
+		# drop from input line
+		$0 = substr($0, RSTART+RLENGTH, length($0) - RSTART+RLENGTH)
+
+		# parse attributes
 		num_attr = split(attr_str, attrs, ",[ \t]*")
 		for (i = 1; i <= num_attr; i++) {
 			attr = attrs[i]
-			if (sub("^&", "", attr) > 0) {
+			if (sub("^&[ \t]*", "", attr) > 0) {
 				mask = attr
-			} else if (sub("^<<", "", attr) > 0) {
+			} else if (sub("^<<[ \t]*", "", attr) > 0) {
 				shift = "-"attr
-			} else if (sub("^>>", "", attr) > 0) {
+			} else if (sub("^>>[ \t]*", "", attr) > 0) {
 				shift = attr
 			} else {
 				error("unknown attribute '" attr "'")
@@ -410,30 +436,27 @@ function parse_offset ()
 		}
 	}
 
-	debug("type=" type ",offset=" offset ",count=" count ",mask="mask ",shift="shift)
+	_comma = ($1 == "|") ? "," : ""
+	debug("{"offset", " width ", " mask ", " shift"}" _comma)
 }
 
 # revision offset definition
 $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
-
-	parse_offset()
-	_offstr = $0
-	while ($(NF) == "|") {
-		next_line()
-		sub("^[ \t]+", "", $0)
-		_offstr = _offstr OFS $0
-	}
-	debug(_offstr)
-
-	while ($(NF) == "," || $(NF) == "|") {
-		next_line()
-		debug($0)
-#		parse_offset()
-	}
-
-	#debug("REWR="$0)
-	sub("[^{}]+", "", $0)
-	#debug("SUB="$0)
+	# parse one offset, or a sequence of array offsets
+	do {
+		debug("[")
+		# parse all segments -- they may span lines
+		do {
+			parse_offset_segment()
+			_more_seg = ($1 == "|")
+			if (_more_seg)
+				shiftf(1, 1)
+		} while (_more_seg)
+		debug("],")
+		_more_vals = ($1 == ",")
+		if (_more_vals)
+			shiftf(1, 1)
+	} while (_more_vals)
 }
 
 # private variable flag
