@@ -32,6 +32,11 @@ BEGIN {
 	DTYPE["led"]	= "BHND_NVRAM_DT_LEDDC"
 	DTYPE["cc"]	= "BHND_NVRAM_DT_CCODE"
 
+	# Default masking for standard widths
+	WMASK["u8"]	= "0xFF"
+	WMASK["u16"]	= "0xFFFF"
+	WMASK["u32"]	= "0xFFFFFFFF"
+
 	# Common Regexs
 	INT_REGEX	= "[1-9][0-9]*"
 	HEX_REGEX	= "0x[A-Fa-f0-9]+"
@@ -373,16 +378,39 @@ function parse_offset ()
 	if (offset !~ "^"HEX_REGEX"$")
 		error("invalid offset value '" $2 "'")
 
-	if (match($1, "\\["INT_REGEX"\\]$") > 0) {
-		type = substr($1, 1, RSTART)
-		count = substr($1, RSTART+1, RLENGTH-2)
+	# parse byte count[], if any
+	if (match(type, "\\["INT_REGEX"\\]$") > 0) {
+		count = substr(type, RSTART+1, RLENGTH-2)
+		type = substr(type, 1, RSTART-1)
 	} else {
 		count = 1
 	}
 
-	debug($3)
+	# parse attributes
+	mask=WMASK[type]
+	shift=0
 
-	debug("type=" type ",offset=" offset ",count=" count)
+	if ($3 ~ "^\\(") {
+		if (match($0, "\\([^|\(\)]*\\)") <= 0)
+			error("expected attribute list")
+
+		attr_str = substr($0, RSTART+1, RLENGTH-2)
+		num_attr = split(attr_str, attrs, ",[ \t]*")
+		for (i = 1; i <= num_attr; i++) {
+			attr = attrs[i]
+			if (sub("^&", "", attr) > 0) {
+				mask = attr
+			} else if (sub("^<<", "", attr) > 0) {
+				shift = "-"attr
+			} else if (sub("^>>", "", attr) > 0) {
+				shift = attr
+			} else {
+				error("unknown attribute '" attr "'")
+			}
+		}
+	}
+
+	debug("type=" type ",offset=" offset ",count=" count ",mask="mask ",shift="shift)
 }
 
 # revision offset definition
