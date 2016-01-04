@@ -40,14 +40,23 @@ BEGIN {
 	IDENT_REGEX	= "[A-Za-z][A-Za-z0-9]*"
 
 	# Internal variable names
-	BLOCK_TYPE = "_block_type"
-	BLOCK_NAME = "_block_name"
-	BLOCK_START = "_block_start"
+	BLOCK_TYPE	= "_block_type"
+	BLOCK_NAME	= "_block_name"
+	BLOCK_START	= "_block_start"
+
+	# Common array keys
+	DEF_LINE		= "def_line"
+	NUM_REVS		= "num_revs"
+	REVDESC			= "rev_decl"
+
+	# Struct array keys
+	ST_BASE_ADDRS		= "base_addrs"
+	ST_NUM_BASE_ADDRS	= "num_base_addr"
 }
 
 END {
 	if (!_EARLY_EXIT && depth > 0) {
-		block_start = get(BLOCK_START)
+		block_start = g(BLOCK_START)
 		errorx("missing '}' for block opened on line " block_start "")
 	}
 }
@@ -162,15 +171,17 @@ function parse_revdesc ()
 	return _revstr
 }
 
-# Find opening brace and adjust block depth
+# Find opening brace and adjust block depth. The name may be null, in which
+# case the BLOCK_NAME variable will not be defined in this scope
 function open_block (type, name)
 {
 	if ($0 ~ "{" || getline_matching("^[ \t]*{") > 0) {
 		depth++
 		push(BLOCK_START, NR)
-		push(BLOCK_NAME, name)
+		if (name != null)
+			push(BLOCK_NAME, name)
 		push(BLOCK_TYPE, type)
-		#print "open:",get(BLOCK_TYPE),get(BLOCK_NAME)
+		#print "open:",g(BLOCK_TYPE),g(BLOCK_NAME)
 
 		sub("^[^{]+{", "", $0)
 		return 1
@@ -187,14 +198,14 @@ function close_block ()
 
 	if (in_block("var")) {
 		if (in_nested_block("struct")) {
-			debug("struct-var (revs=" 	structs[get("sname"),num_rev] ")")
+			debug("struct-var (revs=" structs[g(BLOCK_NAME),NUM_REVS] ")")
 		} else {
 		}
 		debug("complete-var")
 	}
 
 	# drop all symbols defined at this depth
-	#print "close:",get(BLOCK_TYPE),get(BLOCK_NAME)
+	#print "close:",g(BLOCK_TYPE),g(BLOCK_NAME)
 	for (s in symbols) {
 		if (s ~ "^"depth"[^0-9]")
 			delete symbols[s]
@@ -208,7 +219,7 @@ function close_block ()
 # Look up a variable with `name` (and optional default value if not found)
 # in the current symbol table. If deflt is not specified and the
 # variable is not defined, a compiler error will be emitted.
-function get (name, deflt)
+function g (name, deflt)
 {
 	for (i = 0; i < depth; i++) {
 		if ((depth-i,name) in symbols)
@@ -245,7 +256,7 @@ function set (name, value, scope)
 # Evaluates to true if immediately within a block scope of the given type
 function in_block (type)
 {
-	return (type == get(BLOCK_TYPE, "NONE"))
+	return (type == g(BLOCK_TYPE, "NONE"))
 }
 
 # Evaluates to true if within an immediate or non-immediate block scope of the
@@ -291,38 +302,47 @@ $1 == "struct" && allow_def("struct") {
 	if (name !~ "^"IDENT_REGEX"$" || name ~ "^"TYPES_REGEX"$")
 		error("invalid identifier '" name "'")
 
-	# Add top-level state 
-	if (name in structs) 
-		error("struct identifier previously defined on line " \
-		    structs[name])
-	structs[name] = NR
-	structs[name,"num_rev"] = 0
+	# Add top-level struct entry 
+	if ((name,DEF_LINE) in structs) 
+		error("struct identifier '" name "' previously defined on " \
+		    "line " structs[name,DEF_LINE])
+	structs[name,DEF_LINE] = NR
+	structs[name,NUM_REVS] = 0
 
 	# Open the block 
 	debug("struct " name " {")
 	open_block($1, name)
-
-	# Declare our local variables
-	push("sname", name)
 }
 
 # struct rev descriptor
 $1 == "revs" && allow_def("struct_revs") {
-	_sname = get("sname")
-	_rev_idx = structs[_sname,"num_rev"]
-	structs[_sname, "num_rev"]++
+	id = g(BLOCK_NAME)
+	rev_idx = structs[id,NUM_REVS]
 
-	for (_df in structs)
-		debug("k="_df ",v="structs[_df])
+	structs[id,NUM_REVS]++
+	structs[id,REVDESC,rev_idx] = parse_revdesc()
 
-	debug("struct_revs " _revstr " []")
+	base_idx = match($0, "\\[[^]]*\\]")
+	if (base_idx == 0)
+		error("expected base address array")
+
+	addrs_str = substr($0, base_idx+1, RLENGTH-2)
+	num_addrs = split(addrs_str, addrs, ",[ \t]*")
+	structs[id,ST_NUM_BASE_ADDRS] = num_addrs
+	for (i = 1; i <= num_addrs; i++) {
+		if (addrs[i] !~ "^"HEX_REGEX"$")
+			error("invalid base address '" addrs[i] "'")
+		structs[id,ST_BASE_ADDRS,i-1] = addrs[i]
+	}
+
+	debug("struct_revs " structs[id,REVDESC,rev_idx] " [" addrs_str "]")
 	next
 }
 
 # sprom block
 $1 == "sprom" && allow_def("sprom") {
 	debug("sprom {")
-	open_block($1, "")
+	open_block($1, null)
 }
 
 # variable revs block
@@ -330,7 +350,7 @@ $1 == "revs" && allow_def("revs") {
 	_revstr = parse_revdesc()
 
 	debug("revs " _revstr " {")
-	open_block($1, "")
+	open_block($1, null)
 }
 
 # offset definition
