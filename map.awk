@@ -148,6 +148,7 @@ function getline_matching (regex)
 	return -1
 }
 
+# Parse a revision descriptor from the current line
 function parse_revdesc ()
 {
 	_revstr = ""
