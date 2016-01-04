@@ -11,33 +11,23 @@
 # generated variable instances will be named noiselvl5ga0, noiselvl5ga1,
 # noiselvl5ga2, noiselvl5ga3 ...)
 #
-struct pathvars[] { 
+struct pathvars[] {
+	# The base offsets at which the structure is defined
 	sprom {
-		revs 2-3 {
-			pathvars@0x1BE,
-			pathvars@0x2BE,
-			pathvars@0x3BE,
-			pathvars@0x4BE
-		}
-		revs 4-8 {
-			pathvars@0x1000,
-			pathvars@0x2000,
-			pathvars@0x3000,
-			pathvars@0x4000
-		}
-		revs >= 11 {
-			pathvars@0x1000, pathvars@0x2000, pathvars@0x3000
-		}
+		revs 2-3	[0x1000, 0x2000, 0x03BE, 0x4000]
+		revs 4-8	[0x5000, 0x6000, 0x7000, 0x8000]
+		revs >= 11	[0x9000, 0xA000, 0xB000]
 	}
 
 	uint noiselvl5ga[] {
 		sfmt	hex
 		sprom {
+			# All offsets are relative to the struct base address
 			revs >= 2048 {
-				u8@0x1BE (mask=0x7C00, shift=10),
-				u8@0x1C0 (mask=0x7C00, shift=10),
-				u8@0x1C2 (mask=0x7C00, shift=10),
-				u8@0x1C4 (mask=0x7C00, shift=10)
+				u16 0x1BE (&0x7C00, >>10),
+				u16 0x1C0 (&0x7C00, >>10),
+				u16 0x1C2 (&0x7C00, >>10),
+				u16 0x1C4 (&0x7C00, >>10)
 			}
 		}
 	}
@@ -58,11 +48,11 @@ private sint private_signedvar {
 mac48 macaddr {
 	sfmt	macaddr
 	sprom {
-		revs 256-2047	{ u8@0x8C (count=48) }
-		revs 32-255	{ u8@0x52 (count=48) }
-		revs 16-31	{ u8@0x4C (count=48) }
-		revs 8-15	{ u8@0x4A (count=48) }
-		revs >= 2048	{ u8@0x90 (count=48) }
+		revs 256-2047	{ u8[48] 0x8C }
+		revs 32-255	{ u8[48] 0x52 }
+		revs 16-31	{ u8[48] 0x4C }
+		revs 8-15	{ u8[48] 0x4A }
+		revs >= 2048	{ u8[48] 0x90 }
 	}
 }
 
@@ -71,22 +61,27 @@ uint noiselvl5ga2[] {
 	sfmt	hex
 	sprom {
 		revs >= 2048 {
-			u8@0x1BE (mask=0x7C00, shift=10),
-			u8@0x1C0 (mask=0x7C00, shift=10),
-			u8@0x1C2 (mask=0x7C00, shift=10),
-			u8@0x1C4 (mask=0x7C00, shift=10)
+			u8 0x1BE (&0x7C00, >>10),
+			u8 0x1C0 (&0x7C00, >>10),
+			u8 0x1C2 (&0x7C00, >>10),
+			u8 0x1C4 (&0x7C00, >>10)
 		}
 	}
 }
 
 uint boardflags {
-	sfmt	hex
+	sfmt   hex
 	sprom {
-		revs 2-3	{ u16@0x72 }
-		revs 4-7	{ u16@0x72 | u16@0x38 (shift=-16) }
-		revs 8-15	{ u16@0x72|u16@0x7A (shift=-16) }
-		revs 16-31	{ u32@0x44 }
-		revs 32-255	{ u32@0x4A }
-		revs >= 256	{ u32@0x84 }
+		revs 2-3	{ u16 0x72 }
+		revs 4-7 {
+			u16 0x82 |
+			u16 0x38 (<<16)
+		}
+		revs 8-15 {
+			u16 0x92 | u16 0x7A (<<16)
+		}
+		revs 16-31	{ u32 0x44 }
+		revs 32-255	{ u32 0x4A }
+		revs >= 256	{ u32 0x84 }
 	}
 }

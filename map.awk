@@ -8,6 +8,8 @@ BEGIN {
 	if (ARGC != 2)
 		usage()
 
+	RS="\n"
+
 	depth = 0
 	symbols[depth,"_file"] = FILENAME
 
@@ -31,8 +33,11 @@ BEGIN {
 	DTYPE["cc"]	= "BHND_NVRAM_DT_CCODE"
 
 	# Common Regexs
-	TYPES_REGEX = "(uint|sint|led|cc|mac48)"
-	IDENT_REGEX = "[A-Za-z][A-Za-z0-9]*"
+	INT_REGEX	= "[1-9][0-9]*"
+	HEX_REGEX	= "0x[A-Fa-f0-9]+"
+	TYPES_REGEX	= "(uint|sint|led|cc|mac48)"
+	WIDTHS_REGEX	= "(u8|u16|u32)(\\[[1-9][0-9]*\\])?"
+	IDENT_REGEX	= "[A-Za-z][A-Za-z0-9]*"
 
 	# Internal variable names
 	BLOCK_TYPE = "_block_type"
@@ -128,10 +133,39 @@ function getline_matching (regex)
 	return -1
 }
 
-# Find opening brace and adjust block depth
-function open_block (type, name, check_first)
+function parse_revdesc ()
 {
-	if (check_first == "{" || getline_matching("^[ \t]*{") > 0) {
+	_revstr = ""
+
+	if ($2 ~ "[0-9]*-[0-9*]") {
+		_revstr = $2
+		sub("-", ",", _revstr)
+	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
+		if ($2 == ">") {
+			_revstr = int($3)+1","REV_MAX
+		} else if ($2 == ">=") {
+			_revstr = $3","REV_MAX
+		} else if ($2 == "<" && int($3) > 0) {
+			_revstr = "0,"int($3)-1
+		} else if ($2 == "<=") {
+			_revstr = "0,"$3
+		} else {
+			error("invalid revision descriptor")
+		}
+	} else if ($2 ~ "[1-9][0-9]*") {
+		_revstr = $2 "," $2
+	} else {
+		error("invalid revision descriptor")
+	}
+
+	_revstr = "{" _revstr "}"
+	return _revstr
+}
+
+# Find opening brace and adjust block depth
+function open_block (type, name)
+{
+	if ($0 ~ "{" || getline_matching("^[ \t]*{") > 0) {
 		depth++
 		push(BLOCK_START, NR)
 		push(BLOCK_NAME, name)
@@ -159,7 +193,7 @@ function close_block ()
 	}
 
 	# strip everything prior to the block closure
-	sub("^[^}]+}", "", $0)
+	sub("^[^}]*}", "", $0)
 	depth--
 }
 
@@ -230,7 +264,10 @@ function allow_def (type)
 	} else if (type == "struct") {
 		return (in_block("NONE"))
 	} else if (type == "revs") {
-		return (in_block("sprom"))
+		return (in_block("sprom") && in_nested_block("var"))
+	} else if (type == "struct_revs") {
+		return (in_block("sprom") && in_nested_block("struct") &&
+		    !in_nested_block("var"))
 	}
 
 	error("unknown type '" type "'")
@@ -246,66 +283,48 @@ $1 == "struct" && allow_def("struct") {
 		error("invalid identifier '" $2 "'")
 
 	debug("struct " $2 " {")
-	open_block($1, $2, $3)
+	open_block($1, $2)
+}
+
+# struct rev descriptor
+$1 == "revs" && allow_def("struct_revs") {
+	_revstr = parse_revdesc()
+	debug("struct_revs " _revstr " []")
+	next
 }
 
 # sprom block
 $1 == "sprom" && allow_def("sprom") {
 	debug("sprom {")
-	open_block($1, "", $2)
+	open_block($1, "")
 }
 
-# revs block
+# variable revs block
 $1 == "revs" && allow_def("revs") {
-	_revstr = ""
-	_bstart = $3
+	_revstr = parse_revdesc()
 
-	if ($2 ~ "[0-9]*-[0-9*]") {
-		_revstr = $2
-		sub("-", ",", _revstr)
-	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
-		if ($2 == ">") {
-			_revstr = int($3)+1","REV_MAX
-		} else if ($2 == ">=") {
-			_revstr = $3","REV_MAX
-		} else if ($2 == "<" && int($3) > 0) {
-			_revstr = "0,"int($3)-1
-		} else if ($2 == "<=") {
-			_revstr = "0,"$3
-		} else {
-			error("invalid revision descriptor")
-		}
-
-		_bstart = $4
-	} else if ($2 ~ "[1-9][0-9]*") {
-		_revstr = $2 "," $2
-	} else {
-		error("invalid revision descriptor")
-	}
-
-	_revstr = "{" _revstr "}"
 	debug("revs " _revstr " {")
-	open_block($1, "", _bstart)
-}
-
-function parse_offset () {
-	if ($1 !~ "^"IDENT_REGEX"@0x[A-Za-z0-9]+")
-		error("expected offset descriptor")
-
-	for (i = 0; i <= NF; i++)
-		debug("off["i"]="$i)
+	open_block($1, "")
 }
 
 # offset definition
-$1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+,?" && in_block("revs") {
-	parse_offset()
+$1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
+	#if (!in_nested_block("struct")) {
+		debug($1 " " $2 " " $3)
+	#} else {
+	#	debug("o=" $1)
+	#}
 
-	while ($(NR) ~ ",$") {
+#	parse_offset()
+
+	while ($(NF) == "," || $(NF) == "|") {
 		next_line()
-		parse_offset()
+#		parse_offset()
 	}
 
-	next
+	#debug("REWR="$0)
+	sub("[^{}]+", "", $0)
+	#debug("SUB="$0)
 }
 
 # private variable block
@@ -327,7 +346,7 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	if (sub(/\[\]$/, "", name) > 0)
 		array = 1
 
-	open_block("var", name, $3)
+	open_block("var", name)
 	debug("type=" DTYPE[type])
 }
 
@@ -344,14 +363,17 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	next
 }
 
-# Skip comment and blank lines
-/^#/ || /^$/ {
+# Skip comments and blank lines
+/^[ \t]*#/ || /^$/ {
 	next
 }
 
 # Close blocks
 /}/ && !in_block("NONE") {
 	while (!in_block("NONE") && $0 ~ "}") {
+#		if (/{/ && index($0, "}") > index($0, "{"))
+#			error("internal error; unmatched entries at close")
+
 		close_block();
 		debug("}")
 	}
@@ -360,7 +382,7 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 
 # Report unbalanced '}'
 /}/ && in_block("NONE") {
-	error("unbalanced '}'")
+	error("extra '}'")
 }
 
 # Invalid variable type
