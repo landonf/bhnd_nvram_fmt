@@ -52,6 +52,12 @@ BEGIN {
 	# Struct array keys
 	ST_BASE_ADDRS		= "base_addrs"
 	ST_NUM_BASE_ADDRS	= "num_base_addr"
+
+	# Variable array keys
+	VAR_NAME		= "v_name"
+	VAR_TYPE		= "v_type"
+	VAR_FMT			= "v_fmt"
+	VAR_STRUCT		= "v_parent_struct"
 }
 
 END {
@@ -197,11 +203,6 @@ function close_block ()
 		error("internal error - no closing brace")
 
 	if (in_block("var")) {
-		if (in_nested_block("struct")) {
-			sid = g(BLOCK_NAME, null, 1)
-			num_revs = structs[sid,NUM_REVS]
-			debug("struct-var (revs=" structs[sid,NUM_REVS] ")")
-		}
 		debug("complete-var")
 	}
 
@@ -381,13 +382,13 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 	#debug("SUB="$0)
 }
 
-# private variable block
+# private variable flag
 $1 == "private" && $2 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	sub("^private"FS, "", $0)
 	_private = 1
 }
 
-# variable block
+# variable definition
 $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	if (!$1 in DTYPE)
 		error("unknown type '" $1 "'")
@@ -400,16 +401,34 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	if (sub(/\[\]$/, "", name) > 0)
 		array = 1
 
+	# Add top-level variable entry 
+	if ((name,DEF_LINE) in vars) 
+		error("variable identifier '" name "' previously defined on " \
+		    "line " vars[name,DEF_LINE])
+
+	vars[name,DEF_LINE] = NR
+	vars[name,VAR_TYPE] = type
+
 	open_block("var", name)
+
+	# Mark as a struct-based variable
+	if (in_nested_block("struct")) {
+		sid = g(BLOCK_NAME, null, 1)
+		vars[name,VAR_PARENT_STRUCT] = sid
+		debug("struct-var " sid " (revs=" structs[sid,NUM_REVS] ")")
+	}
+
 	debug("type=" DTYPE[type])
 }
 
 # variable parameters
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
+	vid = g(BLOCK_NAME)
 	if ($1 == "sfmt") {
 		if (!$2 in SFMT) {
 			error("invalid sfmt '" $2 "'")
 		}
+		vars[vid,VAR_FMT] = $2
 		debug($1 "=" SFMT[$2])
 	} else {
 		error("unknown parameter " $1)
