@@ -47,7 +47,7 @@ BEGIN {
 
 END {
 	if (!_EARLY_EXIT && depth > 0) {
-		block_start = lookup(BLOCK_START)
+		block_start = get(BLOCK_START)
 		errorx("missing '}' for block opened on line " block_start "")
 	}
 }
@@ -170,7 +170,7 @@ function open_block (type, name)
 		push(BLOCK_START, NR)
 		push(BLOCK_NAME, name)
 		push(BLOCK_TYPE, type)
-		#print "open:",lookup(BLOCK_TYPE),lookup(BLOCK_NAME)
+		#print "open:",get(BLOCK_TYPE),get(BLOCK_NAME)
 
 		sub("^[^{]+{", "", $0)
 		return 1
@@ -185,8 +185,19 @@ function close_block ()
 	if ($0 !~ "}")
 		error("internal error - no closing brace")
 
+	_block_type = get(BLOCK_TYPE)
+	if (_block_type == "struct") {
+		debug("complete-struct (revs=" get("num_revs")")")
+		for (_cbi = 0; _cbi < get("num_revs"); _cbi++) {
+			debug("requesting " "rev_addrs,"_cbi)
+			debug("addrs=" get("rev_addrs,"_cbi))
+		}
+	} else if (_block_type == "var") {
+		debug("complete-var")
+	}
+
 	# drop all symbols defined at this depth
-	#print "close:",lookup(BLOCK_TYPE),lookup(BLOCK_NAME)
+	#print "close:",get(BLOCK_TYPE),get(BLOCK_NAME)
 	for (s in symbols) {
 		if (s ~ "^"depth"[^0-9]")
 			delete symbols[s]
@@ -200,7 +211,7 @@ function close_block ()
 # Look up a variable with `name` (and optional default value if not found)
 # in the current symbol table. If deflt is not specified and the
 # variable is not defined, a compiler error will be emitted.
-function lookup (name, deflt)
+function get (name, deflt)
 {
 	for (i = 0; i < depth; i++) {
 		if ((depth-i,name) in symbols)
@@ -221,8 +232,9 @@ function push (name, value)
 }
 
 # Set an existing variable's value in the symbol table; if not yet defined,
-# a new variable will be defined within the current scope.
-function set (name, value)
+# a new variable will be defined within the nearest enclosing struct or var
+# scope
+function set (name, value, scope)
 {
 	for (i = 0; i < depth; i++) {
 		if ((depth-i,name) in symbols) {
@@ -231,14 +243,25 @@ function set (name, value)
 		}
 	}
 
-	# No existing value
-	push(name, value)
+	# No existing value; define in the nearest lexical scope
+	for (i = 0; i < depth; i++) {
+		if ((depth-i,BLOCK_NAME) in symbols &&
+		    (symbols[depth-i,BLOCK_TYPE] == "struct" ||
+		     symbols[depth-i,BLOCK_TYPE] == "var"))
+		{
+			symbols[depth-i,name] = value
+			return
+		}
+	}
+
+	# No existing value, cannot define
+	error("'" name "' is undefined")
 }
 
 # Evaluates to true if immediately within a block scope of the given type
 function in_block (type)
 {
-	return (type == lookup(BLOCK_TYPE, "NONE"))
+	return (type == get(BLOCK_TYPE, "NONE"))
 }
 
 # Evaluates to true if within an immediate or non-immediate block scope of the
@@ -284,12 +307,19 @@ $1 == "struct" && allow_def("struct") {
 
 	debug("struct " $2 " {")
 	open_block($1, $2)
+
+	# Declare our struct variables
+	push("num_revs", 0)
+	push("num_vars", 0)
+	push("rev_addrs", null)
 }
 
 # struct rev descriptor
 $1 == "revs" && allow_def("struct_revs") {
 	_revstr = parse_revdesc()
 	debug("struct_revs " _revstr " []")
+	set("rev_addrs," get("num_revs"), 0x0)
+	set("num_revs", get("num_revs")+1)
 	next
 }
 
