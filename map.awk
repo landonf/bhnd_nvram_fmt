@@ -198,8 +198,9 @@ function close_block ()
 
 	if (in_block("var")) {
 		if (in_nested_block("struct")) {
-			debug("struct-var (revs=" structs[g(BLOCK_NAME),NUM_REVS] ")")
-		} else {
+			sid = g(BLOCK_NAME, null, 1)
+			num_revs = structs[sid,NUM_REVS]
+			debug("struct-var (revs=" structs[sid,NUM_REVS] ")")
 		}
 		debug("complete-var")
 	}
@@ -216,12 +217,19 @@ function close_block ()
 	depth--
 }
 
-# Look up a variable with `name` (and optional default value if not found)
-# in the current symbol table. If deflt is not specified and the
-# variable is not defined, a compiler error will be emitted.
-function g (name, deflt)
+# Look up a variable in the symbol table with `name`, optional default value if
+# not found, and an optional scope level to start searching.
+#
+# If deflt is null and the variable is not defined, a compiler error will be
+# emitted.
+# The scope level is defined relative to the current scope -- 0 is the current
+# scope, 1 is the parent scope, etc.
+function g (name, deflt, scope)
 {
-	for (i = 0; i < depth; i++) {
+	if (scope == null)
+		scope = 0;
+
+	for (i = scope; i < depth; i++) {
 		if ((depth-i,name) in symbols)
 			return symbols[depth-i,name]
 	}
