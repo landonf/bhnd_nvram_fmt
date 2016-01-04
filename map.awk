@@ -300,7 +300,7 @@ function parse_offset () {
 $1 ~ "^" IDENT_REGEX "@0x[A-Fa-f0-9]+,?" && in_block("revs") {
 	parse_offset()
 
-	while ($(NR-1) ~ ",$") {
+	while ($(NR) ~ ",$") {
 		next_line()
 		parse_offset()
 	}
