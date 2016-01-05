@@ -33,8 +33,8 @@ BEGIN {
 	DTYPE["cc"]	= "BHND_NVRAM_DT_CCODE"
 
 	# Default masking for standard widths
-	WMASK["u8"]	= "0xFF"
-	WMASK["u16"]	= "0xFFFF"
+	WMASK["u8"]	= "0x000000FF"
+	WMASK["u16"]	= "0x0000FFFF"
 	WMASK["u32"]	= "0xFFFFFFFF"
 
 	# Byte sizes for standard widths
@@ -132,10 +132,15 @@ function gen_var_max_array_len (v)
 	return _max_elems
 }
 
-function gen_var_decl (v)
+function gen_var_decl (v, struct_rev, struct_revk, base_addr)
 {
+	if (base_addr == null)
+		base_addr = ""
+	else
+		base_addr = base_addr "+"
+
 	printf("\t{\"%s\", %s, %s, %s, %u, (struct bhnd_sprom_var[]) {\n",
-	    v,
+	    v struct_rev,
 	    DTYPE[vars[v,VAR_TYPE]],
 	    SFMT[vars[v,VAR_FMT]],
 	    gen_var_flags(v),
@@ -143,6 +148,19 @@ function gen_var_decl (v)
 
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
 		revk = subkey(v, REV, rev"")
+
+		if (struct_revk != null) {
+			sr_start = structs[struct_revk,REV_START]
+			sr_end = structs[struct_revk,REV_END]
+			if (vars[revk,REV_START] < sr_start)
+				continue
+			if (vars[revk,REV_START] > sr_end)
+				continue
+			if (vars[revk,REV_END] < sr_start)
+				continue
+			if (vars[revk,REV_END] > sr_end)
+				continue
+		}
 
 		printf("\t\t{{%u, %u}, (struct bhnd_sprom_value[]) {\n",
 		    vars[revk,REV_START],
@@ -157,7 +175,7 @@ function gen_var_decl (v)
 			for (seg = 0; seg < num_segs; seg++) {
 				segk = subkey(offk, OFF_SEG, seg"")
 				printf("\t\t\t\t\t{%s,\t%s,\t%s,\t%s},\n",
-				    vars[segk,SEG_ADDR],
+				    base_addr vars[segk,SEG_ADDR],
 				    vars[segk,SEG_WIDTH],
 				    vars[segk,SEG_MASK],
 				    vars[segk,SEG_SHIFT])
@@ -168,6 +186,20 @@ function gen_var_decl (v)
 	}
 
 	printf("\t}, %u},\n", vars[v,NUM_REVS])
+}
+
+function gen_struct_var_decl (v)
+{
+	st = vars[v,VAR_STRUCT]
+	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
+		srevk = subkey(st, REV, srev"")
+		print v""srev
+
+		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
+			offk = subkey(srevk, OFF, off"")
+			gen_var_decl(v, off, srevk, structs[offk,SEG_ADDR])
+		}
+	}
 }
 
 END {
@@ -184,12 +216,10 @@ END {
 	# generate output
 	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
 	for (v in var_names) {
-		if (vars[v,VAR_STRUCT] != null) {
-			#printf "struct-var: "
-			#print("\""v"\"")
-		} else {
+		if (vars[v,VAR_STRUCT] != null)
+			gen_struct_var_decl(v)
+		else
 			gen_var_decl(v)
-		}
 	}
 	printf("};\n")
 
@@ -477,7 +507,7 @@ $1 == "revs" && allow_def("struct_revs") {
 	num_offs = split(addrs_str, addrs, ",[ \t]*")
 	structs[revk, REV_NUM_OFFS] = num_offs
 	for (i = 1; i <= num_offs; i++) {
-		offk = subkey(revk, OFF, i-1)
+		offk = subkey(revk, OFF, (i-1) "")
 
 		if (addrs[i] !~ "^"HEX_REGEX"$")
 			error("invalid base address '" addrs[i] "'")
