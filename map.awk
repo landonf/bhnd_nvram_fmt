@@ -57,11 +57,17 @@ BEGIN {
 	# Common array keys
 	DEF_LINE		= "def_line"
 	NUM_REVS		= "num_revs"
-	REVDESC			= "rev_decl"
 
-	# Struct array keys
-	ST_BASE_ADDRS		= "base_addrs"
-	ST_NUM_BASE_ADDRS	= "num_base_addr"
+	# Revision array keys
+	REV_NUM_OFFS		= "rv_num_offs"
+	REV_OFFS 		= "rv_offset"
+	REV_DESC		= "rv_decl"
+
+	# Offset array keys
+	OFF_ADDR		= "of_addr"
+	OFF_WIDTH		= "of_width"
+	OFF_MASK		= "of_mask"
+	OFF_SHIFT		= "of_shift"
 
 	# Variable array keys
 	VAR_NAME		= "v_name"
@@ -354,21 +360,21 @@ $1 == "revs" && allow_def("struct_revs") {
 	rev_idx = structs[id,NUM_REVS]
 
 	structs[id,NUM_REVS]++
-	structs[id,REVDESC,rev_idx] = parse_revdesc()
+	structs[id,REV_DESC,rev_idx] = parse_revdesc()
 
 	if (match($0, "\\[[^]]*\\]") <= 0)
 		error("expected base address array")
 
 	addrs_str = substr($0, RSTART+1, RLENGTH-2)
-	num_addrs = split(addrs_str, addrs, ",[ \t]*")
-	structs[id,ST_NUM_BASE_ADDRS] = num_addrs
-	for (i = 1; i <= num_addrs; i++) {
+	num_offs = split(addrs_str, addrs, ",[ \t]*")
+	structs[id,REV_NUM_OFFS,rev_idx] = num_offs
+	for (i = 1; i <= num_offs; i++) {
 		if (addrs[i] !~ "^"HEX_REGEX"$")
 			error("invalid base address '" addrs[i] "'")
-		structs[id,ST_BASE_ADDRS,i-1] = addrs[i]
+		structs[id,OFF_ADDR,i-1] = addrs[i]
 	}
 
-	debug("struct_revs " structs[id,REVDESC,rev_idx] " [" addrs_str "]")
+	debug("struct_revs " structs[id,REV_DESC,rev_idx] " [" addrs_str "]")
 	next
 }
 
