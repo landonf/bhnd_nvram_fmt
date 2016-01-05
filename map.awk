@@ -14,7 +14,7 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 1
+	DEBUG = 0
 
 	# Maximum revision
 	REV_MAX = 65535
