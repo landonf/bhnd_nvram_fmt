@@ -589,6 +589,245 @@ private:
         va_end(vap);
         return r;
     }
+    
+    void output_vars (const vector<shared_ptr<bhnd_nvram_var>> &vars) {
+        for (const auto &v : vars) {
+            if (v->flags & BHND_NVRAM_VF_MFGINT)
+                printf("private ");
+            
+            dprintf("%s %s", dtstr(v->type), v->name.c_str());
+            
+            if (v->flags & BHND_NVRAM_VF_ARRAY)
+                printf("[]");
+            
+            printf(" {\n");
+            _depth++;
+            
+            dprintf("sfmt\t%s\n", sfmtstr(v->fmt));
+            if (v->flags & BHND_NVRAM_VF_IGNALL1)
+                dprintf("all1\tignore\n");
+            
+            dprintf("sprom {\n");
+            _depth++;
+            for (const auto &t : v->sprom_descs) {
+                dprintf("revs ");
+                if (t.compat.last == BHND_SPROMREV_MAX)
+                    printf(">= %u", t.compat.first);
+                else if (t.compat.first == t.compat.last)
+                    printf("%u", t.compat.first);
+                else
+                    printf("%u-%u", t.compat.first, t.compat.last);
+                
+                size_t vlines = 0;
+                for (const auto &val : t.values) {
+                    for (__unused const auto &seg : val.segs) {
+                        vlines++;
+                    }
+                }
+                if (vlines <= 1) {
+                    dprintf("{ ");
+                } else {
+                    dprintf("{\n");
+                    _depth++;
+                }
+                
+                size_t vali = 0;
+                for (const auto &val : t.values) {
+                    for (size_t i = 0; i < val.segs.size(); i++) {
+                        const auto &seg = val.segs[i];
+                        
+                        if (vlines > 1)
+                            dprintf("");
+                        printf("%s 0x%04zX", seg.width_str(), seg.offset);
+                        if (!seg.has_defaults()) {
+                            printf(" (");
+                            if (!seg.has_default_mask()) {
+                                printf("&0x%X", seg.mask);
+                                if (!seg.has_default_shift())
+                                    printf(", ");
+                            }
+                            if (!seg.has_default_shift()) {
+                                if (seg.shift < 0)
+                                    printf("<<%zu", -seg.shift);
+                                else
+                                    printf(">>%zu", seg.shift);
+                            }
+                            printf(")");
+                        }
+                        
+                        if (i+1 != val.segs.size())
+                            printf(" |\n");
+                        else if (vlines > 1 && vali+1 != t.values.size())
+                            printf(",\n");
+                    }
+                    vali++;
+                }
+                if (vlines <= 1)
+                    printf(" }\n");
+                else {
+                    _depth--;
+                    dprintf("}\n");
+                }
+            }
+            _depth--;
+            dprintf("}\n");
+            _depth--;
+            dprintf("}\n\n");
+        }
+    }
+
+    vector<shared_ptr<bhnd_nvram_var>> convert_nvars (shared_ptr<vector<nvar>> &nvars) {
+        unordered_map<string, shared_ptr<bhnd_nvram_var>> var_table;
+        vector<shared_ptr<bhnd_nvram_var>> vars;
+        unordered_set<string> consts;
+        
+        for (size_t i = 0; i < nvars->size(); i++) {
+            nvar *n = &(*nvars)[i];
+            
+            /* Record symbolic constants that we'll need to preserve */
+            auto refconst = n->off.referenced_constants();
+            for (const auto &rc : refconst) {
+                if (consts.count(rc) == 0)
+                    consts.insert(rc);
+            }
+            
+            std::string name = n->name.UTF8String;
+            uint32_t revmask = n->revmask;
+            uint32_t flags = n->flags;
+            
+            if (name.length() == 0)
+                errx(EXIT_FAILURE, "variable has zero-length name");
+            
+            /* Generate the basic bhnd_nvram_var record */
+            auto v = std::make_shared<bhnd_nvram_var>();
+            v->name = name;
+            
+            /* Determine fmt and type */
+            if (flags & SRFL_CCODE) {
+                v->type = BHND_NVRAM_DT_CCODE;
+                v->fmt = BHND_NVRAM_SFMT_ASCII;
+            } else if (flags & SRFL_ETHADDR) {
+                v->type = BHND_NVRAM_DT_MAC48;
+                v->fmt = BHND_NVRAM_SFMT_MACADDR;
+            } else if (flags & SRFL_LEDDC) {
+                v->type = BHND_NVRAM_DT_LEDDC;
+                v->fmt = BHND_NVRAM_SFMT_HEX;
+            } else if (flags & SRFL_PRSIGN) {
+                v->type = BHND_NVRAM_DT_SINT;
+                v->fmt = BHND_NVRAM_SFMT_SDEC;
+            } else if (flags & SRFL_PRHEX) {
+                v->type = BHND_NVRAM_DT_UINT;
+                v->fmt = BHND_NVRAM_SFMT_HEX;
+            } else {
+                /* Default behavior */
+                v->type = BHND_NVRAM_DT_UINT;
+                v->fmt = BHND_NVRAM_SFMT_HEX;
+            }
+            
+            /* Apply flags */
+            v->flags = 0;
+            if (flags & SRFL_NOFFS)
+                v->flags |= BHND_NVRAM_VF_IGNALL1;
+            
+            if (flags & SRFL_ARRAY)
+                v->flags |= BHND_NVRAM_VF_ARRAY;
+            
+            if (flags & SRFL_NOVAR)
+                v->flags |= BHND_NVRAM_VF_MFGINT;
+            
+            /* Compare against previous variable with this name, or
+             * register the new variable */
+            if (var_table.count(name) == 0) {
+                vars.push_back(v);
+                var_table.insert({name, v});
+            } else {
+                auto orig = var_table.at(name);
+                
+                if (orig->type != v->type)
+                    errx(EXIT_FAILURE, "%s: type mismatch (%u vs %u)", name.c_str(), orig->type, v->type);
+                
+                if (orig->fmt != v->fmt)
+                    errx(EXIT_FAILURE, "fmt mismatch");
+                
+                if (orig->flags != v->flags) {
+                    /* VF_ARRAY mismatch is OK, but nothing else is */
+                    if ((orig->flags & ~BHND_NVRAM_VF_ARRAY) != (v->flags & ~BHND_NVRAM_VF_ARRAY))
+                        errx(EXIT_FAILURE, "%s: flag mismatch (0x%X vs. 0x%X)", name.c_str(), orig->flags, v->flags);
+                    
+                    /* Promote to an array */
+                    orig->flags |= BHND_NVRAM_VF_ARRAY;
+                }
+                
+                v = orig;
+            }
+            
+            /* Handle array/sparse continuation records */
+            std::vector<bhnd_sprom_value> vals;
+            bhnd_sprom_value base_val;
+            bhnd_sprom_vseg base_seg = {
+                n->byte_off(),
+                n->width(),
+                n->valmask,
+                static_cast<ssize_t>(__builtin_ctz(n->valmask))
+            };
+            
+            base_val.segs.push_back(base_seg);
+            size_t more_width = n->width();
+            while (n->flags & SRFL_MORE) {
+                i++;
+                n = &(*nvars)[i];
+                
+                base_val.segs.push_back({
+                    n->byte_off(),
+                    n->width(),
+                    n->valmask,
+                    static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
+                });
+                
+                more_width += n->width();
+            }
+            vals.push_back(base_val);
+            
+            while (n->flags & SRFL_ARRAY) {
+                bhnd_sprom_value val;
+                
+                i++;
+                n = &(*nvars)[i];
+                
+                val.segs.push_back({
+                    n->byte_off(),
+                    n->width(),
+                    n->valmask,
+                    static_cast<ssize_t>(__builtin_ctz(n->valmask))
+                });
+                
+                more_width = n->width();
+                while (n->flags & SRFL_MORE) {
+                    i++;
+                    n = &(*nvars)[i];
+                    
+                    val.segs.push_back({
+                        n->byte_off(),
+                        n->width(),
+                        n->valmask,
+                        static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
+                    });
+                    
+                    more_width += n->width();
+                }
+                
+                vals.push_back(val);
+            }
+            
+            int ctz = __builtin_ctz(revmask);
+            uint16_t first_ver = (1UL << ctz);
+            uint16_t last_ver = revmask | (((~revmask) << (sizeof(revmask)*8 - ctz)) >> (sizeof(revmask)*8 - ctz));
+            
+            v->sprom_descs.push_back({{first_ver, last_ver}, vals});
+        }
+        
+        return vars;
+    }
 
 public:
     Extractor(int argc, char * const argv[]) {
@@ -661,250 +900,22 @@ public:
         }];
         api = symbols;
 
-        /* Fetch all PCI sromvars */
+        /* Output all PCI sromvars */
         auto nvars = extract_nvars(@"pci_sromvars");
+        auto vars = convert_nvars(nvars);
+        output_vars(vars);
 
         /* Fetch+generate the per-path nvars */
+#if 0
         auto path_nvars = generate_path_vars();
         nvars->reserve(nvars->size() + path_nvars->size());
         nvars->insert(nvars->end(), path_nvars->begin(), path_nvars->end());
 
-        unordered_map<string, shared_ptr<bhnd_nvram_var>> var_table;
-        vector<shared_ptr<bhnd_nvram_var>> vars;
-        unordered_set<string> consts;
-
-        for (size_t i = 0; i < nvars->size(); i++) {
-            nvar *n = &(*nvars)[i];
-            
-            /* Record symbolic constants that we'll need to preserve */
-            auto refconst = n->off.referenced_constants();
-            for (const auto &rc : refconst) {
-                if (consts.count(rc) == 0)
-                    consts.insert(rc);
-            }
-
-            std::string name = n->name.UTF8String;
-            uint32_t revmask = n->revmask;
-            uint32_t flags = n->flags;
-
-            if (name.length() == 0)
-                errx(EXIT_FAILURE, "variable has zero-length name");
-
-            /* Generate the basic bhnd_nvram_var record */
-            auto v = std::make_shared<bhnd_nvram_var>();
-            v->name = name;
-            
-            /* Determine fmt and type */
-            if (flags & SRFL_CCODE) {
-                v->type = BHND_NVRAM_DT_CCODE;
-                v->fmt = BHND_NVRAM_SFMT_ASCII;
-            } else if (flags & SRFL_ETHADDR) {
-                v->type = BHND_NVRAM_DT_MAC48;
-                v->fmt = BHND_NVRAM_SFMT_MACADDR;
-            } else if (flags & SRFL_LEDDC) {
-                v->type = BHND_NVRAM_DT_LEDDC;
-                v->fmt = BHND_NVRAM_SFMT_HEX;
-            } else if (flags & SRFL_PRSIGN) {
-                v->type = BHND_NVRAM_DT_SINT;
-                v->fmt = BHND_NVRAM_SFMT_SDEC;
-            } else if (flags & SRFL_PRHEX) {
-                v->type = BHND_NVRAM_DT_UINT;
-                v->fmt = BHND_NVRAM_SFMT_HEX;
-            } else {
-                /* Default behavior */
-                v->type = BHND_NVRAM_DT_UINT;
-                v->fmt = BHND_NVRAM_SFMT_HEX;
-            }
-            
-            /* Apply flags */
-            v->flags = 0;
-            if (flags & SRFL_NOFFS)
-                v->flags |= BHND_NVRAM_VF_IGNALL1;
-            
-            if (flags & SRFL_ARRAY)
-                v->flags |= BHND_NVRAM_VF_ARRAY;
-            
-            if (flags & SRFL_NOVAR)
-                v->flags |= BHND_NVRAM_VF_MFGINT;
-            
-            /* Compare against previous variable with this name, or
-             * register the new variable */
-            if (var_table.count(name) == 0) {
-                vars.push_back(v);
-                var_table.insert({name, v});
-            } else {
-                auto orig = var_table.at(name);
-
-                if (orig->type != v->type)
-                    errx(EXIT_FAILURE, "%s: type mismatch (%u vs %u)", name.c_str(), orig->type, v->type);
-
-                if (orig->fmt != v->fmt)
-                    errx(EXIT_FAILURE, "fmt mismatch");
-
-                if (orig->flags != v->flags) {
-                    /* VF_ARRAY mismatch is OK, but nothing else is */
-                    if ((orig->flags & ~BHND_NVRAM_VF_ARRAY) != (v->flags & ~BHND_NVRAM_VF_ARRAY))
-                        errx(EXIT_FAILURE, "%s: flag mismatch (0x%X vs. 0x%X)", name.c_str(), orig->flags, v->flags);
-
-                    /* Promote to an array */
-                    orig->flags |= BHND_NVRAM_VF_ARRAY;
-                }
-
-                v = orig;
-            }
-
-            /* Handle array/sparse continuation records */
-            std::vector<bhnd_sprom_value> vals;
-            bhnd_sprom_value base_val;
-            bhnd_sprom_vseg base_seg = {
-                n->byte_off(),
-                n->width(),
-                n->valmask,
-                static_cast<ssize_t>(__builtin_ctz(n->valmask))
-            };
-
-            base_val.segs.push_back(base_seg);
-            size_t more_width = n->width();
-            while (n->flags & SRFL_MORE) {
-                i++;
-                n = &(*nvars)[i];
-                
-                base_val.segs.push_back({
-                    n->byte_off(),
-                    n->width(),
-                    n->valmask,
-                    static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
-                });
-
-                more_width += n->width();
-            }
-            vals.push_back(base_val);
-
-            while (n->flags & SRFL_ARRAY) {
-                bhnd_sprom_value val;
-
-                i++;
-                n = &(*nvars)[i];
-
-                val.segs.push_back({
-                    n->byte_off(),
-                    n->width(),
-                    n->valmask,
-                    static_cast<ssize_t>(__builtin_ctz(n->valmask))
-                });
-
-                more_width = n->width();
-                while (n->flags & SRFL_MORE) {
-                    i++;
-                    n = &(*nvars)[i];
-                    
-                    val.segs.push_back({
-                        n->byte_off(),
-                        n->width(),
-                        n->valmask,
-                        static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
-                    });
-                    
-                    more_width += n->width();
-                }
-                
-                vals.push_back(val);
-            }
-
-            int ctz = __builtin_ctz(revmask);
-            uint16_t first_ver = (1UL << ctz);
-            uint16_t last_ver = revmask | (((~revmask) << (sizeof(revmask)*8 - ctz)) >> (sizeof(revmask)*8 - ctz));
-            
-            v->sprom_descs.push_back({{first_ver, last_ver}, vals});
-        }
-
         sort(vars.begin(), vars.end(), [](const shared_ptr<bhnd_nvram_var> &lhs, const shared_ptr<bhnd_nvram_var> &rhs) {
             return *lhs < *rhs;
         });
+#endif
 
-        for (const auto &v : vars) {
-            if (v->flags & BHND_NVRAM_VF_MFGINT)
-                printf("private ");
-            
-            dprintf("%s %s", dtstr(v->type), v->name.c_str());
-            
-            if (v->flags & BHND_NVRAM_VF_ARRAY)
-                printf("[]");
-
-            printf(" {\n");
-            _depth++;
-
-            dprintf("sfmt\t%s\n", sfmtstr(v->fmt));
-            if (v->flags & BHND_NVRAM_VF_IGNALL1)
-                dprintf("all1\tignore\n");
-
-            dprintf("sprom {\n");
-            _depth++;
-            for (const auto &t : v->sprom_descs) {
-                dprintf("revs ");
-                if (t.compat.last == BHND_SPROMREV_MAX)
-                    printf(">= %u", t.compat.first);
-                else if (t.compat.first == t.compat.last)
-                    printf("%u", t.compat.first);
-                else
-                    printf("%u-%u", t.compat.first, t.compat.last);
-                
-                size_t vlines = 0;
-                for (const auto &val : t.values) {
-                    for (__unused const auto &seg : val.segs) {
-                        vlines++;
-                    }
-                }
-                if (vlines <= 1) {
-                    dprintf("{ ");
-                } else {
-                    dprintf("{\n");
-                    _depth++;
-                }
-
-                size_t vali = 0;
-                for (const auto &val : t.values) {
-                    for (size_t i = 0; i < val.segs.size(); i++) {
-                        const auto &seg = val.segs[i];
-
-                        if (vlines > 1)
-                            dprintf("");
-                        printf("%s 0x%04zX", seg.width_str(), seg.offset);
-                        if (!seg.has_defaults()) {
-                            printf(" (");
-                            if (!seg.has_default_mask()) {
-                                printf("&0x%X", seg.mask);
-                                if (!seg.has_default_shift())
-                                    printf(", ");
-                            }
-                            if (!seg.has_default_shift()) {
-                                if (seg.shift < 0)
-                                    printf("<<%zu", -seg.shift);
-                                else
-                                    printf(">>%zu", seg.shift);
-                            }
-                            printf(")");
-                        }
-                        
-                        if (i+1 != val.segs.size())
-                            printf(" |\n");
-                        else if (vlines > 1 && vali+1 != t.values.size())
-                            printf(",\n");
-                    }
-                    vali++;
-                }
-                if (vlines <= 1)
-                    printf(" }\n");
-                else {
-                    _depth--;
-                    dprintf("}\n");
-                }
-            }
-            _depth--;
-            dprintf("}\n");
-            _depth--;
-            dprintf("}\n\n");
-        }
     }
 };
 
