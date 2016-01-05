@@ -162,7 +162,7 @@ function gen_var_decl (v)
 				    vars[segk,SEG_MASK],
 				    vars[segk,SEG_SHIFT])
 			}
-			printf("\t\t\t}, %u}\n", num_segs)
+			printf("\t\t\t}, %u},\n", num_segs)
 		}
 		printf("\t\t}, %u},\n", num_offs)
 	}
@@ -191,7 +191,7 @@ END {
 			gen_var_decl(v)
 		}
 	}
-	printf("}\n")
+	printf("};\n")
 
 	for (k in vars) {
 		o = k
@@ -319,7 +319,6 @@ function open_block (type, name)
 		if (name != null)
 			push(BLOCK_NAME, name)
 		push(BLOCK_TYPE, type)
-		#print "open:",g(BLOCK_TYPE),g(BLOCK_NAME)
 
 		sub("^[^{]+{", "", $0)
 		return 1
@@ -339,7 +338,6 @@ function close_block ()
 	}
 
 	# drop all symbols defined at this depth
-	#print "close:",g(BLOCK_TYPE),g(BLOCK_NAME)
 	for (s in symbols) {
 		if (s ~ "^"depth"[^0-9]")
 			delete symbols[s]

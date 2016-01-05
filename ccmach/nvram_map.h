@@ -6,22 +6,26 @@
 //  Copyright (c) 2016 Landon Fuller. All rights reserved.
 //
 
+#include <stdio.h>
+#include <unistd.h>
+#include <stdint.h>
+
 /** NVRAM primitive data types */
 typedef enum {
 	BHND_NVRAM_DT_UINT,	/**< unsigned integer */
 	BHND_NVRAM_DT_SINT,	/**< signed integer */
 	BHND_NVRAM_DT_MAC48,	/**< MAC-48 address */
 	BHND_NVRAM_DT_LEDDC,	/**< LED PWM duty-cycle */
-	BHND_NVRAM_DT_ASCII	/**< ASCII character */
+	BHND_NVRAM_DT_CCODE,	/**< country code format (2-3 ASCII chars) */
 } bhnd_nvram_dt;
 
 /** NVRAM data type string representations */
 typedef enum {
-	BHND_NVRAM_SFMT_HEX,	/**< hex string format */
-	BHND_NVRAM_SFMT_SDEC,	/**< signed decimal format */
-	BHND_NVRAM_SFMT_CCODE,	/**< country code format (ascii string) */
+	BHND_NVRAM_SFMT_HEX,		/**< hex string format */
+	BHND_NVRAM_SFMT_SDEC,		/**< signed decimal format */
 	BHND_NVRAM_SFMT_MACADDR,	/**< mac address (canonical form, hex octets,
-				     seperated with ':') */
+					     seperated with ':') */
+	BHND_NVRAM_SFMT_ASCII		/**< ASCII string */
 } bhnd_nvram_sfmt;
 
 /** NVRAM variable flags */
@@ -138,7 +142,7 @@ typedef struct bhnd_nvram_var {
 
 #define	nitems(x)	(sizeof((x)) / sizeof((x)[0]))
 
-const struct bhnd_nvram_var nvram_vars[] = {
+const struct bhnd_nvram_var nvram_vars1[] = {
 	BHND_NVRAM_VAR(poodle, UINT, SFMT_HEX, VF_DFLT, 0,
 	    BHND_SPROM_MAPPING(REV_GTE(1),
 		BHND_SPROM_VAL_U32(0xFFEE)
