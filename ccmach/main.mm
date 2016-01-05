@@ -202,6 +202,40 @@ struct bhnd_sprom_vseg {
     size_t		width;	/**< 1, 2, or 4 bytes */
     uint32_t	mask;	/**< mask to be applied to the value */
     ssize_t		shift;	/**< shift to be applied to the value on extraction. if negative, left shift. if positive, right shift. */
+    
+    const char *width_str () const {
+        switch (width) {
+            case 1:
+                return "u8";
+            case 2:
+                return "u16";
+            case 4:
+                return "u32";
+            default:
+                errx(EXIT_FAILURE, "Unsupported width: %zu", width);
+        }
+    }
+    
+    bool has_default_mask () const {
+        switch (width) {
+            case 1:
+                return (mask == 0xFF);
+            case 2:
+                return (mask == 0xFFFF);
+            case 4:
+                return (mask == 0xFFFFFFFF);
+            default:
+                errx(EXIT_FAILURE, "Unsupported width: %zu", width);
+        }
+    }
+    
+    bool has_default_shift () const {
+        return (shift == 0);
+    }
+
+    bool has_defaults () const {
+        return (has_default_mask() && has_default_shift());
+    }
 };
 
 /** SPROM value descriptor */
@@ -388,6 +422,25 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
 
     *nout = nvar(name, revmask, flags, off, valmask);
     return true;
+}
+
+static const char *dtstr (bhnd_nvram_dt dt) {
+    switch (dt) {
+        case BHND_NVRAM_DT_UINT: return "uint";
+        case BHND_NVRAM_DT_SINT: return "sint";
+        case BHND_NVRAM_DT_MAC48: return "mac48";
+        case BHND_NVRAM_DT_LEDDC: return "led";
+        case BHND_NVRAM_DT_CCODE: return "cc";
+    }
+}
+
+static const char *sfmtstr (bhnd_nvram_sfmt sfmt) {
+    switch (sfmt) {
+        case BHND_NVRAM_SFMT_HEX: return "hex";
+        case BHND_NVRAM_SFMT_SDEC: return "sdec";
+        case BHND_NVRAM_SFMT_MACADDR: return "macaddr";
+        case BHND_NVRAM_SFMT_ASCII: return "ascii";
+    }
 }
 
 class Extractor {
@@ -756,22 +809,80 @@ public:
             return *lhs < *rhs;
         });
 
-    #if 1
         for (const auto &v : vars) {
-            printf("%s:\n", v->name.c_str());
+            if (v->flags & BHND_NVRAM_VF_MFGINT)
+                printf("private ");
+            
+            printf("%s %s", dtstr(v->type), v->name.c_str());
+            
+            if (v->flags & BHND_NVRAM_VF_ARRAY)
+                printf("[]");
+
+            printf(" {\n");
+            
+            printf("\tsfmt  %s\n", sfmtstr(v->fmt));
+
+            printf("\tsprom {\n");
             for (const auto &t : v->sprom_descs) {
-                printf("\trevs 0x%04X - 0x%04X\n", t.compat.first, t.compat.last);
-                size_t idx = 0;
+                printf("\t\trevs ");
+                if (t.compat.last == BHND_SPROMREV_MAX)
+                    printf(">= %u", t.compat.first);
+                else if (t.compat.first == t.compat.last)
+                    printf("%u", t.compat.first);
+                else
+                    printf("%u-%u", t.compat.first, t.compat.last);
+                
+                size_t vlines = 0;
                 for (const auto &val : t.values) {
-                    printf("\t\t%s[%zu]\n", v->name.c_str(), idx);
-                    for (const auto &seg : val.segs) {
-                        printf("\t\t  seg offset=0x%04zX width=%zu mask=0x%08X shift=%zd\n", seg.offset, seg.width, seg.mask, seg.shift);
+                    for (__unused const auto &seg : val.segs) {
+                        vlines++;
                     }
-                    idx++;
                 }
+                if (vlines <= 1) {
+                    printf("\t{ ");
+                } else {
+                    printf("\t{\n");
+                }
+
+                size_t vali = 0;
+                for (const auto &val : t.values) {
+                    for (size_t i = 0; i < val.segs.size(); i++) {
+                        const auto &seg = val.segs[i];
+
+                        if (vlines > 1)
+                            printf("\t\t\t");
+                        printf("%s 0x%04zX", seg.width_str(), seg.offset);
+                        if (!seg.has_defaults()) {
+                            printf(" (");
+                            if (!seg.has_default_mask()) {
+                                printf("&0x%X", seg.mask);
+                                if (!seg.has_default_shift())
+                                    printf(", ");
+                            }
+                            if (!seg.has_default_shift()) {
+                                if (seg.shift < 0)
+                                    printf("<<%zu", -seg.shift);
+                                else
+                                    printf(">>%zu", seg.shift);
+                            }
+                            printf(")");
+                        }
+                        
+                        if (i+1 != val.segs.size())
+                            printf(" |\n");
+                        else if (vlines > 1 && vali+1 != t.values.size())
+                            printf(",\n");
+                    }
+                    vali++;
+                }
+                if (vlines <= 1)
+                    printf(" }\n");
+                else
+                    printf("\n\t\t}\n");
             }
+            printf("\t}\n");
+            printf("}\n\n");
         }
-    #endif
     }
 };
 
