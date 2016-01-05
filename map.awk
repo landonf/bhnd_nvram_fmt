@@ -193,7 +193,6 @@ function gen_struct_var_decl (v)
 	st = vars[v,VAR_STRUCT]
 	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
 		srevk = subkey(st, REV, srev"")
-		print v""srev
 
 		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
 			offk = subkey(srevk, OFF, off"")
