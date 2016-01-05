@@ -448,15 +448,19 @@ $1 == "sprom" && allow_def("sprom") {
 
 # variable revs block
 $1 == "revs" && allow_def("revs") {
-	vid = g(BLOCK_NAME)
+	# parse revision descriptor
+	parse_revdesc(rev_desc)
 
 	# assign revision id
+	vid = g(BLOCK_NAME)
 	rev = vars[vid,NUM_REVS] ""
 	revk = subkey(vid, REV, rev)
 	vars[vid,NUM_REVS]++
 
-	# parse revision descriptor
-	parse_revdesc(rev_desc)
+	# vend scoped rev/revk variables for use in the
+	# revision offset block
+	push("rev_id", rev)
+	push("rev_key", revk)
 
 	# init basic revision state
 	vars[revk,REV_START] = rev_desc[REV_START]
@@ -467,16 +471,9 @@ $1 == "revs" && allow_def("revs") {
 	open_block($1, null)
 }
 
-function parse_offset_segment ()
+function parse_offset_segment (revk, offk)
 {
 	vid = g(BLOCK_NAME)
-
-	# fetch rev/offset refs
-	rev = vars[vid,NUM_REVS] ""
-	revk = subkey(vid, REV, rev)
-
-	off = vars[revk, REV_NUM_OFFS] ""
-	offk = subkey(revk, OFF, off)
 
 	# assign segment id
 	seg = vars[offk,OFF_NUM_SEGS] ""
@@ -541,8 +538,10 @@ function parse_offset_segment ()
 # revision offset definition
 $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 	vid = g(BLOCK_NAME)
-	rev = vars[vid,NUM_REVS] ""
-	revk = subkey(vid, REV, rev)
+
+	# fetch rev id/key defined by our parent block
+	rev = g("rev_id")
+	revk = g("rev_key")
 
 	# parse all offsets
 	do {
@@ -557,7 +556,7 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 		debug("[")
 		# parse all segments
 		do {
-			parse_offset_segment()
+			parse_offset_segment(revk, offk)
 			_more_seg = ($1 == "|")
 			if (_more_seg)
 				shiftf(1, 1)
