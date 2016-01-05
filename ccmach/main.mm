@@ -576,6 +576,19 @@ private:
 
         return generated;
     }
+    
+    int _depth = 0;
+    int dprintf(const char *fmt, ...) {
+        va_list vap;
+   
+        for (int i = 0; i < _depth; i++)
+            printf("\t");
+
+        va_start(vap, fmt);
+        int r = vprintf(fmt, vap);
+        va_end(vap);
+        return r;
+    }
 
 public:
     Extractor(int argc, char * const argv[]) {
@@ -813,20 +826,22 @@ public:
             if (v->flags & BHND_NVRAM_VF_MFGINT)
                 printf("private ");
             
-            printf("%s %s", dtstr(v->type), v->name.c_str());
+            dprintf("%s %s", dtstr(v->type), v->name.c_str());
             
             if (v->flags & BHND_NVRAM_VF_ARRAY)
                 printf("[]");
 
             printf(" {\n");
-            
-            printf("\tsfmt\t%s\n", sfmtstr(v->fmt));
-            if (v->flags & BHND_NVRAM_VF_IGNALL1)
-                printf("\tall1\tignore\n");
+            _depth++;
 
-            printf("\tsprom {\n");
+            dprintf("sfmt\t%s\n", sfmtstr(v->fmt));
+            if (v->flags & BHND_NVRAM_VF_IGNALL1)
+                dprintf("all1\tignore\n");
+
+            dprintf("sprom {\n");
+            _depth++;
             for (const auto &t : v->sprom_descs) {
-                printf("\t\trevs ");
+                dprintf("revs ");
                 if (t.compat.last == BHND_SPROMREV_MAX)
                     printf(">= %u", t.compat.first);
                 else if (t.compat.first == t.compat.last)
@@ -841,9 +856,10 @@ public:
                     }
                 }
                 if (vlines <= 1) {
-                    printf("\t{ ");
+                    dprintf("{ ");
                 } else {
-                    printf("\t{\n");
+                    dprintf("{\n");
+                    _depth++;
                 }
 
                 size_t vali = 0;
@@ -852,7 +868,7 @@ public:
                         const auto &seg = val.segs[i];
 
                         if (vlines > 1)
-                            printf("\t\t\t");
+                            dprintf("");
                         printf("%s 0x%04zX", seg.width_str(), seg.offset);
                         if (!seg.has_defaults()) {
                             printf(" (");
@@ -879,11 +895,15 @@ public:
                 }
                 if (vlines <= 1)
                     printf(" }\n");
-                else
-                    printf("\n\t\t}\n");
+                else {
+                    _depth--;
+                    dprintf("}\n");
+                }
             }
-            printf("\t}\n");
-            printf("}\n\n");
+            _depth--;
+            dprintf("}\n");
+            _depth--;
+            dprintf("}\n\n");
         }
     }
 };
