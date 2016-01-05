@@ -14,7 +14,7 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 0
+	DEBUG = 1
 
 	# Maximum revision
 	REV_MAX = 65535
@@ -564,8 +564,11 @@ function parse_offset_segment (revk, offk)
 	if (type !~ "^"WIDTHS_REGEX"$")
 		error("unknown field width '" $1 "'")
 
-	if (offset !~ "^"HEX_REGEX"$")
+	if (offset !~ "^"HEX_REGEX",?$")
 		error("invalid offset value '" $2 "'")
+
+	# clean up any trailing comma on the offset field
+	sub(",$", "", offset)
 
 	# extract byte count[] and width
 	if (match(type, "\\["INT_REGEX"\\]$") > 0) {
@@ -576,8 +579,11 @@ function parse_offset_segment (revk, offk)
 	}
 	width = WBYTES[type]
 
+	# seek to attributes or end of the offset expr
+	sub("^[^,(|){}]+", "", $0)
+
+
 	# parse attributes
-	shiftf(2)
 	mask=WMASK[type]
 	shift=0
 
