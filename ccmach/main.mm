@@ -567,8 +567,6 @@ private:
             if (v->flags & BHND_NVRAM_VF_IGNALL1)
                 dprintf("all1\tignore\n");
             
-            dprintf("sprom {\n");
-            _depth++;
             for (const auto &t : v->sprom_descs) {
                 dprintf("revs ");
                 if (t.compat.last == BHND_SPROMREV_MAX)
@@ -630,8 +628,6 @@ private:
                     dprintf("}\n");
                 }
             }
-            _depth--;
-            dprintf("}\n");
             _depth--;
             dprintf("}\n\n");
         }
@@ -887,14 +883,12 @@ public:
                 "# a common layout defined at the given base addresses.\n"
                 "#\n"
                 "# To produce SPROM variable names matching those used in the Broadcom HND\n"
-                "# ASCII 'key=value\0' NVRAM, the index number of the variable's\n"
+                "# ASCII 'key=value\\0' NVRAM, the index number of the variable's\n"
                 "# struct instance will be appended (e.g., given a variable of noiselvl5ga, the\n"
                 "# generated variable instances will be named noiselvl5ga0, noiselvl5ga1,\n"
                 "# noiselvl5ga2, noiselvl5ga3 ...)\n"
                 "#\n");
         printf("struct pathvars[] {\n");
-        _depth++;
-        dprintf("sprom {\n");
         _depth++;
         
         for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
@@ -916,9 +910,8 @@ public:
             }
             printf("]\n");
         }
-        _depth--;
-        dprintf("}\n");
         
+        printf("\n");
         output_vars(path_vars);
         
         _depth--;
