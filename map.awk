@@ -104,6 +104,8 @@ function gen_var_decl (v)
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
 		revk = subkey(v, REV, rev)
 		num_offs = vars[revk,REV_NUM_OFFS]
+		print revk
+
 		for (offset = 0; offset < num_offs; offset++) {
 			offk = subkey(revk, OFF, offset)
 			num_segs = vars[offkey,OFF_NUM_SEGS]
@@ -128,14 +130,14 @@ END {
 			#printf "struct-var: "
 			#print("\""v"\"")
 		} else {
-			gen_var_decl(v)
+			#gen_var_decl(v)
 		}
 	}
 
 	for (k in vars) {
 		o = k
 		gsub(SUBSEP, ",", o)
-#		print o,"=",vars[k]
+		print o,"=",vars[k]
 	}
 }
 
@@ -406,14 +408,14 @@ $1 == "struct" && allow_def("struct") {
 $1 == "revs" && allow_def("struct_revs") {
 	sid = g(BLOCK_NAME)
 
-	# assign revision id
-	rev = structs[sid,NUM_REVS]
-	revk = subkey(sid,REV,rev)
-	structs[sid,NUM_REVS]++
-
 	# parse revision descriptor
 	rev_desc[REV_START] = 0
 	parse_revdesc(rev_desc)
+
+	# assign revision id
+	rev = structs[sid,NUM_REVS] ""
+	revk = subkey(sid, REV, rev)
+	structs[sid,NUM_REVS]++
 
 	# init basic revision state
 	structs[revk,REV_START] = rev_desc[REV_START]
@@ -424,15 +426,17 @@ $1 == "revs" && allow_def("struct_revs") {
 
 	addrs_str = substr($0, RSTART+1, RLENGTH-2)
 	num_offs = split(addrs_str, addrs, ",[ \t]*")
-	structs[revk,REV_NUM_OFFS] = num_offs
+	structs[revk, REV_NUM_OFFS] = num_offs
 	for (i = 1; i <= num_offs; i++) {
 		offk = subkey(revk, OFF, i-1)
+
 		if (addrs[i] !~ "^"HEX_REGEX"$")
 			error("invalid base address '" addrs[i] "'")
+
 		structs[offk,SEG_ADDR] = addrs[i]
 	}
 
-	debug("struct_revs " structs[sid,REV_DESC,rev_idx] " [" addrs_str "]")
+	debug("struct_revs " structs[revk,REV_START] "... [" addrs_str "]")
 	next
 }
 
@@ -445,19 +449,19 @@ $1 == "sprom" && allow_def("sprom") {
 # variable revs block
 $1 == "revs" && allow_def("revs") {
 	vid = g(BLOCK_NAME)
-	rev = vars[vid,NUM_REVS]
+
+	# assign revision id
+	rev = vars[vid,NUM_REVS] ""
 	revk = subkey(vid, REV, rev)
+	vars[vid,NUM_REVS]++
 
 	# parse revision descriptor
-	rev_desc[REV_START] = 0
 	parse_revdesc(rev_desc)
 
 	# init basic revision state
 	vars[revk,REV_START] = rev_desc[REV_START]
 	vars[revk,REV_END] = rev_desc[REV_END]
 	vars[revk,REV_NUM_OFFS] = 0
-
-	vars[vid,NUM_REVS]++
 
 	debug("revs " _revstr " {")
 	open_block($1, null)
@@ -468,15 +472,15 @@ function parse_offset_segment ()
 	vid = g(BLOCK_NAME)
 
 	# fetch rev/offset refs
-	rev = vars[vid,NUM_REVS]
-	revk = subkey(vid,REV,rev)
+	rev = vars[vid,NUM_REVS] ""
+	revk = subkey(vid, REV, rev)
 
-	off = vars[revk, REV_NUM_OFFS]
-	offk = subkey(revk,OFF,off)
+	off = vars[revk, REV_NUM_OFFS] ""
+	offk = subkey(revk, OFF, off)
 
 	# assign segment id
-	seg = vars[offk,OFF_NUM_SEGS]
-	segk = subkey(offk,OFF_SEG,seg)
+	seg = vars[offk,OFF_NUM_SEGS] ""
+	segk = subkey(offk, OFF_SEG, seg)
 	vars[offk,OFF_NUM_SEGS]++
 
 	type=$1
@@ -537,19 +541,19 @@ function parse_offset_segment ()
 # revision offset definition
 $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 	vid = g(BLOCK_NAME)
-	rev = vars[vid,NUM_REVS]
-	revk = subkey(vid,REV,rev)
-
-	# assign offset id
-	off = vars[revk,REV_NUM_OFFS]
-	offk = subkey(revk, OFF, off)
-	vars[revk,REV_NUM_OFFS]++
-
-	# initialize segment count
-	vars[offk,OFF_NUM_SEGS] = 0
+	rev = vars[vid,NUM_REVS] ""
+	revk = subkey(vid, REV, rev)
 
 	# parse all offsets
 	do {
+		# assign offset id
+		off = vars[revk,REV_NUM_OFFS] ""
+		offk = subkey(revk, OFF, off)
+		vars[revk,REV_NUM_OFFS]++
+
+		# initialize segment count
+		vars[offk,OFF_NUM_SEGS] = 0
+
 		debug("[")
 		# parse all segments
 		do {
@@ -562,8 +566,6 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 		_more_vals = ($1 == ",")
 		if (_more_vals)
 			shiftf(1, 1)
-
-		vars[revk,REV_NUM_OFFS]++
 	} while (_more_vals)
 }
 
