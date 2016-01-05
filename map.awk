@@ -57,17 +57,24 @@ BEGIN {
 	# Common array keys
 	DEF_LINE		= "def_line"
 	NUM_REVS		= "num_revs"
+	REV			= "rev"
 
 	# Revision array keys
-	REV_NUM_OFFS		= "rv_num_offs"
-	REV_OFFS 		= "rv_offset"
-	REV_DESC		= "rv_decl"
+	REV_START		= "rev_start"
+	REV_END			= "rev_end"
+	REV_DESC		= "rev_decl"
+	REV_NUM_OFFS		= "num_offs"
 
 	# Offset array keys
-	OFF_ADDR		= "of_addr"
-	OFF_WIDTH		= "of_width"
-	OFF_MASK		= "of_mask"
-	OFF_SHIFT		= "of_shift"
+	OFF 			= "off"
+	OFF_NUM_SEGS		= "off_num_segs"
+	OFF_SEG			= "off_seg"
+
+	# Segment array keys
+	SEG_ADDR		= "seg_addr"
+	SEG_WIDTH		= "seg_width"
+	SEG_MASK		= "seg_mask"
+	SEG_SHIFT		= "seg_shift"
 
 	# Variable array keys
 	VAR_NAME		= "v_name"
@@ -76,9 +83,38 @@ BEGIN {
 	VAR_STRUCT		= "v_parent_struct"
 }
 
+function subkey (parent, child0, child1)
+{
+	if (child1 != null)
+		return parent SUBSEP child0 SUBSEP child1
+	else
+		return parent SUBSEP child0
+}
+
 function gen_var_decl (v)
 {
-	
+	printf("{\"%s\", %s, %s, %s, %u, %u, {\n",
+	    v,
+	    DTYPE[vars[v,VAR_TYPE]],
+	    SFMT[vars[v,VAR_FMT]],
+	    0, #TODO: flags
+	    0, #TODO: default array length
+	    vars[v,NUM_REVS])
+
+	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
+		revk = subkey(v, REV, rev)
+		num_offs = vars[revk,REV_NUM_OFFS]
+		for (offset = 0; offset < num_offs; offset++) {
+			offk = subkey(revk, OFF, offset)
+			num_segs = vars[offkey,OFF_NUM_SEGS]
+			for (seg = 0; sid < num_segs; sid++) {
+				segkey = subkey(offk, OFF_SEG, seg)
+				print "ADDRFUN ADDRFUN!" ars[segkey,SEG_ADDR]
+			}
+		}
+	}
+
+	printf("},\n")
 }
 
 END {
@@ -89,11 +125,17 @@ END {
 
 	for (v in var_names) {
 		if (vars[v,VAR_STRUCT] != null) {
-			printf "struct-var: "
+			#printf "struct-var: "
+			#print("\""v"\"")
 		} else {
-			printf "var: "
+			gen_var_decl(v)
 		}
-		print("\""v"\"")
+	}
+
+	for (k in vars) {
+		o = k
+		gsub(SUBSEP, ",", o)
+#		print o,"=",vars[k]
 	}
 }
 
@@ -141,21 +183,6 @@ function debug (msg)
 	print msg > "/dev/stderr"
 }
 
-# Print to output file with the correct indentation and no implicit newline
-function oprinti (str)
-{
-	for (i = 0; i < depth; i++)
-		printf("\t")
-	printf("%s", str)
-}
-
-
-# Print to output file with no implicit newline
-function oprint (str)
-{
-	printf("%s", str)
-}
-
 # Advance to the next non-comment input record
 function next_line ()
 {
@@ -193,33 +220,40 @@ function shiftf (n, do_getline)
 }
 
 # Parse a revision descriptor from the current line
-function parse_revdesc ()
+function parse_revdesc (result)
 {
-	_revstr = ""
+	_rstart = 0
+	_rend = 0
 
 	if ($2 ~ "[0-9]*-[0-9*]") {
-		_revstr = $2
-		sub("-", ",", _revstr)
+		split($2, _revrange, "[ \t]*-[ \t]*")
+		_rstart = _revrange[1]
+		_rend = _revrange[2]
 	} else if ($2 ~ "(>|>=|<|<=)" && $3 ~ "[1-9][0-9]*") {
 		if ($2 == ">") {
-			_revstr = int($3)+1","REV_MAX
+			_rstart = int($3)+1
+			_rend = REV_MAX
 		} else if ($2 == ">=") {
-			_revstr = $3","REV_MAX
+			_rstart = int($3)
+			_rend = REV_MAX
 		} else if ($2 == "<" && int($3) > 0) {
-			_revstr = "0,"int($3)-1
+			_rstart = 0
+			_rend = int($3)-1
 		} else if ($2 == "<=") {
-			_revstr = "0,"$3
+			_rstart = 0
+			_rend = int($3)-1
 		} else {
 			error("invalid revision descriptor")
 		}
 	} else if ($2 ~ "[1-9][0-9]*") {
-		_revstr = $2 "," $2
+		_rstart = int($2)
+		_rend = int($2)
 	} else {
 		error("invalid revision descriptor")
 	}
 
-	_revstr = "{" _revstr "}"
-	return _revstr
+	result[REV_START] = _rstart
+	result[REV_END] = _rend
 }
 
 # Find opening brace and adjust block depth. The name may be null, in which
@@ -371,21 +405,31 @@ $1 == "struct" && allow_def("struct") {
 # struct rev descriptor
 $1 == "revs" && allow_def("struct_revs") {
 	sid = g(BLOCK_NAME)
-	rev_idx = structs[sid,NUM_REVS]
 
+	# assign revision id
+	rev = structs[sid,NUM_REVS]
+	revk = subkey(sid,REV,rev)
 	structs[sid,NUM_REVS]++
-	structs[sid,REV_DESC,rev_idx] = parse_revdesc()
+
+	# parse revision descriptor
+	rev_desc[REV_START] = 0
+	parse_revdesc(rev_desc)
+
+	# init basic revision state
+	structs[revk,REV_START] = rev_desc[REV_START]
+	structs[revk,REV_END] = rev_desc[REV_END]
 
 	if (match($0, "\\[[^]]*\\]") <= 0)
 		error("expected base address array")
 
 	addrs_str = substr($0, RSTART+1, RLENGTH-2)
 	num_offs = split(addrs_str, addrs, ",[ \t]*")
-	structs[sid,REV_NUM_OFFS,rev_idx] = num_offs
+	structs[revk,REV_NUM_OFFS] = num_offs
 	for (i = 1; i <= num_offs; i++) {
+		offk = subkey(revk, OFF, i-1)
 		if (addrs[i] !~ "^"HEX_REGEX"$")
 			error("invalid base address '" addrs[i] "'")
-		structs[sid,OFF_ADDR,i-1] = addrs[i]
+		structs[offk,SEG_ADDR] = addrs[i]
 	}
 
 	debug("struct_revs " structs[sid,REV_DESC,rev_idx] " [" addrs_str "]")
@@ -401,11 +445,19 @@ $1 == "sprom" && allow_def("sprom") {
 # variable revs block
 $1 == "revs" && allow_def("revs") {
 	vid = g(BLOCK_NAME)
-	rev_idx = vars[vid,NUM_REVS]
+	rev = vars[vid,NUM_REVS]
+	revk = subkey(vid, REV, rev)
+
+	# parse revision descriptor
+	rev_desc[REV_START] = 0
+	parse_revdesc(rev_desc)
+
+	# init basic revision state
+	vars[revk,REV_START] = rev_desc[REV_START]
+	vars[revk,REV_END] = rev_desc[REV_END]
+	vars[revk,REV_NUM_OFFS] = 0
 
 	vars[vid,NUM_REVS]++
-	vars[vid,REV_DESC,rev_idx] = parse_revdesc()
-	vars[vid,REV_NUM_OFFS,rid] = 0
 
 	debug("revs " _revstr " {")
 	open_block($1, null)
@@ -413,6 +465,20 @@ $1 == "revs" && allow_def("revs") {
 
 function parse_offset_segment ()
 {
+	vid = g(BLOCK_NAME)
+
+	# fetch rev/offset refs
+	rev = vars[vid,NUM_REVS]
+	revk = subkey(vid,REV,rev)
+
+	off = vars[revk, REV_NUM_OFFS]
+	offk = subkey(revk,OFF,off)
+
+	# assign segment id
+	seg = vars[offk,OFF_NUM_SEGS]
+	segk = subkey(offk,OFF_SEG,seg)
+	vars[offk,OFF_NUM_SEGS]++
+
 	type=$1
 	offset=$2
 
@@ -461,15 +527,26 @@ function parse_offset_segment ()
 		}
 	}
 
-	_comma = ($1 == "|") ? "," : ""
+	vars[segk,SEG_ADDR]	= offset
+	vars[segk,SEG_WIDTH]	= width
+	vars[segk,SEG_MASK]	= mask
+	vars[segk,SEG_SHIFT]	= shift
 	debug("{"offset", " width ", " mask ", " shift"}" _comma)
 }
 
 # revision offset definition
 $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 	vid = g(BLOCK_NAME)
-	rid = vars[vid,NUM_REVS]
-	off_idx = vars[vid,REV_NUM_OFFS,rid]
+	rev = vars[vid,NUM_REVS]
+	revk = subkey(vid,REV,rev)
+
+	# assign offset id
+	off = vars[revk,REV_NUM_OFFS]
+	offk = subkey(revk, OFF, off)
+	vars[revk,REV_NUM_OFFS]++
+
+	# initialize segment count
+	vars[offk,OFF_NUM_SEGS] = 0
 
 	# parse all offsets
 	do {
@@ -486,7 +563,7 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 		if (_more_vals)
 			shiftf(1, 1)
 
-		vars[sid,REV_NUM_OFFS,rid]++
+		vars[revk,REV_NUM_OFFS]++
 	} while (_more_vals)
 }
 
