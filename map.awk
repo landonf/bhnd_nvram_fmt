@@ -673,9 +673,6 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 # Close blocks
 /}/ && !in_block("NONE") {
 	while (!in_block("NONE") && $0 ~ "}") {
-#		if (/{/ && index($0, "}") > index($0, "{"))
-#			error("internal error; unmatched entries at close")
-
 		close_block();
 		debug("}")
 	}
