@@ -820,7 +820,9 @@ public:
 
             printf(" {\n");
             
-            printf("\tsfmt  %s\n", sfmtstr(v->fmt));
+            printf("\tsfmt\t%s\n", sfmtstr(v->fmt));
+            if (v->flags & BHND_NVRAM_VF_IGNALL1)
+                printf("\tall1\tignore\n");
 
             printf("\tsprom {\n");
             for (const auto &t : v->sprom_descs) {
