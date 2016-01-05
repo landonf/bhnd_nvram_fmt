@@ -585,7 +585,7 @@ private:
                     }
                 }
                 if (vlines <= 1) {
-                    printf(" { ");
+                    printf("\t{ ");
                 } else {
                     printf(" {\n");
                     _depth++;
@@ -880,7 +880,18 @@ public:
             { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    "revs >= 11" },
             { nil, nil }
         };
-        
+
+        printf("#\n"
+                "# Any variables defined within a `struct` block will be interpreted relative to\n"
+                "# the provided array of SPROM base addresses; this is used to define\n"
+                "# a common layout defined at the given base addresses.\n"
+                "#\n"
+                "# To produce SPROM variable names matching those used in the Broadcom HND\n"
+                "# ASCII 'key=value\0' NVRAM, the index number of the variable's\n"
+                "# struct instance will be appended (e.g., given a variable of noiselvl5ga, the\n"
+                "# generated variable instances will be named noiselvl5ga0, noiselvl5ga1,\n"
+                "# noiselvl5ga2, noiselvl5ga3 ...)\n"
+                "#\n");
         printf("struct pathvars[] {\n");
         _depth++;
         dprintf("sprom {\n");
