@@ -81,6 +81,8 @@ BEGIN {
 	VAR_TYPE		= "v_type"
 	VAR_FMT			= "v_fmt"
 	VAR_STRUCT		= "v_parent_struct"
+	VAR_PRIVATE		= "v_private"
+	VAR_ARRAY		= "v_array"
 }
 
 function subkey (parent, child0, child1)
@@ -91,53 +93,85 @@ function subkey (parent, child0, child1)
 		return parent SUBSEP child0
 }
 
+function gen_var_flags (v)
+{
+	_flags = "BHND_NVRAM_VF_DFLT"
+	if (vars[v,VAR_ARRAY])
+		_flags = _flags "|BHND_NVRAM_VF_ARRAY"
+
+	if (vars[v,VAR_PRIVATE])
+		_flags = _flags "|BHND_NVRAM_VF_MFGINT"
+
+	# TODO BHND_NVRAM_VF_IGNALL1
+	return _flags
+}
+
 function gen_var_decl (v)
 {
-	printf("{\"%s\", %s, %s, %s, %u, %u, {\n",
+	printf("\t{\"%s\", %s, %s, %s, %u, %u, {\n",
 	    v,
 	    DTYPE[vars[v,VAR_TYPE]],
 	    SFMT[vars[v,VAR_FMT]],
-	    0, #TODO: flags
-	    0, #TODO: default array length
+	    gen_var_flags(v),
+	    0, #TODO: default array length?
 	    vars[v,NUM_REVS])
 
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
-		revk = subkey(v, REV, rev)
-		num_offs = vars[revk,REV_NUM_OFFS]
-		print revk
+		revk = subkey(v, REV, rev"")
 
+		printf("\t\t{{%u, %u}, {\n",
+		    vars[revk,REV_START],
+		    vars[revk,REV_END])
+
+		num_offs = vars[revk,REV_NUM_OFFS]
 		for (offset = 0; offset < num_offs; offset++) {
-			offk = subkey(revk, OFF, offset)
-			num_segs = vars[offkey,OFF_NUM_SEGS]
-			for (seg = 0; sid < num_segs; sid++) {
-				segkey = subkey(offk, OFF_SEG, seg)
-				print "ADDRFUN ADDRFUN!" ars[segkey,SEG_ADDR]
+			offk = subkey(revk, OFF, offset"")
+			num_segs = vars[offk,OFF_NUM_SEGS]
+
+			printf("\t\t\t{\n")
+			for (seg = 0; seg < num_segs; seg++) {
+				segk = subkey(offk, OFF_SEG, seg"")
+				printf("\t\t\t\t{%s,\t%s,\t%s,\t%s},\n",
+				    vars[segk,SEG_ADDR],
+				    vars[segk,SEG_WIDTH],
+				    vars[segk,SEG_MASK],
+				    vars[segk,SEG_SHIFT])
 			}
+			printf("\t\t\t},\n")
 		}
+		printf("\t\t},\n")
 	}
 
-	printf("},\n")
+	printf("\t},\n")
 }
 
 END {
-	if (!_EARLY_EXIT && depth > 0) {
+	# skip completion handling if exiting from an error
+	if (_EARLY_EXIT)
+		exit 1
+
+	# check for complete block closure
+	if (depth > 0) {
 		block_start = g(BLOCK_START)
 		errorx("missing '}' for block opened on line " block_start "")
 	}
 
+	# generate output
+	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
 	for (v in var_names) {
 		if (vars[v,VAR_STRUCT] != null) {
 			#printf "struct-var: "
 			#print("\""v"\"")
 		} else {
-			#gen_var_decl(v)
+			gen_var_decl(v)
 		}
 	}
+	printf("}\n")
 
 	for (k in vars) {
 		o = k
 		gsub(SUBSEP, ",", o)
-		print o,"=",vars[k]
+		#print o,"=",vars[k]
 	}
 }
 
@@ -568,19 +602,25 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 	} while (_more_vals)
 }
 
-# private variable flag
-$1 == "private" && $2 ~ "^"TYPES_REGEX"$" && allow_def("var") {
-	sub("^private"FS, "", $0)
-	_private = 1
-}
-
 # variable definition
-$1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
+(($1 == "private" && $2 ~ "^"TYPES_REGEX"$") || $1 ~ "^"TYPES_REGEX"$") && \
+    allow_def("var") \
+{
+	# check for 'private' flag
+	if ($1 == "private") {
+		private = 1
+		shiftf(1)
+	} else {
+		private = 0
+	}
+
+	# verify type
 	if (!$1 in DTYPE)
 		error("unknown type '" $1 "'")
 
 	type = $1
 	name = $2
+	array = 0
 	debug(type " " name " {")
 
 	# Check for and remove array[] specifier
@@ -596,6 +636,8 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	vars[name,DEF_LINE] = NR
 	vars[name,VAR_TYPE] = type
 	vars[name,NUM_REVS] = 0
+	vars[name,VAR_PRIVATE] = private
+	vars[name,VAR_ARRAY] = array
 
 	open_block("var", name)
 
