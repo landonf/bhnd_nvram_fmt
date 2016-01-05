@@ -536,46 +536,6 @@ private:
     NSArray *get_tokens (PLClangCursor *cursor) {
         return [tu tokensForSourceRange: cursor.extent];
     }
-
-    shared_ptr<vector<nvar>> generate_path_vars () {
-        auto nvars = extract_nvars(@"perpath_pci_sromvars");
-        auto generated = make_shared<vector<nvar>>();
-
-        struct pathcfg {
-            NSString *path_pfx;
-            NSString *path_num;
-        } pathcfgs[] = {
-            { @"SROM11_PATH", @"MAX_PATH_SROM_11" },
-            { @"SROM8_PATH", @"MAX_PATH_SROM" },
-            { @"SROM4_PATH", @"MAX_PATH_SROM" },
-            { nil, nil }
-        };
-
-        for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
-            PLClangCursor *maxCursor = api[cfg->path_num];
-            if (maxCursor == nil)
-                errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
-            uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
-
-            for (uint32_t i = 0; i < max; i++) {
-                for (const auto &n : *nvars) {
-                    NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
-                    PLClangCursor *c = api[path];
-                    if (c == nil)
-                        errx(EXIT_FAILURE, "missing %s", path.UTF8String);
-                    
-                    nvar gn = n;
-                    if ([n.name length] > 0)
-                        gn.name = [n.name stringByAppendingFormat: @"%u", i];
-                    
-                    gn.off.virtual_base = path;
-                    generated->push_back(gn);
-                }
-            }
-        }
-
-        return generated;
-    }
     
     int _depth = 0;
     int dprintf(const char *fmt, ...) {
@@ -625,9 +585,9 @@ private:
                     }
                 }
                 if (vlines <= 1) {
-                    dprintf("{ ");
+                    printf(" { ");
                 } else {
-                    dprintf("{\n");
+                    printf(" {\n");
                     _depth++;
                 }
                 
@@ -665,6 +625,7 @@ private:
                 if (vlines <= 1)
                     printf(" }\n");
                 else {
+                    printf("\n");
                     _depth--;
                     dprintf("}\n");
                 }
@@ -905,7 +866,53 @@ public:
         auto vars = convert_nvars(nvars);
         output_vars(vars);
 
-        /* Fetch+generate the per-path nvars */
+        /* Output the per-path vars */
+        auto path_nvars = extract_nvars(@"perpath_pci_sromvars");
+        auto path_vars = convert_nvars(path_nvars);
+
+        struct pathcfg {
+            NSString *path_pfx;
+            NSString *path_num;
+            const char *revdesc;
+        } pathcfgs[] = {
+            { @"SROM4_PATH",    @"MAX_PATH_SROM",       "revs 4-7" },
+            { @"SROM8_PATH",    @"MAX_PATH_SROM",       "revs 8-10" },
+            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    "revs >= 11" },
+            { nil, nil }
+        };
+        
+        printf("struct pathvars[] {\n");
+        _depth++;
+        dprintf("sprom {\n");
+        _depth++;
+        
+        for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
+            PLClangCursor *maxCursor = api[cfg->path_num];
+            if (maxCursor == nil)
+                errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
+            uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
+    
+            dprintf("%s\t[", cfg->revdesc);
+            for (uint32_t i = 0; i < max; i++) {
+                NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
+                PLClangCursor *c = api[path];
+                if (c == nil)
+                    errx(EXIT_FAILURE, "missing %s", path.UTF8String);
+                uint32_t offset = compute_literal_u32(tu, get_tokens(c));
+                printf("0x%04zX", offset*sizeof(uint16_t));
+                if (i+1 != max)
+                    printf(", ");
+            }
+            printf("]\n");
+        }
+        _depth--;
+        dprintf("}\n");
+        
+        output_vars(path_vars);
+        
+        _depth--;
+        dprintf("}\n");
+
 #if 0
         auto path_nvars = generate_path_vars();
         nvars->reserve(nvars->size() + path_nvars->size());
