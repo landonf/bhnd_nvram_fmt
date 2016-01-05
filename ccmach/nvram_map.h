@@ -141,17 +141,3 @@ typedef struct bhnd_nvram_var {
 #define	BHND_SPROM_SPARSE_VAL(...)	_BHND_SPROM_VAL_DECL(__VA_ARGS__)
 
 #define	nitems(x)	(sizeof((x)) / sizeof((x)[0]))
-
-const struct bhnd_nvram_var nvram_vars1[] = {
-	BHND_NVRAM_VAR(poodle, UINT, SFMT_HEX, VF_DFLT, 0,
-	    BHND_SPROM_MAPPING(REV_GTE(1),
-		BHND_SPROM_VAL_U32(0xFFEE)
-	    )
-	),
-	BHND_NVRAM_VAR(puddles, UINT, SFMT_HEX, VF_ARRAY, 5,
-	    BHND_SPROM_MAPPING(REV_EQ(1), BHND_SPROM_SPARSE_VAL(
-		{0xFFEE, sizeof(uint32_t), UINT32_MAX, 0},
-		{0xFFEE, sizeof(uint32_t), UINT32_MAX, 0})
-	    )
-	)
-};
