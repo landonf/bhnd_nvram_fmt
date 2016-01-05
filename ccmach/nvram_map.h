@@ -69,7 +69,7 @@ typedef struct bhnd_sprom_var {
 typedef struct bhnd_nvram_var {
 	const char		*name;		/**< variable name */
 	bhnd_nvram_dt		 type;		/**< base data type */
-	bhnd_nvram_sfmt		 fmt;		/**< string format */
+	bhnd_nvram_sfmt		 sfmt;		/**< string format */
 	uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
 	size_t			 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
 
@@ -81,7 +81,7 @@ typedef struct bhnd_nvram_var {
 {									\
     	.name		= __STRING(_name),				\
 	.type		= BHND_NVRAM_DT_ ## _type,			\
-	.fmt		= BHND_NVRAM_ ## _fmt,			\
+	.sfmt		= BHND_NVRAM_ ## _fmt,			\
 	.flags		= _flags,					\
 	.array_len	= _array_len,					\
 	.sprom_descs	= _BHND_NV_VA_ARRAY(sprom_var, __VA_ARGS__),	\
