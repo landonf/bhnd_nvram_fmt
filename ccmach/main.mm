@@ -563,7 +563,9 @@ private:
             printf(" {\n");
             _depth++;
             
-            dprintf("sfmt\t%s\n", sfmtstr(v->fmt));
+            if (v->fmt != BHND_NVRAM_SFMT_HEX)
+                dprintf("sfmt\t%s\n", sfmtstr(v->fmt));
+            
             if (v->flags & BHND_NVRAM_VF_IGNALL1)
                 dprintf("all1\tignore\n");
             
