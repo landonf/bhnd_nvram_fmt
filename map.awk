@@ -14,7 +14,7 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 1
+	DEBUG = 0
 
 	# Maximum revision
 	REV_MAX = 65535
@@ -76,10 +76,24 @@ BEGIN {
 	VAR_STRUCT		= "v_parent_struct"
 }
 
+function gen_var_decl (v)
+{
+	
+}
+
 END {
 	if (!_EARLY_EXIT && depth > 0) {
 		block_start = g(BLOCK_START)
 		errorx("missing '}' for block opened on line " block_start "")
+	}
+
+	for (v in var_names) {
+		if (vars[v,VAR_STRUCT] != null) {
+			printf "struct-var: "
+		} else {
+			printf "var: "
+		}
+		print("\""v"\"")
 	}
 }
 
@@ -356,25 +370,25 @@ $1 == "struct" && allow_def("struct") {
 
 # struct rev descriptor
 $1 == "revs" && allow_def("struct_revs") {
-	id = g(BLOCK_NAME)
-	rev_idx = structs[id,NUM_REVS]
+	sid = g(BLOCK_NAME)
+	rev_idx = structs[sid,NUM_REVS]
 
-	structs[id,NUM_REVS]++
-	structs[id,REV_DESC,rev_idx] = parse_revdesc()
+	structs[sid,NUM_REVS]++
+	structs[sid,REV_DESC,rev_idx] = parse_revdesc()
 
 	if (match($0, "\\[[^]]*\\]") <= 0)
 		error("expected base address array")
 
 	addrs_str = substr($0, RSTART+1, RLENGTH-2)
 	num_offs = split(addrs_str, addrs, ",[ \t]*")
-	structs[id,REV_NUM_OFFS,rev_idx] = num_offs
+	structs[sid,REV_NUM_OFFS,rev_idx] = num_offs
 	for (i = 1; i <= num_offs; i++) {
 		if (addrs[i] !~ "^"HEX_REGEX"$")
 			error("invalid base address '" addrs[i] "'")
-		structs[id,OFF_ADDR,i-1] = addrs[i]
+		structs[sid,OFF_ADDR,i-1] = addrs[i]
 	}
 
-	debug("struct_revs " structs[id,REV_DESC,rev_idx] " [" addrs_str "]")
+	debug("struct_revs " structs[sid,REV_DESC,rev_idx] " [" addrs_str "]")
 	next
 }
 
@@ -386,7 +400,12 @@ $1 == "sprom" && allow_def("sprom") {
 
 # variable revs block
 $1 == "revs" && allow_def("revs") {
-	_revstr = parse_revdesc()
+	vid = g(BLOCK_NAME)
+	rev_idx = vars[vid,NUM_REVS]
+
+	vars[vid,NUM_REVS]++
+	vars[vid,REV_DESC,rev_idx] = parse_revdesc()
+	vars[vid,REV_NUM_OFFS,rid] = 0
 
 	debug("revs " _revstr " {")
 	open_block($1, null)
@@ -448,6 +467,10 @@ function parse_offset_segment ()
 
 # revision offset definition
 $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
+	vid = g(BLOCK_NAME)
+	rid = vars[vid,NUM_REVS]
+	off_idx = vars[vid,REV_NUM_OFFS,rid]
+
 	# parse all offsets
 	do {
 		debug("[")
@@ -462,6 +485,8 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 		_more_vals = ($1 == ",")
 		if (_more_vals)
 			shiftf(1, 1)
+
+		vars[sid,REV_NUM_OFFS,rid]++
 	} while (_more_vals)
 }
 
@@ -485,10 +510,11 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 		array = 1
 
 	# Add top-level variable entry 
-	if ((name,DEF_LINE) in vars) 
+	if (name in var_names) 
 		error("variable identifier '" name "' previously defined on " \
 		    "line " vars[name,DEF_LINE])
 
+	var_names[name] = 0
 	vars[name,DEF_LINE] = NR
 	vars[name,VAR_TYPE] = type
 	vars[name,NUM_REVS] = 0
@@ -498,8 +524,7 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 	# Mark as a struct-based variable
 	if (in_nested_block("struct")) {
 		sid = g(BLOCK_NAME, null, 1)
-		vars[name,VAR_PARENT_STRUCT] = sid
-		debug("struct-var " sid " (revs=" structs[sid,NUM_REVS] ")")
+		vars[name,VAR_STRUCT] = sid
 	}
 
 	debug("type=" DTYPE[type])
@@ -509,9 +534,9 @@ $1 ~ "^"TYPES_REGEX"$" && allow_def("var") {
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	vid = g(BLOCK_NAME)
 	if ($1 == "sfmt") {
-		if (!$2 in SFMT) {
+		if (!$2 in SFMT)
 			error("invalid sfmt '" $2 "'")
-		}
+
 		vars[vid,VAR_FMT] = $2
 		debug($1 "=" SFMT[$2])
 	} else {
@@ -546,7 +571,6 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 $1 && allow_def("var") {
 	error("unknown type '" $1 "'")
 }
-
 
 # Generic parse failure
 {
