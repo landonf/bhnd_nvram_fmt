@@ -83,6 +83,7 @@ BEGIN {
 	VAR_STRUCT		= "v_parent_struct"
 	VAR_PRIVATE		= "v_private"
 	VAR_ARRAY		= "v_array"
+	VAR_IGNALL1		= "v_ignall1"
 }
 
 NR == 1 {
@@ -111,6 +112,9 @@ function gen_var_flags (v)
 
 	if (vars[v,VAR_PRIVATE])
 		_flags = _flags "|BHND_NVRAM_VF_MFGINT"
+
+	if (vars[v,VAR_IGNALL1])
+		_flags = _flags "|BHND_NVRAM_VF_IGNALL1"
 
 	# TODO BHND_NVRAM_VF_IGNALL1
 	return _flags
@@ -709,6 +713,8 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 
 		vars[vid,VAR_FMT] = $2
 		debug($1 "=" SFMT[$2])
+	} else if ($1 == "all1" && $2 == "ignore") {
+		vars[vid,VAR_IGNALL1] = 1
 	} else {
 		error("unknown parameter " $1)
 	}
