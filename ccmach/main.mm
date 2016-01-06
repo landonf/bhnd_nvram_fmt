@@ -501,9 +501,7 @@ private:
                 
                 size_t vlines = 0;
                 for (const auto &val : t.values) {
-                    for (__unused const auto &seg : val.segs) {
-                        vlines++;
-                    }
+                    vlines++;
                 }
                 
                 
@@ -585,7 +583,7 @@ private:
                             break;
                         
                         if (i+1 != val.segs.size())
-                            printf(" |\n");
+                            printf(" | ");
                         else if (vlines > 1 && vali+1 != t.values.size())
                             printf(",\n");
                     }

@@ -75,14 +75,8 @@ uint antswitch {
 
 uint boardflags {
 	revs 2-3	{ u16 0x0072 }
-	revs 4-7 {
-		u16 0x0072 |
-		u16 0x0038 (<<16)
-	}
-	revs 8-15 {
-		u16 0x0072 |
-		u16 0x007A (<<16)
-	}
+	revs 4-7	{ u16 0x0072 | u16 0x0038 (<<16) }
+	revs 8-15	{ u16 0x0072 | u16 0x007A (<<16) }
 	revs 16-31	{ u32 0x0044 }
 	revs 32-255	{ u32 0x004A }
 	revs >= 256	{ u32 0x0084 }
