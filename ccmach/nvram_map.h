@@ -48,7 +48,7 @@ struct bhnd_sprom_compat {
 struct bhnd_sprom_seg {
 	uint16_t	offset;	/**< byte offset within SPROM */
 	size_t		width;	/**< 1, 2, or 4 bytes */
-	uint32_t	mask;	/**< mask to be applied to the value */
+	uint32_t	mask;	/**< mask to be applied to the value(s) */
 	size_t		shift;	/**< shift to be applied to the value */
 };
 

@@ -512,14 +512,10 @@ private:
                 size_t elem_size = 0;
                 size_t next_addr = 0;
                 uint32_t elem_mask = 0;
+                size_t elem_shft = 0;
                 
                 for (const auto &val : t.values) {
                     if (val.segs.size() != 1) {
-                        unified_array = 0;
-                        break;
-                    }
-                    
-                    if (!val.segs[0].has_default_shift()) {
                         unified_array = 0;
                         break;
                     }
@@ -528,7 +524,8 @@ private:
                         elem_size = val.segs[0].width;
                         next_addr = val.segs[0].offset;
                         elem_mask = val.segs[0].mask;
-                    } else if (elem_size != val.segs[0].width || val.segs[0].offset != next_addr || val.segs[0].mask != elem_mask) {
+                        elem_shft = val.segs[0].shift;
+                    } else if (elem_size != val.segs[0].width || val.segs[0].offset != next_addr || val.segs[0].mask != elem_mask || val.segs[0].shift != elem_shft) {
                         unified_array = 0;
                         break;
                     }

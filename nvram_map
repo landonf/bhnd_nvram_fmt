@@ -640,12 +640,7 @@ uint[] noiselvl5ga0 {
 }
 
 uint[] noiselvl5ga1 {
-	revs >= 2048 {
-		u16 0x01BE (&0x3E0, >>5),
-		u16 0x01C0 (&0x3E0, >>5),
-		u16 0x01C2 (&0x3E0, >>5),
-		u16 0x01C4 (&0x3E0, >>5)
-	}
+	revs >= 2048	{ u16[4] 0x01BE (&0x3E0, >>5) }
 }
 
 uint[] noiselvl5ga2 {
@@ -1041,12 +1036,7 @@ uint[] rxgainerr5ga0 {
 }
 
 uint[] rxgainerr5ga1 {
-	revs >= 2048 {
-		u16 0x01C8 (&0x7C0, >>6),
-		u16 0x01CA (&0x7C0, >>6),
-		u16 0x01CC (&0x7C0, >>6),
-		u16 0x01CE (&0x7C0, >>6)
-	}
+	revs >= 2048	{ u16[4] 0x01C8 (&0x7C0, >>6) }
 }
 
 uint[] rxgainerr5ga2 {
