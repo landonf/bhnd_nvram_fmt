@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include "../m.h"
 
+#define	nitems(x)	(sizeof((x)) / sizeof((x)[0]))
+
 int main (int argc, char * const argv[]) {
 	uint16_t spromver = 256;
 
