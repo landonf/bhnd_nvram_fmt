@@ -346,9 +346,9 @@ static const char *dtstr (bhnd_nvram_dt dt) {
     switch (dt) {
         case BHND_NVRAM_DT_UINT: return "uint";
         case BHND_NVRAM_DT_SINT: return "sint";
-        case BHND_NVRAM_DT_MAC48: return "mac48";
+        case BHND_NVRAM_DT_MAC48: return "uint[]";
         case BHND_NVRAM_DT_LEDDC: return "led";
-        case BHND_NVRAM_DT_CCODE: return "cc";
+        case BHND_NVRAM_DT_CCODE: return "uint[]";
     }
 }
 
@@ -473,12 +473,11 @@ private:
             if (v->flags & BHND_NVRAM_VF_MFGINT)
                 printf("private ");
             
-            dprintf("%s %s", dtstr(v->type), v->name.c_str());
-            
+            dprintf("%s", dtstr(v->type));
             if (v->flags & BHND_NVRAM_VF_ARRAY)
                 printf("[]");
             
-            printf(" {\n");
+            printf(" %s {\n", v->name.c_str());
             _depth++;
             
             if (v->fmt != BHND_NVRAM_SFMT_HEX)
@@ -502,13 +501,52 @@ private:
                         vlines++;
                     }
                 }
+                
+                
+                /* attempt unification of array vals */
+                size_t unified_array = 0;
+                size_t elem_size = 0;
+                size_t next_addr = 0;
+                uint32_t elem_mask = 0;
+                
+                for (const auto &val : t.values) {
+                    if (val.segs.size() != 1) {
+                        unified_array = 0;
+                        break;
+                    }
+                    
+                    if (!val.segs[0].has_default_shift()) {
+                        unified_array = 0;
+                        break;
+                    }
+                    
+                    if (unified_array == 0) {
+                        elem_size = val.segs[0].width;
+                        next_addr = val.segs[0].offset;
+                        elem_mask = val.segs[0].mask;
+                    } else if (elem_size != val.segs[0].width || val.segs[0].offset != next_addr || val.segs[0].mask != elem_mask) {
+                        unified_array = 0;
+                        break;
+                    }
+                    
+                    next_addr += val.segs[0].width;
+                    unified_array++;
+                }
+                
+                if (unified_array == 1)
+                    unified_array = 0;
+                
+                if (unified_array)
+                    vlines = 1;
+
                 if (vlines <= 1) {
                     printf("\t{ ");
                 } else {
                     printf(" {\n");
                     _depth++;
                 }
-                
+
+
                 size_t vali = 0;
                 for (const auto &val : t.values) {
                     for (size_t i = 0; i < val.segs.size(); i++) {
@@ -516,7 +554,16 @@ private:
                         
                         if (vlines > 1)
                             dprintf("");
-                        printf("%s 0x%04zX", seg.width_str(), seg.offset);
+                        if (v->type == BHND_NVRAM_DT_MAC48) {
+                            printf("u8[48] 0x%04zX", seg.offset);
+                        } else if (v->type == BHND_NVRAM_DT_CCODE && seg.width == 2) {
+                            printf("u8[2] 0x%04zX", seg.offset);
+                        } else if (unified_array) {
+                            printf("%s[%zu] 0x%04zX", seg.width_str(), unified_array, seg.offset);
+                        } else {
+                            printf("%s 0x%04zX", seg.width_str(), seg.offset);
+                        }
+                        
                         if (!seg.has_defaults()) {
                             printf(" (");
                             if (!seg.has_default_mask()) {
@@ -533,13 +580,20 @@ private:
                             printf(")");
                         }
                         
+                        if (unified_array)
+                            break;
+                        
                         if (i+1 != val.segs.size())
                             printf(" |\n");
                         else if (vlines > 1 && vali+1 != t.values.size())
                             printf(",\n");
                     }
                     vali++;
+                    
+                    if (unified_array)
+                        break;
                 }
+
                 if (vlines <= 1)
                     printf(" }\n");
                 else {
