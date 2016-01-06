@@ -96,12 +96,14 @@ NR == 1 {
 	print "#include \"ccmach/nvram_map.h\""
 }
 
-function subkey (parent, child0, child1)
+# print msg, indented for the given depth
+function printi (depth, msg)
 {
-	if (child1 != null)
-		return parent SUBSEP child0 SUBSEP child1
-	else
-		return parent SUBSEP child0
+	for (_ind = 0; _ind < depth; _ind++)
+		printf("\t")
+
+	if (msg != null)
+		printf("%s", msg)
 }
 
 function gen_var_flags (v)
@@ -136,20 +138,20 @@ function gen_var_max_array_len (v)
 	return _max_elems
 }
 
-function gen_var_decl (v, struct_rev, struct_revk, base_addr)
+function gen_var_decl (v, depth, struct_rev, struct_revk, base_addr)
 {
 	if (base_addr == null)
 		base_addr = ""
 	else
 		base_addr = base_addr "+"
 
-	printf("\t{\"%s\", %s, %s, %s, %u, (struct bhnd_sprom_var[]) {\n",
-	    v struct_rev,
-	    DTYPE[vars[v,VAR_TYPE]],
-	    SFMT[vars[v,VAR_FMT]],
-	    gen_var_flags(v),
-	    gen_var_max_array_len(v))
-
+	printi(depth, "{\"" v struct_rev "\", ")
+	printf("%s, ", DTYPE[vars[v,VAR_TYPE]])
+	printf("%s, ", SFMT[vars[v,VAR_FMT]])
+	printf("%s, ", gen_var_flags(v))
+	printf("%s, ", gen_var_max_array_len(v))
+	printf("(struct bhnd_sprom_var[]) {\n")
+	depth++
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
 		revk = subkey(v, REV, rev"")
 
@@ -166,33 +168,39 @@ function gen_var_decl (v, struct_rev, struct_revk, base_addr)
 				continue
 		}
 
-		printf("\t\t{{%u, %u}, (struct bhnd_sprom_value[]) {\n",
+		printi(depth, "")
+		printf("{{%u, %u}, (struct bhnd_sprom_value[]) {\n",
 		    vars[revk,REV_START],
 		    vars[revk,REV_END])
+		depth++
 
 		num_offs = vars[revk,REV_NUM_OFFS]
 		for (offset = 0; offset < num_offs; offset++) {
 			offk = subkey(revk, OFF, offset"")
 			num_segs = vars[offk,OFF_NUM_SEGS]
 
-			printf("\t\t\t{(struct bhnd_sprom_vseg []) {\n")
+			printi(depth, "{(struct bhnd_sprom_vseg []) {\n")
+			depth++
 			for (seg = 0; seg < num_segs; seg++) {
 				segk = subkey(offk, OFF_SEG, seg"")
-				printf("\t\t\t\t\t{%s,\t%s,\t%s,\t%s},\n",
+				printi(depth, "")
+				printf("{%s,\t%s,\t%s,\t%s},\n",
 				    base_addr vars[segk,SEG_ADDR],
 				    vars[segk,SEG_WIDTH],
 				    vars[segk,SEG_MASK],
 				    vars[segk,SEG_SHIFT])
 			}
-			printf("\t\t\t}, %u},\n", num_segs)
+			depth--
+			printi(depth, "}, " num_segs "},\n")
 		}
-		printf("\t\t}, %u},\n", num_offs)
+		depth--
+		printi(depth, "}, " num_offs "},\n")
 	}
-
-	printf("\t}, %u},\n", vars[v,NUM_REVS])
+	depth--
+	printi(depth, "}, " vars[v,NUM_REVS] "},\n")
 }
 
-function gen_struct_var_decl (v)
+function gen_struct_var_decl (v, depth)
 {
 	st = vars[v,VAR_STRUCT]
 	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
@@ -200,7 +208,7 @@ function gen_struct_var_decl (v)
 
 		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
 			offk = subkey(srevk, OFF, off"")
-			gen_var_decl(v, off, srevk, structs[offk,SEG_ADDR])
+			gen_var_decl(v, depth, off, srevk, structs[offk,SEG_ADDR])
 		}
 	}
 }
@@ -219,10 +227,10 @@ END {
 	# generate output
 	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
 	for (v in var_names) {
-		if (vars[v,VAR_STRUCT] != null)
-			gen_struct_var_decl(v)
-		else
-			gen_var_decl(v)
+		if (vars[v,VAR_STRUCT] != null) {
+			#gen_struct_var_decl(v, 1)
+		} else
+			gen_var_decl(v, 1)
 	}
 	printf("};\n")
 
@@ -267,6 +275,16 @@ function debug (msg)
 	for (_di = 0; _di < depth; _di++)
 		printf("\t") > "/dev/stderr"
 	print msg > "/dev/stderr"
+}
+
+# Return an array key composed of the given (parent, selector, child)
+# tuple. the child argument is optional and may be omitted.
+function subkey (parent, selector, child)
+{
+	if (child != null)
+		return parent SUBSEP selector SUBSEP child
+	else
+		return parent SUBSEP selector
 }
 
 # Advance to the next non-comment input record
