@@ -45,7 +45,7 @@ BEGIN {
 	# Common Regexs
 	INT_REGEX	= "[1-9][0-9]*"
 	HEX_REGEX	= "0x[A-Fa-f0-9]+"
-	TYPES_REGEX	= "(uint|sint|led|cc|mac48)"
+	TYPES_REGEX	= "(uint|sint|led|cc|mac48)(\\[\\])?"
 	WIDTHS_REGEX	= "(u8|u16|u32)(\\[[1-9][0-9]*\\])?"
 	IDENT_REGEX	= "[A-Za-z][A-Za-z0-9]*"
 
@@ -73,6 +73,7 @@ BEGIN {
 	# Segment array keys
 	SEG_ADDR		= "seg_addr"
 	SEG_WIDTH		= "seg_width"
+	SEG_COUNT		= "seg_count"
 	SEG_MASK		= "seg_mask"
 	SEG_SHIFT		= "seg_shift"
 
@@ -172,9 +173,10 @@ function gen_var_rev_body (revk, base_addr)
 		for (seg = 0; seg < num_segs; seg++) {
 			segk = subkey(offk, OFF_SEG, seg"")
 			printi()
-			printf("{%s,\t%s,\t%s,\t%s},\n",
+			printf("{%s,\t%s,\t%s,\t%s,\t%s},\n",
 			    base_addr vars[segk,SEG_ADDR],
 			    vars[segk,SEG_WIDTH],
+			    vars[segk,SEG_COUNT],
 			    vars[segk,SEG_MASK],
 			    vars[segk,SEG_SHIFT])
 		}
@@ -672,6 +674,7 @@ function parse_offset_segment (revk, offk)
 
 	vars[segk,SEG_ADDR]	= offset
 	vars[segk,SEG_WIDTH]	= width
+	vars[segk,SEG_COUNT]	= count
 	vars[segk,SEG_MASK]	= mask
 	vars[segk,SEG_SHIFT]	= shift
 	debug("{"offset", " width ", " mask ", " shift"}" _comma)
@@ -722,18 +725,19 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 		private = 0
 	}
 
+	type = $1
+	name = $2
+	array = 0
+
+	# Check for and remove array[] specifier
+	if (sub(/\[\]$/, "", type) > 0)
+		array = 1
+
 	# verify type
 	if (!$1 in DTYPE)
 		error("unknown type '" $1 "'")
 
-	type = $1
-	name = $2
-	array = 0
 	debug(type " " name " {")
-
-	# Check for and remove array[] specifier
-	if (sub(/\[\]$/, "", name) > 0)
-		array = 1
 
 	# Add top-level variable entry 
 	if (name in var_names) 
