@@ -12,7 +12,7 @@
 #include "nvram_map.h"
 
 
-const struct bhnd_nvram_var nvram_vars1[] = {
+const struct bhnd_nvram_var nvram_vars[] = {
     BHND_NVRAM_VAR(poodle, UINT, SFMT_HEX, VF_DFLT, 0,
                    BHND_SPROM_MAPPING(REV_GTE(1),
                                       BHND_SPROM_VAL_U32(0xFFEE)
@@ -25,3 +25,11 @@ const struct bhnd_nvram_var nvram_vars1[] = {
                                       )
                    )
 };
+
+int main (int argc, char * const argv[]) {
+	uint16_t spromver = 256;
+
+	for (size_t vid = 0; vid < nitems(nvram_vars); vid++) {
+		printf("%s\n", nvram_vars[vid].name);
+	}
+}
