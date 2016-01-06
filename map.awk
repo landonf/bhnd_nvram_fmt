@@ -233,12 +233,6 @@ END {
 			gen_var_decl(v, 1)
 	}
 	printf("};\n")
-
-	for (k in vars) {
-		o = k
-		gsub(SUBSEP, ",", o)
-		#print o,"=",vars[k]
-	}
 }
 
 function usage ()
