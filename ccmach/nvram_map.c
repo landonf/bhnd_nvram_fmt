@@ -55,7 +55,7 @@ bhnd_nvram_type_width (bhnd_nvram_dt type)
 	}
 }
 
-int main (int argc, char * const argv[]) {
+int mmain (int argc, char * const argv[]) {
 	uint16_t sprom_ver = 2048;
 	const char *vname = argv[1];
 
@@ -78,4 +78,5 @@ int main (int argc, char * const argv[]) {
 	if (nv->flags & BHND_NVRAM_VF_ARRAY) {
 		printf("array with max length of %zu (%zu bytes)\n", nv->array_len, bhnd_nvram_type_width(nv->type) * nv->array_len);
 	}
+    return 0;
 }

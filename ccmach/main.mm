@@ -37,121 +37,28 @@ struct symbolic_constant {
     std::string name() const { return token.spelling.UTF8String; }
 };
 
-/** A symbolic offset definition */
-struct symbolic_offset {
-    PLClangTranslationUnit *tu;
-    NSArray                *tokens;
-    uint16_t                raw_value;
-    size_t                  raw_byte_offset;
-    NSString               *virtual_base = nil;
-
-    symbolic_offset() {}
-
-    symbolic_offset(PLClangTranslationUnit *_tu, NSArray *_tokens) : tu(_tu), tokens(_tokens) {
-        raw_value = compute_literal_u32(tu, tokens);
-        
-        /** bcmsrom offsets assume 16-bit pointer arithmetic */
-        raw_byte_offset = raw_value * sizeof(uint16_t);
-    }
-
-    vector<string> referenced_constants () {
-        vector<string> ret;
-        
-        if (virtual_base)
-            ret.push_back(virtual_base.UTF8String);
-        
-        for (PLClangToken *t in tokens) {
-            switch (t.kind) {
-                case PLClangTokenKindIdentifier:
-                    ret.push_back(t.spelling.UTF8String);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return ret;
-    }
-
-    std::string byte_adjusted_string_rep () {
-        NSMutableArray *strs = [NSMutableArray array];
-
-        if (virtual_base != nil) {
-            [strs addObject: virtual_base];
-            [strs addObject: @"+"];
-        }
-
-        for (PLClangToken *t in tokens) {
-            switch (t.kind) {
-                case PLClangTokenKindIdentifier:
-                case PLClangTokenKindPunctuation:
-                    [strs addObject: t.spelling];
-                    break;
-                case PLClangTokenKindLiteral: {
-                    NSNumber *n = (NSNumber *) get_literal(tu, t);
-                    u_int off = [n unsignedIntValue];
-                    NSString *soff = [NSString stringWithFormat: @"%u", off*2];
-                    [strs addObject: soff];
-                    break;
-                } default:
-                    errx(EXIT_FAILURE, "unsupported token %s", t.description.UTF8String);
-            }
-        }
-
-        return [strs componentsJoinedByString:@""].UTF8String;
-    }
-
-    bool isSimple() const {
-        return (tokens.count == 1);
-    };
-};
-
-namespace std {
-    std::string to_string(const struct symbolic_offset &off) {
-        std::string ret;
-        
-        ret = [off.tokens componentsJoinedByString: @" "].UTF8String;
-
-        return ret;
-    }
-}
-
 /* A parsed SPROM record from the vendor header file */
 struct nvar {
     NSString *name;
     uint32_t revmask;
     uint32_t flags;
-    symbolic_offset off;
+    size_t off;
     uint32_t valmask;
+    size_t width;
+
     nvar () {}
     nvar (NSString *n,
           uint32_t _revmask,
           uint32_t _flags,
-          symbolic_offset _off,
-          uint32_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off), valmask(_valmask) {}
-
-    size_t byte_off() const {
-        size_t offset = off.raw_byte_offset;
-        if (!(valmask & 0xFF00))
-            offset += sizeof(uint8_t);
-        
-        return offset;
-    }
-
-    size_t width() const {
-        size_t w = 4;
-        if (!(valmask & 0xFF000000))
-            w -= 1;
-        
-        if (!(valmask & 0x00FF0000))
-            w -= 1;
-        
-        if (!(valmask & 0x0000FF00))
-            w -= 1;
-        
-        if (!(valmask & 0x000000FF))
-            w -= 1;
-        
-        return w;
+          size_t _off,
+          uint32_t _valmask) : name(n), revmask(_revmask), flags(_flags), off(_off), valmask(_valmask)
+    {
+        if (valmask & 0xFFFF0000)
+            width = 4;
+        else if (valmask & 0x0000FF00)
+            width = 2;
+        else
+            width = 1;
     }
 };
 
@@ -417,10 +324,21 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     NSString *name = (NSString *) get_literal(tu, nameToken);
     uint32_t revmask = compute_literal_u32(tu, grouped[1]);
     uint32_t flags = compute_literal_u32(tu, grouped[2]);
-    symbolic_offset off(tu, (NSArray *) grouped[3]);
+    uint16_t raw_off = compute_literal_u32(tu, grouped[3]);
     uint32_t valmask = compute_literal_u32(tu, grouped[4]);
+    
+    uint16_t byte_off = raw_off * sizeof(uint16_t);
 
-    *nout = nvar(name, revmask, flags, off, valmask);
+
+    if (valmask & 0xFF00) {
+        if (!(valmask & 0x00FF)) {
+            valmask >>= 8;
+        }
+    } else if (valmask & 0x00FF) {
+        byte_off++;
+    }
+
+    *nout = nvar(name, revmask, flags, byte_off, valmask);
     return true;
 }
 
@@ -460,8 +378,8 @@ private:
             
             std::string name = n.name.UTF8String;
             uint32_t flags = n.flags;
-            uint16_t offset = n.byte_off();
-            size_t width = n.width();
+            uint16_t offset = n.off;
+            size_t width = n.width;
             uint32_t valmask = n.valmask;
             
             /* Unify unnecessary continuations */
@@ -471,8 +389,8 @@ private:
                 c = &(*nvars)[i];
                 
                 /* Can't unify sparse continuations */
-                if (c->byte_off() != offset + width) {
-                    warnx("%s: sparse continuation (%zx, %hu, %zu)", name.c_str(), c->byte_off(), offset, width);
+                if (c->off != offset + width) {
+                    warnx("%s: sparse continuation (%zx, %zx)", name.c_str(), c->off, offset+width);
                     i--;
                     break;
                 }
@@ -481,10 +399,10 @@ private:
                     errx(EXIT_FAILURE, "%s: continuation has non-matching revmask", name.c_str());
                 
                 if (c->valmask != 0xFFFF)
-                    errx(EXIT_FAILURE, "%s: unsupported valmask", name.c_str());
+                    errx(EXIT_FAILURE, "%s: unsupported valmask: 0x%X", name.c_str(), c->valmask);
                 
-                width += c->width();
-                valmask <<= c->width()*8;
+                width += c->width;
+                valmask <<= c->width*8;
                 valmask |= c->valmask;
                 flags &= ~SRFL_MORE;
             }
@@ -643,13 +561,6 @@ private:
         for (size_t i = 0; i < nvars->size(); i++) {
             nvar *n = &(*nvars)[i];
             
-            /* Record symbolic constants that we'll need to preserve */
-            auto refconst = n->off.referenced_constants();
-            for (const auto &rc : refconst) {
-                if (consts.count(rc) == 0)
-                    consts.insert(rc);
-            }
-            
             std::string name = n->name.UTF8String;
             uint32_t revmask = n->revmask;
             uint32_t flags = n->flags;
@@ -724,26 +635,26 @@ private:
             std::vector<bhnd_sprom_value> vals;
             bhnd_sprom_value base_val;
             bhnd_sprom_vseg base_seg = {
-                n->byte_off(),
-                n->width(),
+                n->off,
+                n->width,
                 n->valmask,
                 static_cast<ssize_t>(__builtin_ctz(n->valmask))
             };
             
             base_val.segs.push_back(base_seg);
-            size_t more_width = n->width();
+            size_t more_width = n->width;
             while (n->flags & SRFL_MORE) {
                 i++;
                 n = &(*nvars)[i];
                 
                 base_val.segs.push_back({
-                    n->byte_off(),
-                    n->width(),
+                    n->off,
+                    n->width,
                     n->valmask,
                     static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
                 });
                 
-                more_width += n->width();
+                more_width += n->width;
             }
             vals.push_back(base_val);
             
@@ -754,25 +665,25 @@ private:
                 n = &(*nvars)[i];
                 
                 val.segs.push_back({
-                    n->byte_off(),
-                    n->width(),
+                    n->off,
+                    n->width,
                     n->valmask,
                     static_cast<ssize_t>(__builtin_ctz(n->valmask))
                 });
                 
-                more_width = n->width();
+                more_width = n->width;
                 while (n->flags & SRFL_MORE) {
                     i++;
                     n = &(*nvars)[i];
                     
                     val.segs.push_back({
-                        n->byte_off(),
-                        n->width(),
+                        n->off,
+                        n->width,
                         n->valmask,
                         static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
                     });
                     
-                    more_width += n->width();
+                    more_width += n->width;
                 }
                 
                 vals.push_back(val);

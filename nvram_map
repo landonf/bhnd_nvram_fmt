@@ -47,11 +47,11 @@ uint boardnum {
 }
 
 uint cc {
-	revs 2-3	{ u8 0x005C (&0xF00, >>8) }
+	revs 2-3	{ u8 0x005C (&0xF) }
 }
 
 uint regrev {
-	revs 8-15	{ u8 0x0078 (&0xFF00, >>8) }
+	revs 8-15	{ u8 0x0078 }
 	revs 16-31	{ u8 0x0055 }
 	revs 32-255	{ u8 0x0047 }
 	revs 256-2047	{ u8 0x0095 }
@@ -69,11 +69,11 @@ uint ledbh0 {
 
 uint ledbh1 {
 	all1	ignore
-	revs 2-15	{ u8 0x0064 (&0xFF00, >>8) }
-	revs 16-31	{ u8 0x0056 (&0xFF00, >>8) }
-	revs 32-255	{ u8 0x0076 (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x0096 (&0xFF00, >>8) }
-	revs >= 2048	{ u8 0x009A (&0xFF00, >>8) }
+	revs 2-15	{ u8 0x0064 }
+	revs 16-31	{ u8 0x0056 }
+	revs 32-255	{ u8 0x0076 }
+	revs 256-2047	{ u8 0x0096 }
+	revs >= 2048	{ u8 0x009A }
 }
 
 uint ledbh2 {
@@ -87,11 +87,11 @@ uint ledbh2 {
 
 uint ledbh3 {
 	all1	ignore
-	revs 2-15	{ u8 0x0066 (&0xFF00, >>8) }
-	revs 16-31	{ u8 0x0058 (&0xFF00, >>8) }
-	revs 32-255	{ u8 0x0078 (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x0098 (&0xFF00, >>8) }
-	revs >= 2048	{ u8 0x009C (&0xFF00, >>8) }
+	revs 2-15	{ u8 0x0066 }
+	revs 16-31	{ u8 0x0058 }
+	revs 32-255	{ u8 0x0078 }
+	revs 256-2047	{ u8 0x0098 }
+	revs >= 2048	{ u8 0x009C }
 }
 
 uint pa0b0 {
@@ -111,7 +111,7 @@ uint pa0b2 {
 
 uint pa0itssit {
 	revs 2-15	{ u8 0x0071 }
-	revs 256-2047	{ u8 0x0000 (&0xFF00, >>8) }
+	revs 256-2047	{ u8 0x0000 }
 }
 
 uint pa0maxpwr {
@@ -125,17 +125,17 @@ uint opo {
 }
 
 uint aa2g {
-	revs 2-15	{ u8 0x005C (&0x3000, >>12) }
+	revs 2-15	{ u8 0x005C (&0x30, >>4) }
 	revs 16-255	{ u8 0x005D }
 	revs 256-2047	{ u8 0x009D }
 	revs >= 2048	{ u8 0x00A1 }
 }
 
 uint aa5g {
-	revs 2-15	{ u8 0x005C (&0xC000, >>14) }
-	revs 16-255	{ u8 0x005C (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x009C (&0xFF00, >>8) }
-	revs >= 2048	{ u8 0x00A0 (&0xFF00, >>8) }
+	revs 2-15	{ u8 0x005C (&0xC0, >>6) }
+	revs 16-255	{ u8 0x005C }
+	revs 256-2047	{ u8 0x009C }
+	revs >= 2048	{ u8 0x00A0 }
 }
 
 uint ag0 {
@@ -145,9 +145,9 @@ uint ag0 {
 }
 
 uint ag1 {
-	revs 2-15	{ u8 0x0074 (&0xFF00, >>8) }
-	revs 16-255	{ u8 0x005E (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x009E (&0xFF00, >>8) }
+	revs 2-15	{ u8 0x0074 }
+	revs 16-255	{ u8 0x005E }
+	revs 256-2047	{ u8 0x009E }
 }
 
 uint ag2 {
@@ -156,8 +156,8 @@ uint ag2 {
 }
 
 uint ag3 {
-	revs 16-255	{ u8 0x0060 (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x00A0 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x0060 }
+	revs 256-2047	{ u8 0x00A0 }
 }
 
 uint pa1b0 {
@@ -206,18 +206,18 @@ uint pa1hib2 {
 }
 
 uint pa1itssit {
-	revs 2-15	{ u8 0x0070 (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x0000 (&0xFF00, >>8) }
+	revs 2-15	{ u8 0x0070 }
+	revs 256-2047	{ u8 0x0000 }
 }
 
 uint pa1maxpwr {
-	revs 2-15	{ u8 0x0068 (&0xFF00, >>8) }
+	revs 2-15	{ u8 0x0068 }
 	revs 256-2047	{ u8 0x0001 }
 }
 
 uint pa1lomaxpwr {
-	revs 4-15	{ u8 0x003A (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x0000 (&0xFF00, >>8) }
+	revs 4-15	{ u8 0x003A }
+	revs 256-2047	{ u8 0x0000 }
 }
 
 uint pa1himaxpwr {
@@ -226,13 +226,13 @@ uint pa1himaxpwr {
 }
 
 uint bxa2g {
-	revs 8-15	{ u8 0x0050 (&0x1800, >>11) }
-	revs 256-2047	{ u8 0x00A4 (&0x1800, >>11) }
+	revs 8-15	{ u8 0x0050 (&0x18, >>3) }
+	revs 256-2047	{ u8 0x00A4 (&0x18, >>3) }
 }
 
 uint rssisav2g {
-	revs 8-15	{ u8 0x0050 (&0x700, >>8) }
-	revs 256-2047	{ u8 0x00A4 (&0x700, >>8) }
+	revs 8-15	{ u8 0x0050 (&0x7) }
+	revs 256-2047	{ u8 0x00A4 (&0x7) }
 }
 
 uint rssismc2g {
@@ -246,13 +246,13 @@ uint rssismf2g {
 }
 
 uint bxa5g {
-	revs 8-15	{ u8 0x0052 (&0x1800, >>11) }
-	revs 256-2047	{ u8 0x00A6 (&0x1800, >>11) }
+	revs 8-15	{ u8 0x0052 (&0x18, >>3) }
+	revs 256-2047	{ u8 0x00A6 (&0x18, >>3) }
 }
 
 uint rssisav5g {
-	revs 8-15	{ u8 0x0052 (&0x700, >>8) }
-	revs 256-2047	{ u8 0x00A6 (&0x700, >>8) }
+	revs 8-15	{ u8 0x0052 (&0x7) }
+	revs 256-2047	{ u8 0x00A6 (&0x7) }
 }
 
 uint rssismc5g {
@@ -271,8 +271,8 @@ uint tri2g {
 }
 
 uint tri5g {
-	revs 8-15	{ u8 0x0054 (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x00A8 (&0xFF00, >>8) }
+	revs 8-15	{ u8 0x0054 }
+	revs 256-2047	{ u8 0x00A8 }
 }
 
 uint tri5gl {
@@ -281,8 +281,8 @@ uint tri5gl {
 }
 
 uint tri5gh {
-	revs 8-15	{ u8 0x0056 (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x00AA (&0xFF00, >>8) }
+	revs 8-15	{ u8 0x0056 }
+	revs 256-2047	{ u8 0x00AA }
 }
 
 sint rxpo2g {
@@ -293,8 +293,8 @@ sint rxpo2g {
 
 sint rxpo5g {
 	sfmt	sdec
-	revs 8-15	{ u8 0x005A (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x00AC (&0xFF00, >>8) }
+	revs 8-15	{ u8 0x005A }
+	revs 256-2047	{ u8 0x00AC }
 }
 
 uint txchain {
@@ -313,9 +313,9 @@ uint rxchain {
 
 uint antswitch {
 	all1	ignore
-	revs 16-255	{ u8 0x007A (&0xFF00, >>8) }
-	revs 256-2047	{ u8 0x00A2 (&0xFF00, >>8) }
-	revs >= 2048	{ u8 0x00A8 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x007A }
+	revs 256-2047	{ u8 0x00A2 }
+	revs >= 2048	{ u8 0x00A8 }
 }
 
 uint tssipos2g {
@@ -331,11 +331,11 @@ uint pdetrange2g {
 }
 
 uint triso2g {
-	revs 256-2047	{ u8 0x00AE (&0x700, >>8) }
+	revs 256-2047	{ u8 0x00AE (&0x7) }
 }
 
 uint antswctl2g {
-	revs 256-2047	{ u8 0x00AE (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x00AE (&0xF8, >>3) }
 }
 
 uint tssipos5g {
@@ -351,11 +351,11 @@ uint pdetrange5g {
 }
 
 uint triso5g {
-	revs 256-2047	{ u8 0x00B0 (&0x700, >>8) }
+	revs 256-2047	{ u8 0x00B0 (&0x7) }
 }
 
 uint antswctl5g {
-	revs 256-2047	{ u8 0x00B0 (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x00B0 (&0xF8, >>3) }
 }
 
 uint txpid2ga0 {
@@ -363,7 +363,7 @@ uint txpid2ga0 {
 }
 
 uint txpid2ga1 {
-	revs 16-255	{ u8 0x0062 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x0062 }
 }
 
 uint txpid2ga2 {
@@ -371,7 +371,7 @@ uint txpid2ga2 {
 }
 
 uint txpid2ga3 {
-	revs 16-255	{ u8 0x0064 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x0064 }
 }
 
 uint txpid5ga0 {
@@ -379,7 +379,7 @@ uint txpid5ga0 {
 }
 
 uint txpid5ga1 {
-	revs 16-255	{ u8 0x0066 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x0066 }
 }
 
 uint txpid5ga2 {
@@ -387,7 +387,7 @@ uint txpid5ga2 {
 }
 
 uint txpid5ga3 {
-	revs 16-255	{ u8 0x0068 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x0068 }
 }
 
 uint txpid5gla0 {
@@ -395,7 +395,7 @@ uint txpid5gla0 {
 }
 
 uint txpid5gla1 {
-	revs 16-255	{ u8 0x006A (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x006A }
 }
 
 uint txpid5gla2 {
@@ -403,7 +403,7 @@ uint txpid5gla2 {
 }
 
 uint txpid5gla3 {
-	revs 16-255	{ u8 0x006C (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x006C }
 }
 
 uint txpid5gha0 {
@@ -411,7 +411,7 @@ uint txpid5gha0 {
 }
 
 uint txpid5gha1 {
-	revs 16-255	{ u8 0x006E (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x006E }
 }
 
 uint txpid5gha2 {
@@ -419,7 +419,7 @@ uint txpid5gha2 {
 }
 
 uint txpid5gha3 {
-	revs 16-255	{ u8 0x0070 (&0xFF00, >>8) }
+	revs 16-255	{ u8 0x0070 }
 }
 
 cc ccode {
@@ -460,8 +460,8 @@ led leddc {
 }
 
 uint tempthresh {
-	revs 256-2047	{ u8 0x00B2 (&0xFF00, >>8) }
-	revs >= 2048	{ u8 0x00AE (&0xFF00, >>8) }
+	revs 256-2047	{ u8 0x00B2 }
+	revs >= 2048	{ u8 0x00AE }
 }
 
 uint tempoffset {
@@ -475,8 +475,8 @@ uint rawtempsense {
 }
 
 uint measpower {
-	revs 256-2047	{ u8 0x00B4 (&0xFE00, >>9) }
-	revs >= 2048	{ u8 0x00B0 (&0xFE00, >>9) }
+	revs 256-2047	{ u8 0x00B4 (&0xFE, >>1) }
+	revs >= 2048	{ u8 0x00B0 (&0xFE, >>1) }
 }
 
 uint tempsense_slope {
@@ -485,13 +485,13 @@ uint tempsense_slope {
 }
 
 uint tempcorrx {
-	revs 256-2047	{ u8 0x00B6 (&0xFC00, >>10) }
-	revs >= 2048	{ u8 0x00B2 (&0xFC00, >>10) }
+	revs 256-2047	{ u8 0x00B6 (&0xFC, >>2) }
+	revs >= 2048	{ u8 0x00B2 (&0xFC, >>2) }
 }
 
 uint tempsense_option {
-	revs 256-2047	{ u8 0x00B6 (&0x300, >>8) }
-	revs >= 2048	{ u8 0x00B2 (&0x300, >>8) }
+	revs 256-2047	{ u8 0x00B6 (&0x3) }
+	revs >= 2048	{ u8 0x00B2 (&0x3) }
 }
 
 uint freqoffset_corr {
@@ -511,7 +511,7 @@ uint elna2g {
 }
 
 uint elna5g {
-	revs 256-2047	{ u8 0x00BA (&0xFF00, >>8) }
+	revs 256-2047	{ u8 0x00BA }
 }
 
 uint phycal_tempdelta {
@@ -520,13 +520,13 @@ uint phycal_tempdelta {
 }
 
 uint temps_period {
-	revs 256-2047	{ u8 0x00BC (&0xF00, >>8) }
-	revs >= 2048	{ u8 0x00B8 (&0xF00, >>8) }
+	revs 256-2047	{ u8 0x00BC (&0xF) }
+	revs >= 2048	{ u8 0x00B8 (&0xF) }
 }
 
 uint temps_hysteresis {
-	revs 256-2047	{ u8 0x00BC (&0xF000, >>12) }
-	revs >= 2048	{ u8 0x00B8 (&0xF000, >>12) }
+	revs 256-2047	{ u8 0x00BC (&0xF0, >>4) }
+	revs >= 2048	{ u8 0x00B8 (&0xF0, >>4) }
 }
 
 uint measpower1 {
@@ -862,10 +862,10 @@ uint eu_edthresh2g {
 }
 
 uint eu_edthresh5g {
-	revs 256-511	{ u8 0x01A8 (&0xFF00, >>8) }
-	revs 512-1023	{ u8 0x0198 (&0xFF00, >>8) }
-	revs 1024-2047	{ u8 0x0198 (&0xFF00, >>8) }
-	revs 2048-4095	{ u8 0x01D0 (&0xFF00, >>8) }
+	revs 256-511	{ u8 0x01A8 }
+	revs 512-1023	{ u8 0x0198 }
+	revs 1024-2047	{ u8 0x0198 }
+	revs 2048-4095	{ u8 0x01D0 }
 }
 
 uint rxgainerr2ga0 {
@@ -879,8 +879,8 @@ uint rxgainerr2ga1 {
 }
 
 uint rxgainerr2ga2 {
-	revs 256-2047	{ u8 0x019A (&0xF800, >>11) }
-	revs >= 2048	{ u8 0x01C6 (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x019A (&0xF8, >>3) }
+	revs >= 2048	{ u8 0x01C6 (&0xF8, >>3) }
 }
 
 uint rxgainerr5gla0 {
@@ -892,7 +892,7 @@ uint rxgainerr5gla1 {
 }
 
 uint rxgainerr5gla2 {
-	revs 256-2047	{ u8 0x019C (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x019C (&0xF8, >>3) }
 }
 
 uint rxgainerr5gma0 {
@@ -904,7 +904,7 @@ uint rxgainerr5gma1 {
 }
 
 uint rxgainerr5gma2 {
-	revs 256-2047	{ u8 0x019E (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x019E (&0xF8, >>3) }
 }
 
 uint rxgainerr5gha0 {
@@ -916,7 +916,7 @@ uint rxgainerr5gha1 {
 }
 
 uint rxgainerr5gha2 {
-	revs 256-2047	{ u8 0x01A0 (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x01A0 (&0xF8, >>3) }
 }
 
 uint rxgainerr5gua0 {
@@ -928,7 +928,7 @@ uint rxgainerr5gua1 {
 }
 
 uint rxgainerr5gua2 {
-	revs 256-2047	{ u8 0x01A2 (&0xF800, >>11) }
+	revs 256-2047	{ u8 0x01A2 (&0xF8, >>3) }
 }
 
 uint sar2g {
@@ -937,8 +937,8 @@ uint sar2g {
 }
 
 uint sar5g {
-	revs 512-2047	{ u8 0x01A8 (&0xFF00, >>8) }
-	revs >= 2048	{ u8 0x01BA (&0xFF00, >>8) }
+	revs 512-2047	{ u8 0x01A8 }
+	revs >= 2048	{ u8 0x01BA }
 }
 
 uint noiselvl2ga0 {
@@ -952,8 +952,8 @@ uint noiselvl2ga1 {
 }
 
 uint noiselvl2ga2 {
-	revs 256-2047	{ u8 0x01AA (&0x7C00, >>10) }
-	revs >= 2048	{ u8 0x01BC (&0x7C00, >>10) }
+	revs 256-2047	{ u8 0x01AA (&0x7C, >>2) }
+	revs >= 2048	{ u8 0x01BC (&0x7C, >>2) }
 }
 
 uint noiselvl5gla0 {
@@ -965,7 +965,7 @@ uint noiselvl5gla1 {
 }
 
 uint noiselvl5gla2 {
-	revs 256-2047	{ u8 0x01AC (&0x7C00, >>10) }
+	revs 256-2047	{ u8 0x01AC (&0x7C, >>2) }
 }
 
 uint noiselvl5gma0 {
@@ -977,7 +977,7 @@ uint noiselvl5gma1 {
 }
 
 uint noiselvl5gma2 {
-	revs 256-2047	{ u8 0x01AE (&0x7C00, >>10) }
+	revs 256-2047	{ u8 0x01AE (&0x7C, >>2) }
 }
 
 uint noiselvl5gha0 {
@@ -989,7 +989,7 @@ uint noiselvl5gha1 {
 }
 
 uint noiselvl5gha2 {
-	revs 256-2047	{ u8 0x01B0 (&0x7C00, >>10) }
+	revs 256-2047	{ u8 0x01B0 (&0x7C, >>2) }
 }
 
 uint noiselvl5gua0 {
@@ -1001,7 +1001,7 @@ uint noiselvl5gua1 {
 }
 
 uint noiselvl5gua2 {
-	revs 256-2047	{ u8 0x01B2 (&0x7C00, >>10) }
+	revs 256-2047	{ u8 0x01B2 (&0x7C, >>2) }
 }
 
 uint noisecaloffset {
@@ -1009,7 +1009,7 @@ uint noisecaloffset {
 }
 
 uint noisecaloffset5g {
-	revs 256-1023	{ u8 0x01B4 (&0xFF00, >>8) }
+	revs 256-1023	{ u8 0x01B4 }
 }
 
 uint subband5gver {
@@ -1036,7 +1036,7 @@ uint boardflags3 {
 }
 
 uint agbg0 {
-	revs >= 2048	{ u8 0x00A2 (&0xFF00, >>8) }
+	revs >= 2048	{ u8 0x00A2 }
 }
 
 uint agbg1 {
@@ -1044,7 +1044,7 @@ uint agbg1 {
 }
 
 uint agbg2 {
-	revs >= 2048	{ u8 0x00A4 (&0xFF00, >>8) }
+	revs >= 2048	{ u8 0x00A4 }
 }
 
 uint aga0 {
@@ -1052,7 +1052,7 @@ uint aga0 {
 }
 
 uint aga1 {
-	revs >= 2048	{ u8 0x00A6 (&0xFF00, >>8) }
+	revs >= 2048	{ u8 0x00A6 }
 }
 
 uint aga2 {
@@ -1072,15 +1072,15 @@ uint pdgain2g {
 }
 
 uint tworangetssi2g {
-	revs >= 2048	{ u8 0x00AA (&0x200, >>9) }
+	revs >= 2048	{ u8 0x00AA (&0x2, >>1) }
 }
 
 uint papdcap2g {
-	revs >= 2048	{ u8 0x00AA (&0x400, >>10) }
+	revs >= 2048	{ u8 0x00AA (&0x4, >>2) }
 }
 
 uint femctrl {
-	revs >= 2048	{ u8 0x00AA (&0xF800, >>11) }
+	revs >= 2048	{ u8 0x00AA (&0xF8, >>3) }
 }
 
 uint tssiposslope5g {
@@ -1096,15 +1096,15 @@ uint pdgain5g {
 }
 
 uint tworangetssi5g {
-	revs >= 2048	{ u8 0x00AC (&0x200, >>9) }
+	revs >= 2048	{ u8 0x00AC (&0x2, >>1) }
 }
 
 uint papdcap5g {
-	revs >= 2048	{ u8 0x00AC (&0x400, >>10) }
+	revs >= 2048	{ u8 0x00AC (&0x4, >>2) }
 }
 
 uint gainctrlsph {
-	revs >= 2048	{ u8 0x00AC (&0xF800, >>11) }
+	revs >= 2048	{ u8 0x00AC (&0xF8, >>3) }
 }
 
 uint xtalfreq {
@@ -1150,11 +1150,11 @@ uint pdoffset2g40ma1 {
 }
 
 uint pdoffset2g40ma2 {
-	revs >= 2048	{ u8 0x00C8 (&0xF00, >>8) }
+	revs >= 2048	{ u8 0x00C8 (&0xF) }
 }
 
 uint pdoffset2g40mvalid {
-	revs >= 2048	{ u8 0x00C8 (&0x8000, >>15) }
+	revs >= 2048	{ u8 0x00C8 (&0x80, >>7) }
 }
 
 uint pdoffset40ma0 {
@@ -1182,7 +1182,7 @@ uint pdoffset80ma2 {
 }
 
 uint paparambwver {
-	revs >= 2048	{ u8 0x0190 (&0xF000, >>12) }
+	revs >= 2048	{ u8 0x0190 (&0xF0, >>4) }
 }
 
 uint pa5gbw4080a0[] {
@@ -1360,10 +1360,10 @@ uint noiselvl5ga1[] {
 
 uint noiselvl5ga2[] {
 	revs >= 2048 {
-		u8 0x01BE (&0x7C00, >>10),
-		u8 0x01C0 (&0x7C00, >>10),
-		u8 0x01C2 (&0x7C00, >>10),
-		u8 0x01C4 (&0x7C00, >>10)
+		u8 0x01BE (&0x7C, >>2),
+		u8 0x01C0 (&0x7C, >>2),
+		u8 0x01C2 (&0x7C, >>2),
+		u8 0x01C4 (&0x7C, >>2)
 	}
 }
 
@@ -1387,10 +1387,10 @@ uint rxgainerr5ga1[] {
 
 uint rxgainerr5ga2[] {
 	revs >= 2048 {
-		u8 0x01C8 (&0xF800, >>11),
-		u8 0x01CA (&0xF800, >>11),
-		u8 0x01CC (&0xF800, >>11),
-		u8 0x01CE (&0xF800, >>11)
+		u8 0x01C8 (&0xF8, >>3),
+		u8 0x01CA (&0xF8, >>3),
+		u8 0x01CC (&0xF8, >>3),
+		u8 0x01CE (&0xF8, >>3)
 	}
 }
 
@@ -1431,7 +1431,7 @@ uint pdoffsetcckma1 {
 }
 
 uint pdoffsetcckma2 {
-	revs >= 2048	{ u8 0x018E (&0xF00, >>8) }
+	revs >= 2048	{ u8 0x018E (&0xF) }
 }
 
 #
@@ -1457,13 +1457,13 @@ struct pathvars[] {
 	}
 
 	uint itt2ga {
-		revs 16-255	{ u8 0x0000 (&0xFF00, >>8) }
-		revs 256-2047	{ u8 0x0000 (&0xFF00, >>8) }
+		revs 16-255	{ u8 0x0000 }
+		revs 256-2047	{ u8 0x0000 }
 	}
 
 	uint itt5ga {
-		revs 16-255	{ u8 0x000A (&0xFF00, >>8) }
-		revs 256-2047	{ u8 0x0008 (&0xFF00, >>8) }
+		revs 16-255	{ u8 0x000A }
+		revs 256-2047	{ u8 0x0008 }
 	}
 
 	uint pa2gw0a {
@@ -1490,9 +1490,9 @@ struct pathvars[] {
 		revs 256-2047	{ u8 0x0009 }
 		revs >= 2048 {
 			u8 0x000D,
-			u8 0x000C (&0xFF00, >>8),
+			u8 0x000C,
 			u8 0x000F,
-			u8 0x000E (&0xFF00, >>8)
+			u8 0x000E
 		}
 	}
 
@@ -1502,8 +1502,8 @@ struct pathvars[] {
 	}
 
 	uint maxp5gla {
-		revs 16-255	{ u8 0x000C (&0xFF00, >>8) }
-		revs 256-2047	{ u8 0x000A (&0xFF00, >>8) }
+		revs 16-255	{ u8 0x000C }
+		revs 256-2047	{ u8 0x000A }
 	}
 
 	uint pa5gw0a {
@@ -1584,15 +1584,15 @@ struct pathvars[] {
 	}
 
 	uint rxgains5ghelnagaina {
-		revs >= 2048	{ u8 0x0008 (&0x700, >>8) }
+		revs >= 2048	{ u8 0x0008 (&0x7) }
 	}
 
 	uint rxgains5ghtrisoa {
-		revs >= 2048	{ u8 0x0008 (&0x7800, >>11) }
+		revs >= 2048	{ u8 0x0008 (&0x78, >>3) }
 	}
 
 	uint rxgains5ghtrelnabypa {
-		revs >= 2048	{ u8 0x0008 (&0x8000, >>15) }
+		revs >= 2048	{ u8 0x0008 (&0x80, >>7) }
 	}
 
 	uint rxgains2gelnagaina {
@@ -1608,15 +1608,15 @@ struct pathvars[] {
 	}
 
 	uint rxgains5gelnagaina {
-		revs >= 2048	{ u8 0x000A (&0x700, >>8) }
+		revs >= 2048	{ u8 0x000A (&0x7) }
 	}
 
 	uint rxgains5gtrisoa {
-		revs >= 2048	{ u8 0x000A (&0x7800, >>11) }
+		revs >= 2048	{ u8 0x000A (&0x78, >>3) }
 	}
 
 	uint rxgains5gtrelnabypa {
-		revs >= 2048	{ u8 0x000A (&0x8000, >>15) }
+		revs >= 2048	{ u8 0x000A (&0x80, >>7) }
 	}
 
 	uint pa5ga[] {
