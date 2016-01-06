@@ -219,9 +219,9 @@ END {
 	# generate output
 	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
 	for (v in var_names) {
-		if (vars[v,VAR_STRUCT] != null)
-			gen_struct_var_decl(v)
-		else
+		if (vars[v,VAR_STRUCT] != null) {
+#			gen_struct_var_decl(v)
+		} else
 			gen_var_decl(v)
 	}
 	printf("};\n")
