@@ -130,7 +130,7 @@ function gen_var_max_array_len (v)
 	_max_elems = 0
 	for (_rev = 0; _rev < vars[v,NUM_REVS]; _rev++) {
 		_revk = subkey(v, REV, _rev"")
-		_num_offs = vars[revk,REV_NUM_OFFS]
+		_num_offs = vars[_revk,REV_NUM_OFFS]
 		if (_num_offs > _max_elems)
 			_max_elems = _num_offs
 	}
