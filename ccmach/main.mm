@@ -468,7 +468,11 @@ private:
         return r;
     }
     
-    void output_vars (const vector<shared_ptr<bhnd_nvram_var>> &vars) {
+    void output_vars (vector<shared_ptr<bhnd_nvram_var>> &vars) {
+        sort(vars.begin(), vars.end(), [](const shared_ptr<bhnd_nvram_var> &lhs, const shared_ptr<bhnd_nvram_var> &rhs) {
+            return *lhs < *rhs;
+        });
+
         for (const auto &v : vars) {
             if (v->flags & BHND_NVRAM_VF_MFGINT)
                 printf("private ");
@@ -883,17 +887,6 @@ public:
         
         _depth--;
         dprintf("}\n");
-
-#if 0
-        auto path_nvars = generate_path_vars();
-        nvars->reserve(nvars->size() + path_nvars->size());
-        nvars->insert(nvars->end(), path_nvars->begin(), path_nvars->end());
-
-        sort(vars.begin(), vars.end(), [](const shared_ptr<bhnd_nvram_var> &lhs, const shared_ptr<bhnd_nvram_var> &rhs) {
-            return *lhs < *rhs;
-        });
-#endif
-
     }
 };
 
