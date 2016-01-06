@@ -39,52 +39,43 @@ enum {
 #define	BHND_SPROMREV_MAX	UINT16_MAX	/**< maximum supported SPROM revision */
 
 /** SPROM revision compatibility declaration */
-struct bhnd_sprom_compat {
+typedef struct bhnd_sprom_compat {
 	uint16_t	first;	/**< first compatible SPROM revision */
 	uint16_t	last;	/**< last compatible SPROM revision, or BHND_SPROMREV_MAX */
-};
-
-/** SPROM struct address declaration. Used to specify distinct revision-specific
- *  base addresses for structs that share a common layout */ 
-struct bhnd_sprom_struct {
-	struct bhnd_sprom_compat	compat;		/**< sprom compatibility */
-	uint16_t 			base_addr;	/**< the base address */
-};
+} bhnd_sprom_compat_t;
 
 /** SPROM value segment descriptor */
-struct bhnd_sprom_seg {
+typedef struct bhnd_sprom_vseg {
 	uint16_t	offset;	/**< byte offset within SPROM */
 	size_t		width;	/**< 1, 2, or 4 bytes */
 	uint32_t	mask;	/**< mask to be applied to the value */
 	size_t		shift;	/**< shift to be applied to the value */
-};
+} bhnd_sprom_vseg_t;
 
 /** SPROM value descriptor */
-struct bhnd_sprom_value {
-	const struct bhnd_sprom_seg	*segs;		/**< segment(s) containing this value */
-	size_t				 num_segs;	/**< number of segments */
-};
+typedef struct bhnd_sprom_value {
+	const bhnd_sprom_vseg_t	*segs;		/**< segment(s) containing this value */
+	size_t			 num_segs;	/**< number of segments */
+} bhnd_sprom_value_t;
 
 /** SPROM-specific variable definition */
-struct bhnd_sprom_var {
-	struct bhnd_sprom_compat	 compat;	/**< sprom compatibility declaration */
-	const struct bhnd_sprom_struct	*structs;	/**< struct base offset descriptor(s) */
-	size_t				 num_structs;	/**< number of struct descriptors */
-	const struct bhnd_sprom_value	*values;	/**< value descriptor(s) */
+typedef struct bhnd_sprom_var {
+	const bhnd_sprom_compat_t	 compat;	/**< sprom compatibility declaration */
+	const bhnd_sprom_value_t	*values;	/**< value descriptor(s) */
 	size_t				 num_values;	/**< number of values (e.g. if this is an array) */
-};
+} bhnd_sprom_var_t;
 
 /** NVRAM variable definition */
-struct bhnd_nvram_var {
-	const char			*name;		/**< variable name */
-	bhnd_nvram_dt			 type;		/**< base data type */
-	bhnd_nvram_sfmt			 sfmt;		/**< string format */
-	uint32_t			 flags;		/**< BHND_NVRAM_VF_* flags */
-	size_t				 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
+typedef struct bhnd_nvram_var {
+	const char		*name;		/**< variable name */
+	bhnd_nvram_dt		 type;		/**< base data type */
+	bhnd_nvram_sfmt		 sfmt;		/**< string format */
+	uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
+	size_t			 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
 
-	const struct bhnd_sprom_var	*sprom_descs;	/**< SPROM-specific variable descriptors */
-	size_t				 num_sp_descs;	/**< number of sprom descriptors */
-};
+	const bhnd_sprom_var_t	*sprom_descs;	/**< SPROM-specific variable descriptors */
+	size_t			 num_sp_descs;	/**< number of sprom descriptors */
+} bhnd_nvram_var_t;
 
 #define	_BHND_NV_VAR_DECL(_name, _type, _fmt, _flags, _array_len, ...) \
 {									\
@@ -125,9 +116,9 @@ struct bhnd_nvram_var {
 
 #define _BHND_SPROM_VAL_DECL(...)					\
 {									\
-	.segs		= _BHND_NV_VA_ARRAY(sprom_seg, __VA_ARGS__),	\
+	.segs		= _BHND_NV_VA_ARRAY(sprom_vseg, __VA_ARGS__),	\
 	.num_segs	=						\
-	    nitems(_BHND_NV_VA_ARRAY(sprom_seg, __VA_ARGS__))		\
+	    nitems(_BHND_NV_VA_ARRAY(sprom_vseg, __VA_ARGS__))		\
 }
 
 #define	BHND_SPROM_MAPPING(_compat, ...)		\
