@@ -692,6 +692,7 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 	vars[name,NUM_REVS] = 0
 	vars[name,VAR_PRIVATE] = private
 	vars[name,VAR_ARRAY] = array
+	vars[name,VAR_FMT] = "hex" # default if not specified
 
 	open_block("var", name)
 
