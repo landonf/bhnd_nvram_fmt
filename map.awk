@@ -366,10 +366,6 @@ function close_block ()
 	if ($0 !~ "}")
 		error("internal error - no closing brace")
 
-	if (in_block("var")) {
-		debug("complete-var")
-	}
-
 	# drop all symbols defined at this depth
 	for (s in symbols) {
 		if (s ~ "^"depth"[^0-9]")
@@ -448,16 +444,15 @@ function in_nested_block (type)
 # the current scope
 function allow_def (type)
 {
-	if (type == "var" || type == "sprom") {
+	if (type == "var") {
 		return (in_block("NONE") || in_block("struct") ||
 		    in_block("var"))
 	} else if (type == "struct") {
 		return (in_block("NONE"))
 	} else if (type == "revs") {
-		return (in_block("sprom") && in_nested_block("var"))
+		return (in_block("var"))
 	} else if (type == "struct_revs") {
-		return (in_block("sprom") && in_nested_block("struct") &&
-		    !in_nested_block("var"))
+		return (in_block("struct"))
 	}
 
 	error("unknown type '" type "'")
@@ -520,12 +515,6 @@ $1 == "revs" && allow_def("struct_revs") {
 
 	debug("struct_revs " structs[revk,REV_START] "... [" addrs_str "]")
 	next
-}
-
-# sprom block
-$1 == "sprom" && allow_def("sprom") {
-	debug("sprom {")
-	open_block($1, null)
 }
 
 # variable revs block
