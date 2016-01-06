@@ -96,10 +96,10 @@ NR == 1 {
 	print "#include \"ccmach/nvram_map.h\""
 }
 
-# print msg, indented for the given depth
-function printi (depth, msg)
+# print msg, indented for the current output depth
+function printi (msg)
 {
-	for (_ind = 0; _ind < depth; _ind++)
+	for (_ind = 0; _ind < output_depth; _ind++)
 		printf("\t")
 
 	if (msg != null)
@@ -138,82 +138,130 @@ function gen_var_max_array_len (v)
 	return _max_elems
 }
 
-function gen_var_decl (v, depth, struct_rev, struct_revk, base_addr)
+function gen_var_head (v, suffix)
 {
-	if (base_addr == null)
-		base_addr = ""
-	else
-		base_addr = base_addr "+"
-
-	printi(depth, "{\"" v struct_rev "\", ")
+	printi("{\"" v suffix "\", ")
 	printf("%s, ", DTYPE[vars[v,VAR_TYPE]])
 	printf("%s, ", SFMT[vars[v,VAR_FMT]])
 	printf("%s, ", gen_var_flags(v))
 	printf("%s, ", gen_var_max_array_len(v))
 	printf("(struct bhnd_sprom_var[]) {\n")
-	depth++
-	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
-		revk = subkey(v, REV, rev"")
-
-		if (struct_revk != null) {
-			sr_start = structs[struct_revk,REV_START]
-			sr_end = structs[struct_revk,REV_END]
-			if (vars[revk,REV_START] < sr_start)
-				continue
-			if (vars[revk,REV_START] > sr_end)
-				continue
-			if (vars[revk,REV_END] < sr_start)
-				continue
-			if (vars[revk,REV_END] > sr_end)
-				continue
-		}
-
-		printi(depth, "")
-		printf("{{%u, %u}, (struct bhnd_sprom_value[]) {\n",
-		    vars[revk,REV_START],
-		    vars[revk,REV_END])
-		depth++
-
-		num_offs = vars[revk,REV_NUM_OFFS]
-		for (offset = 0; offset < num_offs; offset++) {
-			offk = subkey(revk, OFF, offset"")
-			num_segs = vars[offk,OFF_NUM_SEGS]
-
-			printi(depth, "{(struct bhnd_sprom_vseg []) {\n")
-			depth++
-			for (seg = 0; seg < num_segs; seg++) {
-				segk = subkey(offk, OFF_SEG, seg"")
-				printi(depth, "")
-				printf("{%s,\t%s,\t%s,\t%s},\n",
-				    base_addr vars[segk,SEG_ADDR],
-				    vars[segk,SEG_WIDTH],
-				    vars[segk,SEG_MASK],
-				    vars[segk,SEG_SHIFT])
-			}
-			depth--
-			printi(depth, "}, " num_segs "},\n")
-		}
-		depth--
-		printi(depth, "}, " num_offs "},\n")
-	}
-	depth--
-	printi(depth, "}, " vars[v,NUM_REVS] "},\n")
+	output_depth++
 }
 
-function gen_struct_var_decl (v, depth)
+function gen_var_rev_body (revk, base_addr)
+{
+	if (base_addr != null)
+		base_addr = base_addr"+"
+	else
+		base_addr = ""
+
+	printi()
+	printf("{{%u, %u}, (struct bhnd_sprom_value[]) {\n",
+	    vars[revk,REV_START],
+	    vars[revk,REV_END])
+	output_depth++
+
+	num_offs = vars[revk,REV_NUM_OFFS]
+	for (offset = 0; offset < num_offs; offset++) {
+		offk = subkey(revk, OFF, offset"")
+		num_segs = vars[offk,OFF_NUM_SEGS]
+
+		printi( "{(struct bhnd_sprom_seg []) {\n")
+		output_depth++
+		for (seg = 0; seg < num_segs; seg++) {
+			segk = subkey(offk, OFF_SEG, seg"")
+			printi()
+			printf("{%s,\t%s,\t%s,\t%s},\n",
+			    base_addr vars[segk,SEG_ADDR],
+			    vars[segk,SEG_WIDTH],
+			    vars[segk,SEG_MASK],
+			    vars[segk,SEG_SHIFT])
+		}
+		output_depth--
+		printi("}, " num_segs "},\n")
+	}
+	output_depth--
+	printi("}, " num_offs "},\n")
+}
+
+function gen_var_body (v, base_addr)
+{
+	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
+		revk = subkey(v, REV, rev"")
+		gen_var_rev_body(revk)
+	}
+}
+
+function gen_var_tail (v, num_revs)
+{
+	output_depth--
+	printi("}, " num_revs "},\n")
+}
+
+function gen_struct_var (v)
 {
 	st = vars[v,VAR_STRUCT]
+	st_max_off = 0
+
+	# determine the total number of variables to generate
 	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
 		srevk = subkey(st, REV, srev"")
-
 		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
-			offk = subkey(srevk, OFF, off"")
-			gen_var_decl(v, depth, off, srevk, structs[offk,SEG_ADDR])
+			if (off > st_max_off)
+				st_max_off = off
 		}
+	}
+
+	# generate variables for each defined struct offset
+	for (off = 0; off < st_max_off; off++) {
+		st_rev_count = 0
+		gen_var_head(v, off"")
+
+		for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
+			srevk = subkey(st, REV, srev"")
+
+			# Skip offsets not defined for this revision
+			if (off > structs[srevk,REV_NUM_OFFS])
+				continue
+
+			offk = subkey(srevk, OFF, off"")
+			base_addr = structs[offk,SEG_ADDR]
+
+			for (vrev = 0; vrev < vars[v,NUM_REVS]; vrev++) {
+				vrevk = subkey(v, REV, vrev"")
+				v_start = vars[vrevk,REV_START]
+				v_end = vars[vrevk,REV_END]
+				s_start = structs[srevk,REV_START]
+				s_end = structs[srevk,REV_END]
+
+				# XXX we don't support computing the union
+				# of partially overlapping ranges
+				if ((v_start < s_start && v_end >= s_start) ||
+				    (v_start <= s_end && v_end > s_end))
+				{
+					errorx("partially overlapping " \
+					    "revision ranges are not supported")
+				}
+
+				# skip variables revs that are not within
+				# the struct offset's compatibility range
+				if (v_start < s_start || v_start > s_end ||
+				    v_end < s_start || v_end > s_end)
+					continue
+
+				st_rev_count++
+				gen_var_rev_body(vrevk, base_addr)
+			}
+		}
+
+		gen_var_tail(v, st_rev_count)
 	}
 }
 
 END {
+
+
 	# skip completion handling if exiting from an error
 	if (_EARLY_EXIT)
 		exit 1
@@ -226,12 +274,17 @@ END {
 
 	# generate output
 	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
+	output_depth = 1
 	for (v in var_names) {
 		if (vars[v,VAR_STRUCT] != null) {
-			#gen_struct_var_decl(v, 1)
-		} else
-			gen_var_decl(v, 1)
+			gen_struct_var(v)
+		} else {
+			gen_var_head(v)
+			gen_var_body(v)
+			gen_var_tail(v, vars[v,NUM_REVS])
+		}
 	}
+	output_depth = 0
 	printf("};\n")
 }
 
