@@ -27,25 +27,50 @@ BEGIN {
 	FMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"
 
 	# Data Type Constants
-	DTYPE["uint"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["int"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["uint8"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["uint16"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["uint32"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["int8"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["int16"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["int32"]	= "BHND_NVRAM_DT_SINT"
 	DTYPE["char"]	= "BHND_NVRAM_DT_CHAR"
 
-	# Default masking for standard widths
-	WMASK["u8"]	= "0x000000FF"
-	WMASK["u16"]	= "0x0000FFFF"
-	WMASK["u32"]	= "0xFFFFFFFF"
+	# Default masking for standard types
+	TMASK["uint8"]	= "0x000000FF"
+	TMASK["uint16"]	= "0x0000FFFF"
+	TMASK["uint32"]	= "0xFFFFFFFF"
+	TMASK["int8"]	= TMASK["uint8"]
+	TMASK["int16"]	= TMASK["uint16"]
+	TMASK["int32"]	= TMASK["uint32"]
 
-	# Byte sizes for standard widths
-	WBYTES["u8"]	= "1"
-	WBYTES["u16"]	= "2"
-	WBYTES["u32"]	= "4"
+	# Byte sizes for standard types
+	TSIZE["uint8"]	= "1"
+	TSIZE["uint16"]	= "2"
+	TSIZE["uint32"]	= "4"
+	TSIZE["int8"]	= TSIZE["uint8"]
+	TSIZE["int16"]	= TSIZE["uint8"]
+	TSIZE["int32"]	= TSIZE["uint8"]
+	TSIZE["char"]	= "1"
 
 	# Common Regexs
-	INT_REGEX	= "[1-9][0-9]*"
-	HEX_REGEX	= "0x[A-Fa-f0-9]+"
-	TYPES_REGEX	= "(u?int(8|16|32)|char)(\\[" INT_REGEX "\\])?"
-	IDENT_REGEX	= "[A-Za-z_][A-Za-z0-9_]*"
+	INT_REGEX	= "^(0|[1-9][0-9]*),?$"
+	HEX_REGEX	= "^0x[A-Fa-f0-9]+,?$"
+
+	ARRAY_REGEX	= "\\[(0|[1-9][0-9]*)\\]"
+	TYPES_REGEX	= "^(u?int(8|16|32)|char)("ARRAY_REGEX")?,?$"
+
+	IDENT_REGEX	= "^[A-Za-z_][A-Za-z0-9_]*,?$"
+	SROM_OFF_REGEX	= "("TYPES_REGEX"|"HEX_REGEX")"
+
+	# Block types
+	BLOCK_T_STRUCT	= "struct"
+	BLOCK_T_VAR	= "var"
+	BLOCK_T_SROM	= "srom"
+	BLOCK_T_NONE	= "NONE"
+
+	# Property types
+	PROP_T_FMT	= "fmt"
+	PROP_T_ALL1	= "all1"
 
 	# Internal variable names
 	BLOCK_TYPE	= "_block_type"
@@ -95,32 +120,23 @@ NR == 1 {
 	print "#include \"ccmach/nvram_map.h\""
 }
 
-# print msg, indented for the current output depth
-function printi (msg)
-{
-	for (_ind = 0; _ind < output_depth; _ind++)
-		printf("\t")
-
-	if (msg != null)
-		printf("%s", msg)
-}
-
+# return the flag definition for variable `v`
 function gen_var_flags (v)
 {
-	_flags = "BHND_NVRAM_VF_DFLT"
+	_num_flags = 0;
 	if (vars[v,VAR_ARRAY])
-		_flags = _flags "|BHND_NVRAM_VF_ARRAY"
+		_flags[_num_flags++] = "BHND_NVRAM_VF_ARRAY"
 
 	if (vars[v,VAR_PRIVATE])
-		_flags = _flags "|BHND_NVRAM_VF_MFGINT"
+		_flags[_num_flags++] = "BHND_NVRAM_VF_MFGINT"
 
 	if (vars[v,VAR_IGNALL1])
-		_flags = _flags "|BHND_NVRAM_VF_IGNALL1"
+		_flags[_num_flags++] = "BHND_NVRAM_VF_IGNALL1"
 
-	# TODO BHND_NVRAM_VF_IGNALL1
-	return _flags
+	return join(_flags, ", ", _num_flags)
 }
 
+# open a bhnd_nvram_var definition for `v`, with optional name `suffix`.
 function gen_var_head (v, suffix)
 {
 	printi("{\"" v suffix "\", ")
@@ -131,6 +147,7 @@ function gen_var_head (v, suffix)
 	output_depth++
 }
 
+# generate a bhnd_sprom_var definition for the given variable revision key
 function gen_var_rev_body (revk, base_addr)
 {
 	if (base_addr != null)
@@ -168,7 +185,8 @@ function gen_var_rev_body (revk, base_addr)
 	printi("}, " num_offs_written "},\n")
 }
 
-function gen_var_body (v, base_addr)
+# generate an array of bhnd_sprom_var definitions for `v`
+function gen_var_body (v)
 {
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
 		revk = subkey(v, REV, rev"")
@@ -176,12 +194,14 @@ function gen_var_body (v, base_addr)
 	}
 }
 
+# close a bhnd_nvram_var definition for `v`
 function gen_var_tail (v, num_revs)
 {
 	output_depth--
 	printi("}, " num_revs "},\n")
 }
 
+# generate a complete set of variable definitions for struct variable `v`.
 function gen_struct_var (v)
 {
 	st = vars[v,VAR_STRUCT]
@@ -243,8 +263,6 @@ function gen_struct_var (v)
 }
 
 END {
-
-
 	# skip completion handling if exiting from an error
 	if (_EARLY_EXIT)
 		exit 1
@@ -271,25 +289,62 @@ END {
 	printf("};\n")
 }
 
+
+#
+# Print usage
+#
 function usage ()
 {
 	print "usage: bhnd_nvram_map.awk <input map>"
 	exit 1
 }
 
+#
+# Join all array elements with the given separator
+#
+function join (array, sep, count)
+{
+	if (count == 0)
+		return ""
+
+	_result = array[0]
+	for (_ji = 1; _ji < count; _ji++)
+		_result = _result sep array[_ji]
+
+	return _result
+}
+
+#
+# Print msg, indented for the current `output_depth`
+#
+function printi (msg)
+{
+	for (_ind = 0; _ind < output_depth; _ind++)
+		printf("\t")
+
+	if (msg != null)
+		printf("%s", msg)
+}
+
+#
 # Print a warning to stderr
+#
 function warn (msg)
 {
 	print "warning:", msg, "at", FILENAME, "line", NR > "/dev/stderr"
 }
 
+#
 # Print a compiler error to stderr
+#
 function error (msg)
 {
 	errorx(msg " at " FILENAME " line " NR ":\n\t" $0)
 }
 
+#
 # Print an error message without including the source line information
+#
 function errorx (msg)
 {
 	print "error:", msg > "/dev/stderr"
@@ -297,7 +352,9 @@ function errorx (msg)
 	exit 1
 }
 
+#
 # Print a debug output message
+#
 function debug (msg)
 {
 	if (!DEBUG)
@@ -307,8 +364,11 @@ function debug (msg)
 	print msg > "/dev/stderr"
 }
 
+#
 # Return an array key composed of the given (parent, selector, child)
-# tuple. the child argument is optional and may be omitted.
+# tuple.
+# The child argument is optional and may be omitted.
+#
 function subkey (parent, selector, child)
 {
 	if (child != null)
@@ -317,7 +377,9 @@ function subkey (parent, selector, child)
 		return parent SUBSEP selector
 }
 
+#
 # Advance to the next non-comment input record
+#
 function next_line ()
 {
 	do {
@@ -326,7 +388,9 @@ function next_line ()
 	return _result
 }
 
+#
 # Advance to the next input record and verify that it matches @p regex
+#
 function getline_matching (regex)
 {
 	_result = next_line()
@@ -339,8 +403,12 @@ function getline_matching (regex)
 	return -1
 }
 
-# Shift the current fields left by `n`. If all fields are consumed and
-# the optional do_getline argument is true, read the next line.
+#
+# Shift the current fields left by `n`.
+#
+# If all fields are consumed and the optional do_getline argument is true,
+# read the next line.
+#
 function shiftf (n, do_getline)
 {
 	if (n > NF) error("shift past end of line")
@@ -353,7 +421,9 @@ function shiftf (n, do_getline)
 		next_line()
 }
 
-# Parse a revision descriptor from the current line
+#
+# Parse a revision descriptor from the current line.
+#
 function parse_revdesc (result)
 {
 	_rstart = 0
@@ -390,8 +460,12 @@ function parse_revdesc (result)
 	result[REV_END] = _rend
 }
 
-# Find opening brace and adjust block depth. The name may be null, in which
-# case the BLOCK_NAME variable will not be defined in this scope
+#
+# Find opening brace and adjust block depth.
+#
+# The name may be null, in which case the BLOCK_NAME variable will not be
+# defined in this scope
+#
 function open_block (type, name)
 {
 	if ($0 ~ "{" || getline_matching("^[ \t]*{") > 0) {
@@ -408,7 +482,9 @@ function open_block (type, name)
 	error("found '"$1 "' instead of expected '{' for '" name "'")
 }
 
-# Find closing brace and adjust block depth
+#
+# Find closing brace and adjust block depth.
+#
 function close_block ()
 {
 	if ($0 !~ "}")
@@ -425,27 +501,39 @@ function close_block ()
 	depth--
 }
 
-# Look up a variable in the symbol table with `name`, optional default value if
-# not found, and an optional scope level to start searching.
-#
-# If deflt is null and the variable is not defined, a compiler error will be
-# emitted.
-# The scope level is defined relative to the current scope -- 0 is the current
-# scope, 1 is the parent scope, etc.
-function g (name, deflt, scope)
+# Internal symbol table lookup function. Returns the symbol depth if
+# name is found at or above scope; if scope is null, it defauls to 0
+function _find_sym (name, scope)
 {
 	if (scope == null)
 		scope = 0;
 
 	for (i = scope; i < depth; i++) {
 		if ((depth-i,name) in symbols)
-			return symbols[depth-i,name]
+			return (depth-i)
 	}
 
-	if (deflt)
-		return deflt
-	else
+	return -1
+}
+
+#
+# Look up a variable in the symbol table with `name` and return its value.
+#
+# If `scope` is not null, the variable search will start at the provided
+# scope level -- 0 is the current scope, 1 is the parent's scope, etc.
+#
+function g (name, scope)
+{
+	_g_depth = _find_sym(name, scope)
+	if (_g_depth < 0)
 		error("'" name "' is undefined")
+
+	return (symbols[_g_depth,name])
+}
+
+function is_defined (name, scope)
+{
+	return (_find_sym(name, scope) >= 0)
 }
 
 # Define a new variable in the symbol table's current scope,
@@ -472,7 +560,10 @@ function set (name, value, scope)
 # Evaluates to true if immediately within a block scope of the given type
 function in_block (type)
 {
-	return (type == g(BLOCK_TYPE, "NONE"))
+	if (!is_defined(BLOCK_TYPE))
+		return (type == BLOCK_T_NONE)
+
+	return (type == g(BLOCK_TYPE))
 }
 
 # Evaluates to true if within an immediate or non-immediate block scope of the
@@ -492,28 +583,26 @@ function in_nested_block (type)
 # the current scope
 function allow_def (type)
 {
-	if (type == "var") {
-		return (in_block("NONE") || in_block("struct"))
-	} else if (type == "struct") {
-		return (in_block("NONE"))
-	} else if (type == "srom") {
-		return (in_block("var"))
-	} else if (type == "struct_srom") {
-		return (in_block("struct"))
+	if (type == BLOCK_T_VAR) {
+		return (in_block(BLOCK_T_NONE) || in_block(BLOCK_T_STRUCT))
+	} else if (type == BLOCK_T_STRUCT) {
+		return (in_block(BLOCK_T_NONE))
+	} else if (type == BLOCK_T_SROM) {
+		return (in_block(BLOCK_T_VAR) || in_block(BLOCK_T_STRUCT))
 	}
 
 	error("unknown type '" type "'")
 }
 
 # struct definition
-$1 == "struct" && allow_def("struct") {
+$1 == BLOCK_T_STRUCT && allow_def($1) {
 	name = $2
 
 	# Remove array[] specifier
 	if (sub(/\[\]$/, "", name) == 0)
 		error("expected '" name "[]', not '" name "'")
 
-	if (name !~ "^"IDENT_REGEX"$" || name ~ "^"TYPES_REGEX"$")
+	if (name !~ IDENT_REGEX || name ~ TYPES_REGEX)
 		error("invalid identifier '" name "'")
 
 	# Add top-level struct entry 
@@ -525,11 +614,11 @@ $1 == "struct" && allow_def("struct") {
 
 	# Open the block 
 	debug("struct " name " {")
-	open_block($1, name)
+	open_block(BLOCK_T_STRUCT, name)
 }
 
-# struct rev descriptor
-$1 == "srom" && allow_def("struct_srom") {
+# struct srom descriptor
+$1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) && in_block(BLOCK_T_STRUCT) {
 	sid = g(BLOCK_NAME)
 
 	# parse revision descriptor
@@ -554,7 +643,7 @@ $1 == "srom" && allow_def("struct_srom") {
 	for (i = 1; i <= num_offs; i++) {
 		offk = subkey(revk, OFF, (i-1) "")
 
-		if (addrs[i] !~ "^"HEX_REGEX"$")
+		if (addrs[i] !~ HEX_REGEX)
 			error("invalid base address '" addrs[i] "'")
 
 		structs[offk,SEG_ADDR] = addrs[i]
@@ -564,8 +653,8 @@ $1 == "srom" && allow_def("struct_srom") {
 	next
 }
 
-# variable srom revs block
-$1 == "srom" && allow_def("srom") {
+# variable srom descriptor
+$1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
 	# parse revision descriptor
 	parse_revdesc(rev_desc)
 
@@ -585,11 +674,14 @@ $1 == "srom" && allow_def("srom") {
 	vars[revk,REV_END] = rev_desc[REV_END]
 	vars[revk,REV_NUM_OFFS] = 0
 
-	debug("srom " _revstr " {")
+	debug("srom " rev_desc[REV_START] "-" rev_desc[REV_END] " {")
 	open_block($1, null)
 }
 
-function parse_offset_segment (revk, offk)
+#
+# Parse an offset declaration from the current line.
+#
+function parse_offset_segment (revk, offk, default_type)
 {
 	vid = g(BLOCK_NAME)
 
@@ -598,33 +690,43 @@ function parse_offset_segment (revk, offk)
 	segk = subkey(offk, OFF_SEG, seg)
 	vars[offk,OFF_NUM_SEGS]++
 
-	type=$1
-	offset=$2
+	# handle missing explicit type
+	if ($1 ~ HEX_REGEX) {
+		type = default_type
+		offset = $1
+		shiftf(1)
+	} else {
+		type = $1
+		offset = $2
+		shiftf(2)
+	}
 
-	if (type !~ "^"WIDTHS_REGEX"$")
-		error("unknown field width '" $1 "'")
-
-	if (offset !~ "^"HEX_REGEX",?$")
-		error("invalid offset value '" $2 "'")
-
+	# detect explicit array definition (denoted with a comma), and
 	# clean up any trailing comma on the offset field
-	sub(",$", "", offset)
+	array_more = (sub(",$", "", offset) >= 0)
+	if (!array_more)
+		array_more = ($1 ~ "$,")
+
+	if (type !~ TYPES_REGEX)
+		error("unknown field type '" type "'")
+
+	if (offset !~ HEX_REGEX)
+		error("invalid offset value '" offset "'")
 
 	# extract byte count[] and width
-	if (match(type, "\\["INT_REGEX"\\]$") > 0) {
+	if (match(type, ARRAY_REGEX"$") > 0) {
 		count = substr(type, RSTART+1, RLENGTH-2)
 		type = substr(type, 1, RSTART-1)
 	} else {
 		count = 1
 	}
-	width = WBYTES[type]
+	width = TSIZE[type]
 
 	# seek to attributes or end of the offset expr
 	sub("^[^,(|){}]+", "", $0)
 
-
 	# parse attributes
-	mask=WMASK[type]
+	mask=TMASK[type]
 	shift=0
 
 	if ($1 ~ "^\\(") {
@@ -661,12 +763,18 @@ function parse_offset_segment (revk, offk)
 }
 
 # revision offset definition
-($1 ~ "^"TYPES_REGEX"$" || $1 "^"HEX_REGEX"$") && in_block("srom") {
+$1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 	vid = g(BLOCK_NAME)
 
 	# fetch rev id/key defined by our parent block
 	rev = g("rev_id")
 	revk = g("rev_key")
+
+	# fetch our default type from our grandparent var
+	var = g(BLOCK_NAME, 1)
+	default_type = vars[var,VAR_TYPE]
+	if (default_type == null)
+		error("internal error: no type defined for " var)
 
 	# parse all offsets
 	do {
@@ -681,7 +789,7 @@ function parse_offset_segment (revk, offk)
 		debug("[")
 		# parse all segments
 		do {
-			parse_offset_segment(revk, offk)
+			parse_offset_segment(revk, offk, default_type)
 			_more_seg = ($1 == "|")
 			if (_more_seg)
 				shiftf(1, 1)
@@ -694,8 +802,8 @@ function parse_offset_segment (revk, offk)
 }
 
 # variable definition
-(($1 == "private" && $2 ~ "^"TYPES_REGEX"$") || $1 ~ "^"TYPES_REGEX"$") && \
-    allow_def("var") \
+(($1 == "private" && $2 ~ TYPES_REGEX) || $1 ~ TYPES_REGEX) &&
+    allow_def(BLOCK_T_VAR) \
 {
 	# check for 'private' flag
 	if ($1 == "private") {
@@ -710,17 +818,14 @@ function parse_offset_segment (revk, offk)
 	array = 0
 	debug(type " " name " {")
 
-	# Check for and parse any array[] specifier
-	if (match(type, "\\["INT_REGEX"\\]$") > 0) {
-		count = substr(type, RSTART+1, RLENGTH-2)
-		type = substr(type, 1, RSTART-1)
+	# Check for and remove any array[] specifier
+	base_type = type
+	if (sub(ARRAY_REGEX"$", "", base_type) > 0) {
 		array = 1
-	} else {
-		count = 1
 	}
 
 	# verify type
-	if (!type in DTYPE)
+	if (!base_type in DTYPE)
 		error("unknown type '" $1 "'")
 
 	# Add top-level variable entry 
@@ -736,27 +841,29 @@ function parse_offset_segment (revk, offk)
 	vars[name,VAR_ARRAY] = array
 	vars[name,VAR_FMT] = "hex" # default if not specified
 
-	open_block("var", name)
+	open_block(BLOCK_T_VAR, name)
 
-	# Mark as a struct-based variable
 	if (in_nested_block("struct")) {
-		sid = g(BLOCK_NAME, null, 1)
+		# Fetch the enclosing struct's name
+		sid = g(BLOCK_NAME, 1)
+
+		# Mark as a struct-based variable
 		vars[name,VAR_STRUCT] = sid
 	}
 
-	debug("type=" DTYPE[type])
+	debug("type=" DTYPE[base_type])
 }
 
 # variable parameters
-$1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
+$1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block(BLOCK_T_VAR) {
 	vid = g(BLOCK_NAME)
-	if ($1 == "fmt") {
+	if ($1 == PROP_T_FMT) {
 		if (!$2 in FMT)
 			error("invalid fmt '" $2 "'")
 
 		vars[vid,VAR_FMT] = $2
 		debug($1 "=" FMT[$2])
-	} else if ($1 == "all1" && $2 == "ignore") {
+	} else if ($1 == PROP_T_ALL1 && $2 == "ignore") {
 		vars[vid,VAR_IGNALL1] = 1
 	} else {
 		error("unknown parameter " $1)
@@ -770,8 +877,8 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 }
 
 # Close blocks
-/}/ && !in_block("NONE") {
-	while (!in_block("NONE") && $0 ~ "}") {
+/}/ && !in_block(BLOCK_T_NONE) {
+	while (!in_block(BLOCK_T_NONE) && $0 ~ "}") {
 		close_block();
 		debug("}")
 	}
@@ -779,16 +886,18 @@ $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 }
 
 # Report unbalanced '}'
-/}/ && in_block("NONE") {
+/}/ && in_block(BLOCK_T_NONE) {
 	error("extra '}'")
 }
 
 # Invalid variable type
-$1 && allow_def("var") {
+$1 && allow_def(BLOCK_T_VAR) {
 	error("unknown type '" $1 "'")
 }
 
 # Generic parse failure
 {
+	print ($1 ~ SROM_OFF_REGEX)
+	print $1
 	error("unrecognized statement")
 }
