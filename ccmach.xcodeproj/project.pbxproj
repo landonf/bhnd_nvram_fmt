@@ -27,7 +27,7 @@
 /* Begin PBXFileReference section */
 		0595502A1C35E97D0032A4AE /* ccmach */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ccmach; sourceTree = BUILT_PRODUCTS_DIR; };
 		059550341C35EA100032A4AE /* ObjectDoc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectDoc.framework; sourceTree = "<group>"; };
-		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		0599679E1C38DD9B00CB31ED /* nvram_map */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = nvram_map; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		0599679F1C38DFA300CB31ED /* map.awk */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = map.awk; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		05FDE5041C36E4410035C177 /* aidmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aidmp.h; sourceTree = "<group>"; };

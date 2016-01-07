@@ -103,6 +103,19 @@ struct bhnd_sprom_compat {
     uint16_t	last;	/**< last compatible SPROM revision, or BHND_SPROMREV_MAX */
 };
 
+static const char *width_tostring (size_t width) {
+	switch (width) {
+		case 1:
+			return "u8";
+		case 2:
+			return "u16";
+		case 4:
+			return "u32";
+		default:
+			errx(EXIT_FAILURE, "Unsupported width: %zu", width);
+	}
+}
+
 /** SPROM value segment descriptor */
 struct bhnd_sprom_vseg {
     size_t      offset;	/**< byte offset within SPROM */
@@ -111,16 +124,7 @@ struct bhnd_sprom_vseg {
     ssize_t		shift;	/**< shift to be applied to the value on extraction. if negative, left shift. if positive, right shift. */
     
     const char *width_str () const {
-        switch (width) {
-            case 1:
-                return "u8";
-            case 2:
-                return "u16";
-            case 4:
-                return "u32";
-            default:
-                errx(EXIT_FAILURE, "Unsupported width: %zu", width);
-        }
+	    return (width_tostring(width));
     }
     
     bool has_default_mask () const {
@@ -148,12 +152,37 @@ struct bhnd_sprom_vseg {
 /** SPROM value descriptor */
 struct bhnd_sprom_value {
     std::vector<bhnd_sprom_vseg>	segs;		/**< segment(s) containing this value */
+	
+	size_t total_width () const {
+		uint32_t mask = 0;
+		for (const auto &seg : segs) {
+			
+			if (seg.shift < 0)
+				mask |= (seg.mask << (-seg.shift));
+			else
+				mask |= (seg.mask >> seg.shift);
+		}
+		
+		if (mask & 0xFFFF0000)
+			return 4;
+		else if ((mask & 0x0000FF00) && (mask & 0xFF))
+			return 2;
+		else
+			return 1;
+	}
 };
 
 /** SPROM-specific variable definition */
 struct bhnd_sprom_var {
     const bhnd_sprom_compat	 compat;	/**< sprom compatibility declaration */
     std::vector<bhnd_sprom_value> values;	/**< value descriptor(s) */
+	
+    size_t elem_width () const {
+        size_t max_width = 0;
+        for (const auto &v : values)
+            max_width = max(max_width, v.total_width());
+        return max_width;
+    }
 };
 
 /** NVRAM variable definition */
@@ -162,10 +191,85 @@ struct bhnd_nvram_var {
     bhnd_nvram_dt		 type;		/**< base data type */
     bhnd_nvram_sfmt		 fmt;		/**< string format */
     uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
-    size_t			 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
     
     std::vector<bhnd_sprom_var>	sprom_descs;	/**< SPROM-specific variable descriptors */
     
+    void normalize () {
+        if (type != BHND_NVRAM_DT_CCODE && type != BHND_NVRAM_DT_MAC48)
+            return;
+
+        flags |= BHND_NVRAM_VF_ARRAY;
+        
+        for (auto &s : sprom_descs) {
+            bhnd_sprom_vseg seg = s.values[0].segs[0];
+            s.values = {};
+
+            size_t alen;
+            if (type == BHND_NVRAM_DT_CCODE) {
+                alen = 2;
+            } else {
+                alen = 48;
+            }
+            
+            for (size_t i = 0; i < alen; i++) {
+                seg.width = 1;
+                seg.offset += 1;
+                seg.mask = 0xFF;
+                s.values.push_back({{seg}});
+            }
+        }
+    }
+
+    size_t elem_count () const {
+        size_t max_elem = 0;
+        for (const auto &s : sprom_descs) {
+            max_elem = max(max_elem, s.values.size());
+        }
+        
+        return max_elem;
+    }
+
+    size_t elem_width () const {
+        size_t max_width = 0;
+        for (const auto &s : sprom_descs)
+            for (const auto &v : s.values)
+                max_width = max(max_width, v.total_width());
+
+        return max_width;
+    }
+    
+    std::string dtstr () const {
+        std::string base;
+        switch (type) {
+            case BHND_NVRAM_DT_UINT: base = "uint"; break;
+            case BHND_NVRAM_DT_SINT: base =  "int"; break;
+            case BHND_NVRAM_DT_MAC48: base = "uint"; break;
+            case BHND_NVRAM_DT_LEDDC: base = "led"; break;
+            case BHND_NVRAM_DT_CCODE: base = "char"; break;
+        }
+        
+        switch (elem_width()) {
+            case 1:
+                if (base != "char")
+                    base += "8";
+                break;
+            case 2:
+                base += "16";
+                break;
+            case 4:
+                base += "32";
+                break;
+        }
+        
+        if (elem_count() > 1) {
+            base += "[" + to_string(elem_count()) + "]";
+            
+            if ((!flags & BHND_NVRAM_VF_ARRAY))
+                warnx("%s is not an array, but has multiple elements", name.c_str());
+        }
+
+        return base;
+    }
     
     bool operator < (const bhnd_nvram_var &other) const {
         return ([@(name.c_str()) compare:@(other.name.c_str()) options:NSNumericSearch] == NSOrderedAscending);
@@ -342,16 +446,6 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     return true;
 }
 
-static const char *dtstr (bhnd_nvram_dt dt) {
-    switch (dt) {
-        case BHND_NVRAM_DT_UINT: return "uint";
-        case BHND_NVRAM_DT_SINT: return "sint";
-        case BHND_NVRAM_DT_MAC48: return "uint[]";
-        case BHND_NVRAM_DT_LEDDC: return "led";
-        case BHND_NVRAM_DT_CCODE: return "uint[]";
-    }
-}
-
 static const char *sfmtstr (bhnd_nvram_sfmt sfmt) {
     switch (sfmt) {
         case BHND_NVRAM_SFMT_HEX: return "hex";
@@ -477,9 +571,7 @@ private:
             if (v->flags & BHND_NVRAM_VF_MFGINT)
                 printf("private ");
             
-            dprintf("%s", dtstr(v->type));
-            if (v->flags & BHND_NVRAM_VF_ARRAY)
-                printf("[]");
+            dprintf("%s", v->dtstr().c_str());
             
             printf(" %s {\n", v->name.c_str());
             _depth++;
@@ -553,16 +645,15 @@ private:
                         
                         if (vlines > 1)
                             dprintf("");
-                        if (v->type == BHND_NVRAM_DT_MAC48) {
-                            printf("u8[48] 0x%04zX", seg.offset);
-                        } else if (v->type == BHND_NVRAM_DT_CCODE && seg.width == 2) {
-                            printf("u8[2] 0x%04zX", seg.offset);
-                        } else if (unified_array) {
-                            printf("%s[%zu] 0x%04zX", seg.width_str(), unified_array, seg.offset);
-                        } else {
-                            printf("%s 0x%04zX", seg.width_str(), seg.offset);
+
+                        if (unified_array) {
+                            if (seg.width != v->elem_width() || v->elem_count() != unified_array)
+                                printf("%s[%zu] ", seg.width_str(), unified_array);
+                        } else if (seg.width != v->elem_width()) {
+                            printf("%s ", seg.width_str());
                         }
-                        
+                        printf("0x%04zX", seg.offset);
+
                         if (!seg.has_defaults()) {
                             printf(" (");
                             if (!seg.has_default_mask()) {
@@ -748,6 +839,9 @@ private:
             
             v->sprom_descs.push_back({{first_ver, last_ver}, vals});
         }
+        
+        for (auto &v : vars)
+            v->normalize();
         
         return vars;
     }

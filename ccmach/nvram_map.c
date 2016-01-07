@@ -10,7 +10,13 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
+
+#ifdef NVRAM_MAIN
 #include "../m.h"
+#else
+#include "nvram_map.h"
+static struct bhnd_nvram_var nvram_vars[] = {};
+#endif
 
 #define	nitems(x)	(sizeof((x)) / sizeof((x)[0]))
 
