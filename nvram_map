@@ -288,12 +288,12 @@ uint8 ledbh3 {
 	srom >= 11	{ 0x009C }
 }
 
-led16 leddc {
+led leddc {
 	all1	ignore
-	srom 8-10	{ 0x009A }
-	srom 5-7	{ 0x005A }
-	srom 4	{ 0x005A }
 	srom 3	{ 0x007C }
+	srom 4	{ 0x005A }
+	srom 5-7	{ 0x005A }
+	srom 8-10	{ 0x009A }
 	srom >= 11	{ 0x009E }
 }
 
@@ -335,10 +335,10 @@ uint32 legofdmbw205gmpo {
 
 uint8[48] macaddr {
 	sfmt	macaddr
-	srom 8-10	{ 0x008D }
-	srom 5-7	{ 0x0053 }
-	srom 4	{ 0x004D }
 	srom 3	{ 0x004B }
+	srom 4	{ 0x004D }
+	srom 5-7	{ 0x0053 }
+	srom 8-10	{ 0x008D }
 	srom >= 11	{ 0x0091 }
 }
 

@@ -192,30 +192,33 @@ struct bhnd_nvram_var {
     bhnd_nvram_sfmt		 fmt;		/**< string format */
     uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
     
-    std::vector<bhnd_sprom_var>	sprom_descs;	/**< SPROM-specific variable descriptors */
+    std::vector<shared_ptr<bhnd_sprom_var>>	sprom_descs;	/**< SPROM-specific variable descriptors */
     
     void normalize () {
-        if (type != BHND_NVRAM_DT_CCODE && type != BHND_NVRAM_DT_MAC48)
-            return;
+        size_t alen;
+        switch (type) {
+            //case BHND_NVRAM_DT_LEDDC:
+            case BHND_NVRAM_DT_CCODE:
+                alen = 2;
+                break;
+            case BHND_NVRAM_DT_MAC48:
+                alen = 48;
+                break;
+            default:
+                return;
+        }
 
         flags |= BHND_NVRAM_VF_ARRAY;
         
         for (auto &s : sprom_descs) {
-            bhnd_sprom_vseg seg = s.values[0].segs[0];
-            s.values = {};
-
-            size_t alen;
-            if (type == BHND_NVRAM_DT_CCODE) {
-                alen = 2;
-            } else {
-                alen = 48;
-            }
+            bhnd_sprom_vseg seg = s->values[0].segs[0];
+            s->values = {};
             
             for (size_t i = 0; i < alen; i++) {
                 seg.width = 1;
                 seg.offset += 1;
                 seg.mask = 0xFF;
-                s.values.push_back({{seg}});
+                s->values.push_back({{seg}});
             }
         }
     }
@@ -223,7 +226,7 @@ struct bhnd_nvram_var {
     size_t elem_count () const {
         size_t max_elem = 0;
         for (const auto &s : sprom_descs) {
-            max_elem = max(max_elem, s.values.size());
+            max_elem = max(max_elem, s->values.size());
         }
         
         return max_elem;
@@ -232,7 +235,7 @@ struct bhnd_nvram_var {
     size_t elem_width () const {
         size_t max_width = 0;
         for (const auto &s : sprom_descs)
-            for (const auto &v : s.values)
+            for (const auto &v : s->values)
                 max_width = max(max_width, v.total_width());
 
         return max_width;
@@ -254,7 +257,8 @@ struct bhnd_nvram_var {
                     base += "8";
                 break;
             case 2:
-                base += "16";
+                if (base != "led")
+                    base += "16";
                 break;
             case 4:
                 base += "32";
@@ -582,17 +586,21 @@ private:
             if (v->flags & BHND_NVRAM_VF_IGNALL1)
                 dprintf("all1\tignore\n");
             
+            sort(v->sprom_descs.begin(), v->sprom_descs.end(), [](const shared_ptr<bhnd_sprom_var> &lhs, const shared_ptr<bhnd_sprom_var> &rhs) {
+                return lhs->compat.first < rhs->compat.last;
+            });
+            
             for (const auto &t : v->sprom_descs) {
                 dprintf("srom ");
-                if (t.compat.last == BHND_SPROMREV_MAX)
-                    printf(">= %u", t.compat.first);
-                else if (t.compat.first == t.compat.last)
-                    printf("%u", t.compat.first);
+                if (t->compat.last == BHND_SPROMREV_MAX)
+                    printf(">= %u", t->compat.first);
+                else if (t->compat.first == t->compat.last)
+                    printf("%u", t->compat.first);
                 else
-                    printf("%u-%u", t.compat.first, t.compat.last);
+                    printf("%u-%u", t->compat.first, t->compat.last);
                 
                 size_t vlines = 0;
-                for (const auto &val : t.values) {
+                for (const auto &val : t->values) {
                     vlines++;
                 }
                 
@@ -604,7 +612,7 @@ private:
                 uint32_t elem_mask = 0;
                 size_t elem_shft = 0;
                 
-                for (const auto &val : t.values) {
+                for (const auto &val : t->values) {
                     if (val.segs.size() != 1) {
                         unified_array = 0;
                         break;
@@ -639,7 +647,7 @@ private:
 
 
                 size_t vali = 0;
-                for (const auto &val : t.values) {
+                for (const auto &val : t->values) {
                     for (size_t i = 0; i < val.segs.size(); i++) {
                         const auto &seg = val.segs[i];
                         
@@ -675,7 +683,7 @@ private:
                         
                         if (i+1 != val.segs.size())
                             printf(" | ");
-                        else if (vlines > 1 && vali+1 != t.values.size())
+                        else if (vlines > 1 && vali+1 != t->values.size())
                             printf(",\n");
                     }
                     vali++;
@@ -836,7 +844,8 @@ private:
             uint16_t first_ver = __builtin_ctz(revmask);
             uint16_t last_ver = 31 - __builtin_clz(revmask);
             
-            v->sprom_descs.push_back({{first_ver, last_ver}, vals});
+            bhnd_sprom_var spvar = {{first_ver, last_ver}, vals};
+            v->sprom_descs.push_back(make_shared<bhnd_sprom_var>(spvar));
         }
         
         for (auto &v : vars)
