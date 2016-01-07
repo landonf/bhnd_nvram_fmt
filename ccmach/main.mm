@@ -107,11 +107,11 @@ struct bhnd_sprom_compat {
 static const char *width_tostring (size_t width) {
 	switch (width) {
 		case 1:
-			return "u8";
+			return "uint8";
 		case 2:
-			return "u16";
+			return "uint16";
 		case 4:
-			return "u32";
+			return "uint32";
 		default:
 			errx(EXIT_FAILURE, "Unsupported width: %zu", width);
 	}

@@ -74,9 +74,9 @@ uint8 antswitch {
 }
 
 uint32 boardflags {
-	srom 1	{ u16 0x0072 }
-	srom 2	{ u16 0x0072 | u16 0x0038 (<<16) }
-	srom 3	{ u16 0x0072 | u16 0x007A (<<16) }
+	srom 1	{ uint16 0x0072 }
+	srom 2	{ uint16 0x0072 | uint16 0x0038 (<<16) }
+	srom 3	{ uint16 0x0072 | uint16 0x007A (<<16) }
 	srom 4	{ 0x0044 }
 	srom 5-7	{ 0x004A }
 	srom >= 8	{ 0x0084 }
@@ -102,7 +102,7 @@ uint16 boardnum {
 }
 
 uint16 boardrev {
-	srom 1-3	{ u8 0x005D }
+	srom 1-3	{ uint8 0x005D }
 	srom 4-7	{ 0x0042 }
 	srom >= 8	{ 0x0082 }
 }
@@ -598,8 +598,8 @@ uint8 measpower1 {
 }
 
 uint8 measpower2 {
-	srom 8-10	{ u16 0x00BE (&0x3F80, >>7) }
-	srom >= 11	{ u16 0x00BA (&0x3F80, >>7) }
+	srom 8-10	{ uint16 0x00BE (&0x3F80, >>7) }
+	srom >= 11	{ uint16 0x00BA (&0x3F80, >>7) }
 }
 
 uint8 noisecaloffset {
@@ -616,8 +616,8 @@ uint8 noiselvl2ga0 {
 }
 
 uint8 noiselvl2ga1 {
-	srom 8-10	{ u16 0x01AA (&0x3E0, >>5) }
-	srom >= 11	{ u16 0x01BC (&0x3E0, >>5) }
+	srom 8-10	{ uint16 0x01AA (&0x3E0, >>5) }
+	srom >= 11	{ uint16 0x01BC (&0x3E0, >>5) }
 }
 
 uint8 noiselvl2ga2 {
@@ -635,7 +635,7 @@ uint8[4] noiselvl5ga0 {
 }
 
 uint8[4] noiselvl5ga1 {
-	srom >= 11	{ u16[4] 0x01BE (&0x3E0, >>5) }
+	srom >= 11	{ uint16[4] 0x01BE (&0x3E0, >>5) }
 }
 
 uint8[4] noiselvl5ga2 {
@@ -652,7 +652,7 @@ uint8 noiselvl5gha0 {
 }
 
 uint8 noiselvl5gha1 {
-	srom 8-10	{ u16 0x01B0 (&0x3E0, >>5) }
+	srom 8-10	{ uint16 0x01B0 (&0x3E0, >>5) }
 }
 
 uint8 noiselvl5gha2 {
@@ -664,7 +664,7 @@ uint8 noiselvl5gla0 {
 }
 
 uint8 noiselvl5gla1 {
-	srom 8-10	{ u16 0x01AC (&0x3E0, >>5) }
+	srom 8-10	{ uint16 0x01AC (&0x3E0, >>5) }
 }
 
 uint8 noiselvl5gla2 {
@@ -676,7 +676,7 @@ uint8 noiselvl5gma0 {
 }
 
 uint8 noiselvl5gma1 {
-	srom 8-10	{ u16 0x01AE (&0x3E0, >>5) }
+	srom 8-10	{ uint16 0x01AE (&0x3E0, >>5) }
 }
 
 uint8 noiselvl5gma2 {
@@ -688,7 +688,7 @@ uint8 noiselvl5gua0 {
 }
 
 uint8 noiselvl5gua1 {
-	srom 8-10	{ u16 0x01B2 (&0x3E0, >>5) }
+	srom 8-10	{ uint16 0x01B2 (&0x3E0, >>5) }
 }
 
 uint8 noiselvl5gua2 {
@@ -872,11 +872,11 @@ uint8 pdetrange5g {
 }
 
 uint8 pdgain2g {
-	srom >= 11	{ u16 0x00AA (&0x1F0, >>4) }
+	srom >= 11	{ uint16 0x00AA (&0x1F0, >>4) }
 }
 
 uint8 pdgain5g {
-	srom >= 11	{ u16 0x00AC (&0x1F0, >>4) }
+	srom >= 11	{ uint16 0x00AC (&0x1F0, >>4) }
 }
 
 uint8 pdoffset2g40ma0 {
@@ -1012,8 +1012,8 @@ uint8 rxgainerr2ga0 {
 }
 
 uint8 rxgainerr2ga1 {
-	srom 8-10	{ u16 0x019A (&0x7C0, >>6) }
-	srom >= 11	{ u16 0x01C6 (&0x7C0, >>6) }
+	srom 8-10	{ uint16 0x019A (&0x7C0, >>6) }
+	srom >= 11	{ uint16 0x01C6 (&0x7C0, >>6) }
 }
 
 uint8 rxgainerr2ga2 {
@@ -1031,7 +1031,7 @@ uint8[4] rxgainerr5ga0 {
 }
 
 uint8[4] rxgainerr5ga1 {
-	srom >= 11	{ u16[4] 0x01C8 (&0x7C0, >>6) }
+	srom >= 11	{ uint16[4] 0x01C8 (&0x7C0, >>6) }
 }
 
 uint8[4] rxgainerr5ga2 {
@@ -1048,7 +1048,7 @@ uint8 rxgainerr5gha0 {
 }
 
 uint8 rxgainerr5gha1 {
-	srom 8-10	{ u16 0x01A0 (&0x7C0, >>6) }
+	srom 8-10	{ uint16 0x01A0 (&0x7C0, >>6) }
 }
 
 uint8 rxgainerr5gha2 {
@@ -1060,7 +1060,7 @@ uint8 rxgainerr5gla0 {
 }
 
 uint8 rxgainerr5gla1 {
-	srom 8-10	{ u16 0x019C (&0x7C0, >>6) }
+	srom 8-10	{ uint16 0x019C (&0x7C0, >>6) }
 }
 
 uint8 rxgainerr5gla2 {
@@ -1072,7 +1072,7 @@ uint8 rxgainerr5gma0 {
 }
 
 uint8 rxgainerr5gma1 {
-	srom 8-10	{ u16 0x019E (&0x7C0, >>6) }
+	srom 8-10	{ uint16 0x019E (&0x7C0, >>6) }
 }
 
 uint8 rxgainerr5gma2 {
@@ -1084,7 +1084,7 @@ uint8 rxgainerr5gua0 {
 }
 
 uint8 rxgainerr5gua1 {
-	srom 8-10	{ u16 0x01A2 (&0x7C0, >>6) }
+	srom 8-10	{ uint16 0x01A2 (&0x7C0, >>6) }
 }
 
 uint8 rxgainerr5gua2 {
@@ -1175,7 +1175,7 @@ uint16 stbcpo {
 }
 
 uint16 subband5gver {
-	srom 8-10	{ u8 0x01A5 (&0x7) }
+	srom 8-10	{ uint8 0x01A5 (&0x7) }
 	srom >= 11	{ 0x00D6 }
 }
 
@@ -1189,7 +1189,7 @@ uint32[5] swctrlmap_2g {
 		0x01BC,
 		0x01C0,
 		0x01C4,
-		u16 0x01C8
+		uint16 0x01C8
 	}
 }
 
@@ -1296,11 +1296,11 @@ uint8 txchain {
 }
 
 uint8 txidxcap2g {
-	srom >= 11	{ u16 0x01A8 (&0xFF0, >>4) }
+	srom >= 11	{ uint16 0x01A8 (&0xFF0, >>4) }
 }
 
 uint8 txidxcap5g {
-	srom >= 11	{ u16 0x01AC (&0xFF0, >>4) }
+	srom >= 11	{ uint16 0x01AC (&0xFF0, >>4) }
 }
 
 uint8 txpid2ga0 {

@@ -14,17 +14,17 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 0
+	DEBUG = 1
 
 	# Maximum revision
 	REV_MAX = 65535
 
 	# Format Constants
-	SFMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
-	SFMT["sdec"]	= "BHND_NVRAM_VFMT_SDEC"
-	SFMT["ccode"]	= "BHND_NVRAM_VFMT_CCODE"
-	SFMT["macaddr"]	= "BHND_NVRAM_VFMT_MACADDR"
-	SFMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"
+	FMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
+	FMT["sdec"]	= "BHND_NVRAM_VFMT_SDEC"
+	FMT["ccode"]	= "BHND_NVRAM_VFMT_CCODE"
+	FMT["macaddr"]	= "BHND_NVRAM_VFMT_MACADDR"
+	FMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"
 
 	# Data Type Constants
 	DTYPE["uint"]	= "BHND_NVRAM_DT_UINT"
@@ -44,9 +44,9 @@ BEGIN {
 	# Common Regexs
 	INT_REGEX	= "[1-9][0-9]*"
 	HEX_REGEX	= "0x[A-Fa-f0-9]+"
-	TYPES_REGEX	= "(uint(8|16|32)|int(8|16|32)|char)(\\[\\])?"
+	TYPES_REGEX	= "(u?int(8|16|32)|char)(\\[" INT_REGEX "\\])?"
 	WIDTHS_REGEX	= "(u8|u16|u32)(\\[[1-9][0-9]*\\])?"
-	IDENT_REGEX	= "[A-Za-z][A-Za-z0-9]*"
+	IDENT_REGEX	= "[A-Za-z_][A-Za-z0-9_]*"
 
 	# Internal variable names
 	BLOCK_TYPE	= "_block_type"
@@ -54,36 +54,36 @@ BEGIN {
 	BLOCK_START	= "_block_start"
 
 	# Common array keys
-	DEF_LINE		= "def_line"
-	NUM_REVS		= "num_revs"
-	REV			= "rev"
+	DEF_LINE	= "def_line"
+	NUM_REVS	= "num_revs"
+	REV		= "rev"
 
 	# Revision array keys
-	REV_START		= "rev_start"
-	REV_END			= "rev_end"
-	REV_DESC		= "rev_decl"
-	REV_NUM_OFFS		= "num_offs"
+	REV_START	= "rev_start"
+	REV_END		= "rev_end"
+	REV_DESC	= "rev_decl"
+	REV_NUM_OFFS	= "num_offs"
 
 	# Offset array keys
-	OFF 			= "off"
-	OFF_NUM_SEGS		= "off_num_segs"
-	OFF_SEG			= "off_seg"
+	OFF 		= "off"
+	OFF_NUM_SEGS	= "off_num_segs"
+	OFF_SEG		= "off_seg"
 
 	# Segment array keys
-	SEG_ADDR		= "seg_addr"
-	SEG_WIDTH		= "seg_width"
-	SEG_COUNT		= "seg_count"
-	SEG_MASK		= "seg_mask"
-	SEG_SHIFT		= "seg_shift"
+	SEG_ADDR	= "seg_addr"
+	SEG_WIDTH	= "seg_width"
+	SEG_COUNT	= "seg_count"
+	SEG_MASK	= "seg_mask"
+	SEG_SHIFT	= "seg_shift"
 
 	# Variable array keys
-	VAR_NAME		= "v_name"
-	VAR_TYPE		= "v_type"
-	VAR_FMT			= "v_fmt"
-	VAR_STRUCT		= "v_parent_struct"
-	VAR_PRIVATE		= "v_private"
-	VAR_ARRAY		= "v_array"
-	VAR_IGNALL1		= "v_ignall1"
+	VAR_NAME	= "v_name"
+	VAR_TYPE	= "v_type"
+	VAR_FMT		= "v_fmt"
+	VAR_STRUCT	= "v_parent_struct"
+	VAR_PRIVATE	= "v_private"
+	VAR_ARRAY	= "v_array"
+	VAR_IGNALL1	= "v_ignall1"
 }
 
 NR == 1 {
@@ -126,7 +126,7 @@ function gen_var_head (v, suffix)
 {
 	printi("{\"" v suffix "\", ")
 	printf("%s, ", DTYPE[vars[v,VAR_TYPE]])
-	printf("%s, ", SFMT[vars[v,VAR_FMT]])
+	printf("%s, ", FMT[vars[v,VAR_FMT]])
 	printf("%s, ", gen_var_flags(v))
 	printf("(struct bhnd_sprom_var[]) {\n")
 	output_depth++
@@ -494,8 +494,7 @@ function in_nested_block (type)
 function allow_def (type)
 {
 	if (type == "var") {
-		return (in_block("NONE") || in_block("struct") ||
-		    in_block("var"))
+		return (in_block("NONE") || in_block("struct"))
 	} else if (type == "struct") {
 		return (in_block("NONE"))
 	} else if (type == "srom") {
@@ -710,16 +709,20 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("srom") {
 	type = $1
 	name = $2
 	array = 0
+	debug(type " " name " {")
 
-	# Check for and remove array[] specifier
-	if (sub(/\[\]$/, "", type) > 0)
+	# Check for and parse any array[] specifier
+	if (match(type, "\\["INT_REGEX"\\]$") > 0) {
+		count = substr(type, RSTART+1, RLENGTH-2)
+		type = substr(type, 1, RSTART-1)
 		array = 1
+	} else {
+		count = 1
+	}
 
 	# verify type
-	if (!$1 in DTYPE)
+	if (!type in DTYPE)
 		error("unknown type '" $1 "'")
-
-	debug(type " " name " {")
 
 	# Add top-level variable entry 
 	if (name in var_names) 
@@ -749,11 +752,11 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("srom") {
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	vid = g(BLOCK_NAME)
 	if ($1 == "fmt") {
-		if (!$2 in SFMT)
+		if (!$2 in FMT)
 			error("invalid fmt '" $2 "'")
 
 		vars[vid,VAR_FMT] = $2
-		debug($1 "=" SFMT[$2])
+		debug($1 "=" FMT[$2])
 	} else if ($1 == "all1" && $2 == "ignore") {
 		vars[vid,VAR_IGNALL1] = 1
 	} else {
