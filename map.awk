@@ -681,7 +681,7 @@ $1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
 #
 # Parse an offset declaration from the current line.
 #
-function parse_offset_segment (revk, offk, default_type)
+function parse_offset_segment (revk, offk)
 {
 	vid = g(BLOCK_NAME)
 
@@ -691,21 +691,9 @@ function parse_offset_segment (revk, offk, default_type)
 	vars[offk,OFF_NUM_SEGS]++
 
 	# handle missing explicit type
-	if ($1 ~ HEX_REGEX) {
-		type = default_type
-		offset = $1
-		shiftf(1)
-	} else {
-		type = $1
-		offset = $2
-		shiftf(2)
-	}
-
-	# detect explicit array definition (denoted with a comma), and
-	# clean up any trailing comma on the offset field
-	array_more = (sub(",$", "", offset) >= 0)
-	if (!array_more)
-		array_more = ($1 ~ "$,")
+	type = $1
+	offset = $2
+	shiftf(2)
 
 	if (type !~ TYPES_REGEX)
 		error("unknown field type '" type "'")
@@ -770,12 +758,6 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 	rev = g("rev_id")
 	revk = g("rev_key")
 
-	# fetch our default type from our grandparent var
-	var = g(BLOCK_NAME, 1)
-	default_type = vars[var,VAR_TYPE]
-	if (default_type == null)
-		error("internal error: no type defined for " var)
-
 	# parse all offsets
 	do {
 		# assign offset id
@@ -789,7 +771,7 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 		debug("[")
 		# parse all segments
 		do {
-			parse_offset_segment(revk, offk, default_type)
+			parse_offset_segment(revk, offk)
 			_more_seg = ($1 == "|")
 			if (_more_seg)
 				shiftf(1, 1)
