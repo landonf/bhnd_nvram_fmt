@@ -80,12 +80,13 @@ typedef enum {
 
 /** NVRAM data type string representations */
 typedef enum {
-    BHND_NVRAM_SFMT_HEX,		/**< hex string format */
-    BHND_NVRAM_SFMT_SDEC,		/**< signed decimal format */
-    BHND_NVRAM_SFMT_MACADDR,	/**< mac address (canonical form, hex octets,
+    BHND_NVRAM_VFMT_HEX,		/**< hex string format */
+    BHND_NVRAM_VFMT_SDEC,		/**< signed decimal format */
+    BHND_NVRAM_VFMT_MACADDR,	/**< mac address (canonical form, hex octets,
                                  seperated with ':') */
-    BHND_NVRAM_SFMT_ASCII		/**< ASCII string */
-} bhnd_nvram_sfmt;
+    BHND_NVRAM_VFMT_LEDDC,        /**< LED PWM duty-cycle (2 bytes -- on/off) */
+    BHND_NVRAM_VFMT_CCODE		/**< ASCII string */
+} bhnd_nvram_fmt;
 
 /** NVRAM variable flags */
 enum {
@@ -189,7 +190,7 @@ struct bhnd_sprom_var {
 struct bhnd_nvram_var {
     std::string		name;		/**< variable name */
     bhnd_nvram_dt		 type;		/**< base data type */
-    bhnd_nvram_sfmt		 fmt;		/**< string format */
+    bhnd_nvram_fmt		 fmt;		/**< string format */
     uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
     
     std::vector<shared_ptr<bhnd_sprom_var>>	sprom_descs;	/**< SPROM-specific variable descriptors */
@@ -197,7 +198,7 @@ struct bhnd_nvram_var {
     void normalize () {
         size_t alen;
         switch (type) {
-            //case BHND_NVRAM_DT_LEDDC:
+            case BHND_NVRAM_DT_LEDDC:
             case BHND_NVRAM_DT_CCODE:
                 alen = 2;
                 break;
@@ -247,7 +248,7 @@ struct bhnd_nvram_var {
             case BHND_NVRAM_DT_UINT: base = "uint"; break;
             case BHND_NVRAM_DT_SINT: base =  "int"; break;
             case BHND_NVRAM_DT_MAC48: base = "uint"; break;
-            case BHND_NVRAM_DT_LEDDC: base = "led"; break;
+            case BHND_NVRAM_DT_LEDDC: base = "uint"; break;
             case BHND_NVRAM_DT_CCODE: base = "char"; break;
         }
         
@@ -257,8 +258,7 @@ struct bhnd_nvram_var {
                     base += "8";
                 break;
             case 2:
-                if (base != "led")
-                    base += "16";
+                base += "16";
                 break;
             case 4:
                 base += "32";
@@ -450,12 +450,13 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     return true;
 }
 
-static const char *sfmtstr (bhnd_nvram_sfmt sfmt) {
-    switch (sfmt) {
-        case BHND_NVRAM_SFMT_HEX: return "hex";
-        case BHND_NVRAM_SFMT_SDEC: return "sdec";
-        case BHND_NVRAM_SFMT_MACADDR: return "macaddr";
-        case BHND_NVRAM_SFMT_ASCII: return "ascii";
+static const char *fmtstr (bhnd_nvram_fmt fmt) {
+    switch (fmt) {
+        case BHND_NVRAM_VFMT_HEX: return "hex";
+        case BHND_NVRAM_VFMT_SDEC: return "sdec";
+        case BHND_NVRAM_VFMT_MACADDR: return "macaddr";
+        case BHND_NVRAM_VFMT_CCODE: return "ccode";
+        case BHND_NVRAM_VFMT_LEDDC: return "led_dutycycle";
     }
 }
 
@@ -580,8 +581,8 @@ private:
             printf(" %s {\n", v->name.c_str());
             _depth++;
             
-            if (v->fmt != BHND_NVRAM_SFMT_HEX)
-                dprintf("sfmt\t%s\n", sfmtstr(v->fmt));
+            if (v->fmt != BHND_NVRAM_VFMT_HEX)
+                dprintf("fmt\t%s\n", fmtstr(v->fmt));
             
             if (v->flags & BHND_NVRAM_VF_IGNALL1)
                 dprintf("all1\tignore\n");
@@ -727,23 +728,23 @@ private:
             /* Determine fmt and type */
             if (flags & SRFL_CCODE) {
                 v->type = BHND_NVRAM_DT_CCODE;
-                v->fmt = BHND_NVRAM_SFMT_ASCII;
+                v->fmt = BHND_NVRAM_VFMT_CCODE;
             } else if (flags & SRFL_ETHADDR) {
                 v->type = BHND_NVRAM_DT_MAC48;
-                v->fmt = BHND_NVRAM_SFMT_MACADDR;
+                v->fmt = BHND_NVRAM_VFMT_MACADDR;
             } else if (flags & SRFL_LEDDC) {
                 v->type = BHND_NVRAM_DT_LEDDC;
-                v->fmt = BHND_NVRAM_SFMT_HEX;
+                v->fmt = BHND_NVRAM_VFMT_LEDDC;
             } else if (flags & SRFL_PRSIGN) {
                 v->type = BHND_NVRAM_DT_SINT;
-                v->fmt = BHND_NVRAM_SFMT_SDEC;
+                v->fmt = BHND_NVRAM_VFMT_SDEC;
             } else if (flags & SRFL_PRHEX) {
                 v->type = BHND_NVRAM_DT_UINT;
-                v->fmt = BHND_NVRAM_SFMT_HEX;
+                v->fmt = BHND_NVRAM_VFMT_HEX;
             } else {
                 /* Default behavior */
                 v->type = BHND_NVRAM_DT_UINT;
-                v->fmt = BHND_NVRAM_SFMT_HEX;
+                v->fmt = BHND_NVRAM_VFMT_HEX;
             }
             
             /* Apply flags */

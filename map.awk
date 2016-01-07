@@ -20,10 +20,10 @@ BEGIN {
 	REV_MAX = 65535
 
 	# Format Constants
-	SFMT["hex"]	= "BHND_NVRAM_SFMT_HEX"
-	SFMT["sdec"]	= "BHND_NVRAM_SFMT_SDEC"
-	SFMT["ascii"]	= "BHND_NVRAM_SFMT_ASCII"
-	SFMT["macaddr"]	= "BHND_NVRAM_SFMT_MACADDR"
+	SFMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
+	SFMT["sdec"]	= "BHND_NVRAM_VFMT_SDEC"
+	SFMT["ascii"]	= "BHND_NVRAM_VFMT_CCODE"
+	SFMT["macaddr"]	= "BHND_NVRAM_VFMT_MACADDR"
 
 	# Data Type Constants
 	DTYPE["uint"]	= "BHND_NVRAM_DT_UINT"
@@ -749,9 +749,9 @@ $1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
 # variable parameters
 $1 ~ "^"IDENT_REGEX"$" && $2 ~ "^"IDENT_REGEX";?$" && in_block("var") {
 	vid = g(BLOCK_NAME)
-	if ($1 == "sfmt") {
+	if ($1 == "fmt") {
 		if (!$2 in SFMT)
-			error("invalid sfmt '" $2 "'")
+			error("invalid fmt '" $2 "'")
 
 		vars[vid,VAR_FMT] = $2
 		debug($1 "=" SFMT[$2])

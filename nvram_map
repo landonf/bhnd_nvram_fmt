@@ -155,7 +155,7 @@ uint16 cckbw202gpo {
 }
 
 char[2] ccode {
-	sfmt	ascii
+	fmt	ccode
 	srom 0-3	{ 0x0077 }
 	srom 4	{ 0x0053 }
 	srom 5-7	{ 0x0045 }
@@ -201,7 +201,7 @@ uint8 epagain5g {
 }
 
 uint8[48] et1macaddr {
-	sfmt	macaddr
+	fmt	macaddr
 	srom 0-2	{ 0x0055 }
 }
 
@@ -244,7 +244,7 @@ uint8 hw_iqcal_en {
 }
 
 uint8[48] il0macaddr {
-	sfmt	macaddr
+	fmt	macaddr
 	srom 0-2	{ 0x0049 }
 }
 
@@ -288,13 +288,14 @@ uint8 ledbh3 {
 	srom >= 11	{ 0x009C }
 }
 
-led leddc {
+uint8[2] leddc {
+	fmt	led_dutycycle
 	all1	ignore
-	srom 3	{ 0x007C }
-	srom 4	{ 0x005A }
-	srom 5-7	{ 0x005A }
-	srom 8-10	{ 0x009A }
-	srom >= 11	{ 0x009E }
+	srom 3	{ 0x007D }
+	srom 4	{ 0x005B }
+	srom 5-7	{ 0x005B }
+	srom 8-10	{ 0x009B }
+	srom >= 11	{ 0x009F }
 }
 
 uint16 legofdm40duppo {
@@ -334,7 +335,7 @@ uint32 legofdmbw205gmpo {
 }
 
 uint8[48] macaddr {
-	sfmt	macaddr
+	fmt	macaddr
 	srom 3	{ 0x004B }
 	srom 4	{ 0x004D }
 	srom 5-7	{ 0x0053 }
@@ -1091,13 +1092,13 @@ uint8 rxgainerr5gua2 {
 }
 
 int8 rxpo2g {
-	sfmt	sdec
+	fmt	sdec
 	srom 3	{ 0x005B }
 	srom 8-10	{ 0x00AD }
 }
 
 int8 rxpo5g {
-	sfmt	sdec
+	fmt	sdec
 	srom 3	{ 0x005A }
 	srom 8-10	{ 0x00AC }
 }

@@ -22,12 +22,12 @@ typedef enum {
 
 /** NVRAM data type string representations */
 typedef enum {
-	BHND_NVRAM_SFMT_HEX,		/**< hex string format */
-	BHND_NVRAM_SFMT_SDEC,		/**< signed decimal format */
-	BHND_NVRAM_SFMT_MACADDR,	/**< mac address (canonical form, hex octets,
+	BHND_NVRAM_VFMT_HEX,		/**< hex string format */
+	BHND_NVRAM_VFMT_SDEC,		/**< signed decimal format */
+	BHND_NVRAM_VFMT_MACADDR,	/**< mac address (canonical form, hex octets,
 					     seperated with ':') */
-	BHND_NVRAM_SFMT_ASCII		/**< ASCII string */
-} bhnd_nvram_sfmt;
+	BHND_NVRAM_VFMT_CCODE		/**< ASCII string */
+} bhnd_nvram_fmt;
 
 /** NVRAM variable flags */
 enum {
@@ -67,7 +67,7 @@ struct bhnd_sprom_var {
 struct bhnd_nvram_var {
 	const char			*name;		/**< variable name */
 	bhnd_nvram_dt			 type;		/**< base data type */
-	bhnd_nvram_sfmt			 sfmt;		/**< string format */
+	bhnd_nvram_fmt			 fmt;		/**< string format */
 	uint32_t			 flags;		/**< BHND_NVRAM_VF_* flags */
 
 	const struct bhnd_sprom_var	*sprom_descs;	/**< SPROM-specific variable descriptors */
