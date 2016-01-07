@@ -1,600 +1,600 @@
 uint8 aa2g {
-	srom 1-3	{ 0x005C (&0x30, >>4) }
-	srom 4-7	{ 0x005D }
-	srom 8-10	{ 0x009D }
-	srom >= 11	{ 0x00A1 }
+	srom 1-3	{ uint8 0x005C (&0x30, >>4) }
+	srom 4-7	{ uint8 0x005D }
+	srom 8-10	{ uint8 0x009D }
+	srom >= 11	{ uint8 0x00A1 }
 }
 
 uint8 aa5g {
-	srom 1-3	{ 0x005C (&0xC0, >>6) }
-	srom 4-7	{ 0x005C }
-	srom 8-10	{ 0x009C }
-	srom >= 11	{ 0x00A0 }
+	srom 1-3	{ uint8 0x005C (&0xC0, >>6) }
+	srom 4-7	{ uint8 0x005C }
+	srom 8-10	{ uint8 0x009C }
+	srom >= 11	{ uint8 0x00A0 }
 }
 
 uint8 ag0 {
-	srom 1-3	{ 0x0075 }
-	srom 4-7	{ 0x005F }
-	srom 8-10	{ 0x009F }
+	srom 1-3	{ uint8 0x0075 }
+	srom 4-7	{ uint8 0x005F }
+	srom 8-10	{ uint8 0x009F }
 }
 
 uint8 ag1 {
-	srom 1-3	{ 0x0074 }
-	srom 4-7	{ 0x005E }
-	srom 8-10	{ 0x009E }
+	srom 1-3	{ uint8 0x0074 }
+	srom 4-7	{ uint8 0x005E }
+	srom 8-10	{ uint8 0x009E }
 }
 
 uint8 ag2 {
-	srom 4-7	{ 0x0061 }
-	srom 8-10	{ 0x00A1 }
+	srom 4-7	{ uint8 0x0061 }
+	srom 8-10	{ uint8 0x00A1 }
 }
 
 uint8 ag3 {
-	srom 4-7	{ 0x0060 }
-	srom 8-10	{ 0x00A0 }
+	srom 4-7	{ uint8 0x0060 }
+	srom 8-10	{ uint8 0x00A0 }
 }
 
 uint8 aga0 {
-	srom >= 11	{ 0x00A5 }
+	srom >= 11	{ uint8 0x00A5 }
 }
 
 uint8 aga1 {
-	srom >= 11	{ 0x00A6 }
+	srom >= 11	{ uint8 0x00A6 }
 }
 
 uint8 aga2 {
-	srom >= 11	{ 0x00A7 }
+	srom >= 11	{ uint8 0x00A7 }
 }
 
 uint8 agbg0 {
-	srom >= 11	{ 0x00A2 }
+	srom >= 11	{ uint8 0x00A2 }
 }
 
 uint8 agbg1 {
-	srom >= 11	{ 0x00A3 }
+	srom >= 11	{ uint8 0x00A3 }
 }
 
 uint8 agbg2 {
-	srom >= 11	{ 0x00A4 }
+	srom >= 11	{ uint8 0x00A4 }
 }
 
 uint8 antswctl2g {
-	srom 8-10	{ 0x00AE (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x00AE (&0xF8, >>3) }
 }
 
 uint8 antswctl5g {
-	srom 8-10	{ 0x00B0 (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x00B0 (&0xF8, >>3) }
 }
 
 uint8 antswitch {
 	all1	ignore
-	srom 4-7	{ 0x007A }
-	srom 8-10	{ 0x00A2 }
-	srom >= 11	{ 0x00A8 }
+	srom 4-7	{ uint8 0x007A }
+	srom 8-10	{ uint8 0x00A2 }
+	srom >= 11	{ uint8 0x00A8 }
 }
 
 uint32 boardflags {
 	srom 1	{ uint16 0x0072 }
 	srom 2	{ uint16 0x0072 | uint16 0x0038 (<<16) }
 	srom 3	{ uint16 0x0072 | uint16 0x007A (<<16) }
-	srom 4	{ 0x0044 }
-	srom 5-7	{ 0x004A }
-	srom >= 8	{ 0x0084 }
+	srom 4	{ uint32 0x0044 }
+	srom 5-7	{ uint32 0x004A }
+	srom >= 8	{ uint32 0x0084 }
 }
 
 uint32 boardflags2 {
-	srom 4	{ 0x0048 }
-	srom 5-7	{ 0x004E }
-	srom >= 8	{ 0x0088 }
+	srom 4	{ uint32 0x0048 }
+	srom 5-7	{ uint32 0x004E }
+	srom >= 8	{ uint32 0x0088 }
 }
 
 uint32 boardflags3 {
-	srom >= 11	{ 0x008C }
+	srom >= 11	{ uint32 0x008C }
 }
 
 uint16 boardnum {
-	srom 1-2	{ 0x004C }
-	srom 3	{ 0x004E }
-	srom 4	{ 0x0050 }
-	srom 5-7	{ 0x0056 }
-	srom 8-10	{ 0x0090 }
-	srom >= 11	{ 0x0094 }
+	srom 1-2	{ uint16 0x004C }
+	srom 3	{ uint16 0x004E }
+	srom 4	{ uint16 0x0050 }
+	srom 5-7	{ uint16 0x0056 }
+	srom 8-10	{ uint16 0x0090 }
+	srom >= 11	{ uint16 0x0094 }
 }
 
 uint16 boardrev {
 	srom 1-3	{ uint8 0x005D }
-	srom 4-7	{ 0x0042 }
-	srom >= 8	{ 0x0082 }
+	srom 4-7	{ uint16 0x0042 }
+	srom >= 8	{ uint16 0x0082 }
 }
 
 uint16 boardtype {
-	srom >= 2	{ 0x0004 }
+	srom >= 2	{ uint16 0x0004 }
 }
 
 uint16 bw40po {
-	srom 4-7	{ 0x018E }
-	srom 8	{ 0x0196 }
+	srom 4-7	{ uint16 0x018E }
+	srom 8	{ uint16 0x0196 }
 }
 
 uint16 bwduppo {
-	srom 4-7	{ 0x0190 }
-	srom 8	{ 0x0198 }
+	srom 4-7	{ uint16 0x0190 }
+	srom 8	{ uint16 0x0198 }
 }
 
 uint8 bxa2g {
-	srom 3	{ 0x0050 (&0x18, >>3) }
-	srom 8-10	{ 0x00A4 (&0x18, >>3) }
+	srom 3	{ uint8 0x0050 (&0x18, >>3) }
+	srom 8-10	{ uint8 0x00A4 (&0x18, >>3) }
 }
 
 uint8 bxa5g {
-	srom 3	{ 0x0052 (&0x18, >>3) }
-	srom 8-10	{ 0x00A6 (&0x18, >>3) }
+	srom 3	{ uint8 0x0052 (&0x18, >>3) }
+	srom 8-10	{ uint8 0x00A6 (&0x18, >>3) }
 }
 
 uint8 cc {
-	srom 1	{ 0x005C (&0xF) }
+	srom 1	{ uint8 0x005C (&0xF) }
 }
 
 uint16 cck2gpo {
-	srom 4-7	{ 0x0138 }
-	srom 8	{ 0x0140 }
+	srom 4-7	{ uint16 0x0138 }
+	srom 8	{ uint16 0x0140 }
 }
 
 uint16 cckPwrOffset {
-	srom 10	{ 0x01B4 }
+	srom 10	{ uint16 0x01B4 }
 }
 
 uint16 cckbw20ul2gpo {
-	srom 9-10	{ 0x0142 }
-	srom >= 11	{ 0x0152 }
+	srom 9-10	{ uint16 0x0142 }
+	srom >= 11	{ uint16 0x0152 }
 }
 
 uint16 cckbw202gpo {
-	srom 9-10	{ 0x0140 }
-	srom >= 11	{ 0x0150 }
+	srom 9-10	{ uint16 0x0140 }
+	srom >= 11	{ uint16 0x0150 }
 }
 
 char[2] ccode {
 	fmt	ccode
-	srom 0-3	{ 0x0077 }
-	srom 4	{ 0x0053 }
-	srom 5-7	{ 0x0045 }
-	srom 8-10	{ 0x0093 }
-	srom >= 11	{ 0x0097 }
+	srom 0-3	{ uint8[2] 0x0077 }
+	srom 4	{ uint8[2] 0x0053 }
+	srom 5-7	{ uint8[2] 0x0045 }
+	srom 8-10	{ uint8[2] 0x0093 }
+	srom >= 11	{ uint8[2] 0x0097 }
 }
 
 uint16 cddpo {
-	srom 4-7	{ 0x018A }
-	srom 8	{ 0x0192 }
+	srom 4-7	{ uint16 0x018A }
+	srom 8	{ uint16 0x0192 }
 }
 
 private uint16 devid {
-	srom >= 8	{ 0x0060 }
+	srom >= 8	{ uint16 0x0060 }
 }
 
 uint16 dot11agduphrpo {
-	srom >= 11	{ 0x01B2 }
+	srom >= 11	{ uint16 0x01B2 }
 }
 
 uint16 dot11agduplrpo {
-	srom >= 11	{ 0x01B4 }
+	srom >= 11	{ uint16 0x01B4 }
 }
 
 uint16 dot11agofdmhrbw202gpo {
-	srom >= 11	{ 0x015C }
+	srom >= 11	{ uint16 0x015C }
 }
 
 uint8 elna2g {
-	srom 8-10	{ 0x00BB }
+	srom 8-10	{ uint8 0x00BB }
 }
 
 uint8 elna5g {
-	srom 8-10	{ 0x00BA }
+	srom 8-10	{ uint8 0x00BA }
 }
 
 uint8 epagain2g {
-	srom >= 11	{ 0x00AB (&0xE, >>1) }
+	srom >= 11	{ uint8 0x00AB (&0xE, >>1) }
 }
 
 uint8 epagain5g {
-	srom >= 11	{ 0x00AD (&0xE, >>1) }
+	srom >= 11	{ uint8 0x00AD (&0xE, >>1) }
 }
 
 uint8[48] et1macaddr {
 	fmt	macaddr
-	srom 0-2	{ 0x0055 }
+	srom 0-2	{ uint8[48] 0x0055 }
 }
 
 uint8 eu_edthresh2g {
-	srom 8	{ 0x01A9 }
-	srom 9	{ 0x0199 }
-	srom 10	{ 0x0199 }
-	srom 11	{ 0x01D1 }
+	srom 8	{ uint8 0x01A9 }
+	srom 9	{ uint8 0x0199 }
+	srom 10	{ uint8 0x0199 }
+	srom 11	{ uint8 0x01D1 }
 }
 
 uint8 eu_edthresh5g {
-	srom 8	{ 0x01A8 }
-	srom 9	{ 0x0198 }
-	srom 10	{ 0x0198 }
-	srom 11	{ 0x01D0 }
+	srom 8	{ uint8 0x01A8 }
+	srom 9	{ uint8 0x0198 }
+	srom 10	{ uint8 0x0198 }
+	srom 11	{ uint8 0x01D0 }
 }
 
 uint8 extpagain2g {
-	srom 8-10	{ 0x00AF (&0x6, >>1) }
+	srom 8-10	{ uint8 0x00AF (&0x6, >>1) }
 }
 
 uint8 extpagain5g {
-	srom 8-10	{ 0x00B1 (&0x6, >>1) }
+	srom 8-10	{ uint8 0x00B1 (&0x6, >>1) }
 }
 
 uint8 femctrl {
-	srom >= 11	{ 0x00AA (&0xF8, >>3) }
+	srom >= 11	{ uint8 0x00AA (&0xF8, >>3) }
 }
 
 uint8 freqoffset_corr {
-	srom 8-10	{ 0x00B9 (&0xF) }
+	srom 8-10	{ uint8 0x00B9 (&0xF) }
 }
 
 uint8 gainctrlsph {
-	srom >= 11	{ 0x00AC (&0xF8, >>3) }
+	srom >= 11	{ uint8 0x00AC (&0xF8, >>3) }
 }
 
 uint8 hw_iqcal_en {
-	srom 8-10	{ 0x00B9 (&0x20, >>5) }
+	srom 8-10	{ uint8 0x00B9 (&0x20, >>5) }
 }
 
 uint8[48] il0macaddr {
 	fmt	macaddr
-	srom 0-2	{ 0x0049 }
+	srom 0-2	{ uint8[48] 0x0049 }
 }
 
 uint8 iqcal_swp_dis {
-	srom 8-10	{ 0x00B9 (&0x10, >>4) }
+	srom 8-10	{ uint8 0x00B9 (&0x10, >>4) }
 }
 
 uint8 ledbh0 {
 	all1	ignore
-	srom 1-3	{ 0x0065 }
-	srom 4	{ 0x0057 }
-	srom 5-7	{ 0x0077 }
-	srom 8-10	{ 0x0097 }
-	srom >= 11	{ 0x009B }
+	srom 1-3	{ uint8 0x0065 }
+	srom 4	{ uint8 0x0057 }
+	srom 5-7	{ uint8 0x0077 }
+	srom 8-10	{ uint8 0x0097 }
+	srom >= 11	{ uint8 0x009B }
 }
 
 uint8 ledbh1 {
 	all1	ignore
-	srom 1-3	{ 0x0064 }
-	srom 4	{ 0x0056 }
-	srom 5-7	{ 0x0076 }
-	srom 8-10	{ 0x0096 }
-	srom >= 11	{ 0x009A }
+	srom 1-3	{ uint8 0x0064 }
+	srom 4	{ uint8 0x0056 }
+	srom 5-7	{ uint8 0x0076 }
+	srom 8-10	{ uint8 0x0096 }
+	srom >= 11	{ uint8 0x009A }
 }
 
 uint8 ledbh2 {
 	all1	ignore
-	srom 1-3	{ 0x0067 }
-	srom 4	{ 0x0059 }
-	srom 5-7	{ 0x0079 }
-	srom 8-10	{ 0x0099 }
-	srom >= 11	{ 0x009D }
+	srom 1-3	{ uint8 0x0067 }
+	srom 4	{ uint8 0x0059 }
+	srom 5-7	{ uint8 0x0079 }
+	srom 8-10	{ uint8 0x0099 }
+	srom >= 11	{ uint8 0x009D }
 }
 
 uint8 ledbh3 {
 	all1	ignore
-	srom 1-3	{ 0x0066 }
-	srom 4	{ 0x0058 }
-	srom 5-7	{ 0x0078 }
-	srom 8-10	{ 0x0098 }
-	srom >= 11	{ 0x009C }
+	srom 1-3	{ uint8 0x0066 }
+	srom 4	{ uint8 0x0058 }
+	srom 5-7	{ uint8 0x0078 }
+	srom 8-10	{ uint8 0x0098 }
+	srom >= 11	{ uint8 0x009C }
 }
 
 uint8[2] leddc {
 	fmt	led_dc
 	all1	ignore
-	srom 3	{ 0x007D }
-	srom 4	{ 0x005B }
-	srom 5-7	{ 0x005B }
-	srom 8-10	{ 0x009B }
-	srom >= 11	{ 0x009F }
+	srom 3	{ uint8[2] 0x007D }
+	srom 4	{ uint8[2] 0x005B }
+	srom 5-7	{ uint8[2] 0x005B }
+	srom 8-10	{ uint8[2] 0x009B }
+	srom >= 11	{ uint8[2] 0x009F }
 }
 
 uint16 legofdm40duppo {
-	srom 9-10	{ 0x0196 }
+	srom 9-10	{ uint16 0x0196 }
 }
 
 uint32 legofdmbw20ul2gpo {
-	srom 9-10	{ 0x0148 }
+	srom 9-10	{ uint32 0x0148 }
 }
 
 uint32 legofdmbw20ul5ghpo {
-	srom 9-10	{ 0x0160 }
+	srom 9-10	{ uint32 0x0160 }
 }
 
 uint32 legofdmbw20ul5glpo {
-	srom 9-10	{ 0x0150 }
+	srom 9-10	{ uint32 0x0150 }
 }
 
 uint32 legofdmbw20ul5gmpo {
-	srom 9-10	{ 0x0158 }
+	srom 9-10	{ uint32 0x0158 }
 }
 
 uint32 legofdmbw202gpo {
-	srom 9-10	{ 0x0144 }
+	srom 9-10	{ uint32 0x0144 }
 }
 
 uint32 legofdmbw205ghpo {
-	srom 9-10	{ 0x015C }
+	srom 9-10	{ uint32 0x015C }
 }
 
 uint32 legofdmbw205glpo {
-	srom 9-10	{ 0x014C }
+	srom 9-10	{ uint32 0x014C }
 }
 
 uint32 legofdmbw205gmpo {
-	srom 9-10	{ 0x0154 }
+	srom 9-10	{ uint32 0x0154 }
 }
 
 uint8[48] macaddr {
 	fmt	macaddr
-	srom 3	{ 0x004B }
-	srom 4	{ 0x004D }
-	srom 5-7	{ 0x0053 }
-	srom 8-10	{ 0x008D }
-	srom >= 11	{ 0x0091 }
+	srom 3	{ uint8[48] 0x004B }
+	srom 4	{ uint8[48] 0x004D }
+	srom 5-7	{ uint8[48] 0x0053 }
+	srom 8-10	{ uint8[48] 0x008D }
+	srom >= 11	{ uint8[48] 0x0091 }
 }
 
 uint16 mcs2gpo0 {
-	srom 4-7	{ 0x014A }
-	srom 8	{ 0x0152 }
+	srom 4-7	{ uint16 0x014A }
+	srom 8	{ uint16 0x0152 }
 }
 
 uint16 mcs2gpo1 {
-	srom 4-7	{ 0x014C }
-	srom 8	{ 0x0154 }
+	srom 4-7	{ uint16 0x014C }
+	srom 8	{ uint16 0x0154 }
 }
 
 uint16 mcs2gpo2 {
-	srom 4-7	{ 0x014E }
-	srom 8	{ 0x0156 }
+	srom 4-7	{ uint16 0x014E }
+	srom 8	{ uint16 0x0156 }
 }
 
 uint16 mcs2gpo3 {
-	srom 4-7	{ 0x0150 }
-	srom 8	{ 0x0158 }
+	srom 4-7	{ uint16 0x0150 }
+	srom 8	{ uint16 0x0158 }
 }
 
 uint16 mcs2gpo4 {
-	srom 4-7	{ 0x0152 }
-	srom 8	{ 0x015A }
+	srom 4-7	{ uint16 0x0152 }
+	srom 8	{ uint16 0x015A }
 }
 
 uint16 mcs2gpo5 {
-	srom 4-7	{ 0x0154 }
-	srom 8	{ 0x015C }
+	srom 4-7	{ uint16 0x0154 }
+	srom 8	{ uint16 0x015C }
 }
 
 uint16 mcs2gpo6 {
-	srom 4-7	{ 0x0156 }
-	srom 8	{ 0x015E }
+	srom 4-7	{ uint16 0x0156 }
+	srom 8	{ uint16 0x015E }
 }
 
 uint16 mcs2gpo7 {
-	srom 4-7	{ 0x0158 }
-	srom 8	{ 0x0160 }
+	srom 4-7	{ uint16 0x0158 }
+	srom 8	{ uint16 0x0160 }
 }
 
 uint16 mcs5ghpo0 {
-	srom 4-7	{ 0x017A }
-	srom 8	{ 0x0182 }
+	srom 4-7	{ uint16 0x017A }
+	srom 8	{ uint16 0x0182 }
 }
 
 uint16 mcs5ghpo1 {
-	srom 4-7	{ 0x017C }
-	srom 8	{ 0x0184 }
+	srom 4-7	{ uint16 0x017C }
+	srom 8	{ uint16 0x0184 }
 }
 
 uint16 mcs5ghpo2 {
-	srom 4-7	{ 0x017E }
-	srom 8	{ 0x0186 }
+	srom 4-7	{ uint16 0x017E }
+	srom 8	{ uint16 0x0186 }
 }
 
 uint16 mcs5ghpo3 {
-	srom 4-7	{ 0x0180 }
-	srom 8	{ 0x0188 }
+	srom 4-7	{ uint16 0x0180 }
+	srom 8	{ uint16 0x0188 }
 }
 
 uint16 mcs5ghpo4 {
-	srom 4-7	{ 0x0182 }
-	srom 8	{ 0x018A }
+	srom 4-7	{ uint16 0x0182 }
+	srom 8	{ uint16 0x018A }
 }
 
 uint16 mcs5ghpo5 {
-	srom 4-7	{ 0x0184 }
-	srom 8	{ 0x018C }
+	srom 4-7	{ uint16 0x0184 }
+	srom 8	{ uint16 0x018C }
 }
 
 uint16 mcs5ghpo6 {
-	srom 4-7	{ 0x0186 }
-	srom 8	{ 0x018E }
+	srom 4-7	{ uint16 0x0186 }
+	srom 8	{ uint16 0x018E }
 }
 
 uint16 mcs5ghpo7 {
-	srom 4-7	{ 0x0188 }
-	srom 8	{ 0x0190 }
+	srom 4-7	{ uint16 0x0188 }
+	srom 8	{ uint16 0x0190 }
 }
 
 uint16 mcs5glpo0 {
-	srom 4-7	{ 0x016A }
-	srom 8	{ 0x0172 }
+	srom 4-7	{ uint16 0x016A }
+	srom 8	{ uint16 0x0172 }
 }
 
 uint16 mcs5glpo1 {
-	srom 4-7	{ 0x016C }
-	srom 8	{ 0x0174 }
+	srom 4-7	{ uint16 0x016C }
+	srom 8	{ uint16 0x0174 }
 }
 
 uint16 mcs5glpo2 {
-	srom 4-7	{ 0x016E }
-	srom 8	{ 0x0176 }
+	srom 4-7	{ uint16 0x016E }
+	srom 8	{ uint16 0x0176 }
 }
 
 uint16 mcs5glpo3 {
-	srom 4-7	{ 0x0170 }
-	srom 8	{ 0x0178 }
+	srom 4-7	{ uint16 0x0170 }
+	srom 8	{ uint16 0x0178 }
 }
 
 uint16 mcs5glpo4 {
-	srom 4-7	{ 0x0172 }
-	srom 8	{ 0x017A }
+	srom 4-7	{ uint16 0x0172 }
+	srom 8	{ uint16 0x017A }
 }
 
 uint16 mcs5glpo5 {
-	srom 4-7	{ 0x0174 }
-	srom 8	{ 0x017C }
+	srom 4-7	{ uint16 0x0174 }
+	srom 8	{ uint16 0x017C }
 }
 
 uint16 mcs5glpo6 {
-	srom 4-7	{ 0x0176 }
-	srom 8	{ 0x017E }
+	srom 4-7	{ uint16 0x0176 }
+	srom 8	{ uint16 0x017E }
 }
 
 uint16 mcs5glpo7 {
-	srom 4-7	{ 0x0178 }
-	srom 8	{ 0x0180 }
+	srom 4-7	{ uint16 0x0178 }
+	srom 8	{ uint16 0x0180 }
 }
 
 uint16 mcs5gpo0 {
-	srom 4-7	{ 0x015A }
-	srom 8	{ 0x0162 }
+	srom 4-7	{ uint16 0x015A }
+	srom 8	{ uint16 0x0162 }
 }
 
 uint16 mcs5gpo1 {
-	srom 4-7	{ 0x015C }
-	srom 8	{ 0x0164 }
+	srom 4-7	{ uint16 0x015C }
+	srom 8	{ uint16 0x0164 }
 }
 
 uint16 mcs5gpo2 {
-	srom 4-7	{ 0x015E }
-	srom 8	{ 0x0166 }
+	srom 4-7	{ uint16 0x015E }
+	srom 8	{ uint16 0x0166 }
 }
 
 uint16 mcs5gpo3 {
-	srom 4-7	{ 0x0160 }
-	srom 8	{ 0x0168 }
+	srom 4-7	{ uint16 0x0160 }
+	srom 8	{ uint16 0x0168 }
 }
 
 uint16 mcs5gpo4 {
-	srom 4-7	{ 0x0162 }
-	srom 8	{ 0x016A }
+	srom 4-7	{ uint16 0x0162 }
+	srom 8	{ uint16 0x016A }
 }
 
 uint16 mcs5gpo5 {
-	srom 4-7	{ 0x0164 }
-	srom 8	{ 0x016C }
+	srom 4-7	{ uint16 0x0164 }
+	srom 8	{ uint16 0x016C }
 }
 
 uint16 mcs5gpo6 {
-	srom 4-7	{ 0x0166 }
-	srom 8	{ 0x016E }
+	srom 4-7	{ uint16 0x0166 }
+	srom 8	{ uint16 0x016E }
 }
 
 uint16 mcs5gpo7 {
-	srom 4-7	{ 0x0168 }
-	srom 8	{ 0x0170 }
+	srom 4-7	{ uint16 0x0168 }
+	srom 8	{ uint16 0x0170 }
 }
 
 uint16 mcs32po {
-	srom 9-10	{ 0x0194 }
+	srom 9-10	{ uint16 0x0194 }
 }
 
 uint32 mcsbw20ul2gpo {
-	srom 9-10	{ 0x0168 }
+	srom 9-10	{ uint32 0x0168 }
 }
 
 uint32 mcsbw20ul5ghpo {
-	srom 9-10	{ 0x018C }
+	srom 9-10	{ uint32 0x018C }
 }
 
 uint32 mcsbw20ul5glpo {
-	srom 9-10	{ 0x0174 }
+	srom 9-10	{ uint32 0x0174 }
 }
 
 uint32 mcsbw20ul5gmpo {
-	srom 9-10	{ 0x0180 }
+	srom 9-10	{ uint32 0x0180 }
 }
 
 uint32 mcsbw202gpo {
-	srom 9-10	{ 0x0164 }
-	srom >= 11	{ 0x0154 }
+	srom 9-10	{ uint32 0x0164 }
+	srom >= 11	{ uint32 0x0154 }
 }
 
 uint32 mcsbw205ghpo {
-	srom 9-10	{ 0x0188 }
-	srom >= 11	{ 0x0180 }
+	srom 9-10	{ uint32 0x0188 }
+	srom >= 11	{ uint32 0x0180 }
 }
 
 uint32 mcsbw205glpo {
-	srom 9-10	{ 0x0170 }
-	srom >= 11	{ 0x0160 }
+	srom 9-10	{ uint32 0x0170 }
+	srom >= 11	{ uint32 0x0160 }
 }
 
 uint32 mcsbw205gmpo {
-	srom 9-10	{ 0x017C }
-	srom >= 11	{ 0x0170 }
+	srom 9-10	{ uint32 0x017C }
+	srom >= 11	{ uint32 0x0170 }
 }
 
 uint32 mcsbw402gpo {
-	srom 9-10	{ 0x016C }
-	srom >= 11	{ 0x0158 }
+	srom 9-10	{ uint32 0x016C }
+	srom >= 11	{ uint32 0x0158 }
 }
 
 uint32 mcsbw405ghpo {
-	srom 9-10	{ 0x0190 }
-	srom >= 11	{ 0x0184 }
+	srom 9-10	{ uint32 0x0190 }
+	srom >= 11	{ uint32 0x0184 }
 }
 
 uint32 mcsbw405glpo {
-	srom 9-10	{ 0x0178 }
-	srom >= 11	{ 0x0164 }
+	srom 9-10	{ uint32 0x0178 }
+	srom >= 11	{ uint32 0x0164 }
 }
 
 uint32 mcsbw405gmpo {
-	srom 9-10	{ 0x0184 }
-	srom >= 11	{ 0x0174 }
+	srom 9-10	{ uint32 0x0184 }
+	srom >= 11	{ uint32 0x0174 }
 }
 
 uint32 mcsbw805ghpo {
-	srom >= 11	{ 0x0188 }
+	srom >= 11	{ uint32 0x0188 }
 }
 
 uint32 mcsbw805glpo {
-	srom >= 11	{ 0x0168 }
+	srom >= 11	{ uint32 0x0168 }
 }
 
 uint32 mcsbw805gmpo {
-	srom >= 11	{ 0x0178 }
+	srom >= 11	{ uint32 0x0178 }
 }
 
 uint16 mcslr5ghpo {
-	srom >= 11	{ 0x0194 }
+	srom >= 11	{ uint16 0x0194 }
 }
 
 uint16 mcslr5glpo {
-	srom >= 11	{ 0x0190 (&0xFFF) }
+	srom >= 11	{ uint16 0x0190 (&0xFFF) }
 }
 
 uint16 mcslr5gmpo {
-	srom >= 11	{ 0x0192 }
+	srom >= 11	{ uint16 0x0192 }
 }
 
 uint8 measpower {
-	srom 8-10	{ 0x00B4 (&0xFE, >>1) }
-	srom >= 11	{ 0x00B0 (&0xFE, >>1) }
+	srom 8-10	{ uint8 0x00B4 (&0xFE, >>1) }
+	srom >= 11	{ uint8 0x00B0 (&0xFE, >>1) }
 }
 
 uint8 measpower1 {
-	srom 8-10	{ 0x00BF (&0x7F) }
-	srom >= 11	{ 0x00BB (&0x7F) }
+	srom 8-10	{ uint8 0x00BF (&0x7F) }
+	srom >= 11	{ uint8 0x00BB (&0x7F) }
 }
 
 uint8 measpower2 {
@@ -603,16 +603,16 @@ uint8 measpower2 {
 }
 
 uint8 noisecaloffset {
-	srom 8-9	{ 0x01B5 }
+	srom 8-9	{ uint8 0x01B5 }
 }
 
 uint8 noisecaloffset5g {
-	srom 8-9	{ 0x01B4 }
+	srom 8-9	{ uint8 0x01B4 }
 }
 
 uint8 noiselvl2ga0 {
-	srom 8-10	{ 0x01AB (&0x1F) }
-	srom >= 11	{ 0x01BD (&0x1F) }
+	srom 8-10	{ uint8 0x01AB (&0x1F) }
+	srom >= 11	{ uint8 0x01BD (&0x1F) }
 }
 
 uint8 noiselvl2ga1 {
@@ -621,16 +621,16 @@ uint8 noiselvl2ga1 {
 }
 
 uint8 noiselvl2ga2 {
-	srom 8-10	{ 0x01AA (&0x7C, >>2) }
-	srom >= 11	{ 0x01BC (&0x7C, >>2) }
+	srom 8-10	{ uint8 0x01AA (&0x7C, >>2) }
+	srom >= 11	{ uint8 0x01BC (&0x7C, >>2) }
 }
 
 uint8[4] noiselvl5ga0 {
 	srom >= 11 {
-		0x01BF (&0x1F),
-		0x01C1 (&0x1F),
-		0x01C3 (&0x1F),
-		0x01C5 (&0x1F)
+		uint8 0x01BF (&0x1F),
+		uint8 0x01C1 (&0x1F),
+		uint8 0x01C3 (&0x1F),
+		uint8 0x01C5 (&0x1F)
 	}
 }
 
@@ -640,15 +640,15 @@ uint8[4] noiselvl5ga1 {
 
 uint8[4] noiselvl5ga2 {
 	srom >= 11 {
-		0x01BE (&0x7C, >>2),
-		0x01C0 (&0x7C, >>2),
-		0x01C2 (&0x7C, >>2),
-		0x01C4 (&0x7C, >>2)
+		uint8 0x01BE (&0x7C, >>2),
+		uint8 0x01C0 (&0x7C, >>2),
+		uint8 0x01C2 (&0x7C, >>2),
+		uint8 0x01C4 (&0x7C, >>2)
 	}
 }
 
 uint8 noiselvl5gha0 {
-	srom 8-10	{ 0x01B1 (&0x1F) }
+	srom 8-10	{ uint8 0x01B1 (&0x1F) }
 }
 
 uint8 noiselvl5gha1 {
@@ -656,11 +656,11 @@ uint8 noiselvl5gha1 {
 }
 
 uint8 noiselvl5gha2 {
-	srom 8-10	{ 0x01B0 (&0x7C, >>2) }
+	srom 8-10	{ uint8 0x01B0 (&0x7C, >>2) }
 }
 
 uint8 noiselvl5gla0 {
-	srom 8-10	{ 0x01AD (&0x1F) }
+	srom 8-10	{ uint8 0x01AD (&0x1F) }
 }
 
 uint8 noiselvl5gla1 {
@@ -668,11 +668,11 @@ uint8 noiselvl5gla1 {
 }
 
 uint8 noiselvl5gla2 {
-	srom 8-10	{ 0x01AC (&0x7C, >>2) }
+	srom 8-10	{ uint8 0x01AC (&0x7C, >>2) }
 }
 
 uint8 noiselvl5gma0 {
-	srom 8-10	{ 0x01AF (&0x1F) }
+	srom 8-10	{ uint8 0x01AF (&0x1F) }
 }
 
 uint8 noiselvl5gma1 {
@@ -680,11 +680,11 @@ uint8 noiselvl5gma1 {
 }
 
 uint8 noiselvl5gma2 {
-	srom 8-10	{ 0x01AE (&0x7C, >>2) }
+	srom 8-10	{ uint8 0x01AE (&0x7C, >>2) }
 }
 
 uint8 noiselvl5gua0 {
-	srom 8-10	{ 0x01B3 (&0x1F) }
+	srom 8-10	{ uint8 0x01B3 (&0x1F) }
 }
 
 uint8 noiselvl5gua1 {
@@ -692,183 +692,183 @@ uint8 noiselvl5gua1 {
 }
 
 uint8 noiselvl5gua2 {
-	srom 8-10	{ 0x01B2 (&0x7C, >>2) }
+	srom 8-10	{ uint8 0x01B2 (&0x7C, >>2) }
 }
 
 uint32 ofdm2gpo {
-	srom 4-7	{ 0x013A }
-	srom 8	{ 0x0142 }
+	srom 4-7	{ uint32 0x013A }
+	srom 8	{ uint32 0x0142 }
 }
 
 uint32 ofdm5ghpo {
-	srom 4-7	{ 0x0146 }
-	srom 8	{ 0x014E }
+	srom 4-7	{ uint32 0x0146 }
+	srom 8	{ uint32 0x014E }
 }
 
 uint32 ofdm5glpo {
-	srom 4-7	{ 0x0142 }
-	srom 8	{ 0x014A }
+	srom 4-7	{ uint32 0x0142 }
+	srom 8	{ uint32 0x014A }
 }
 
 uint32 ofdm5gpo {
-	srom 4-7	{ 0x013E }
-	srom 8	{ 0x0146 }
+	srom 4-7	{ uint32 0x013E }
+	srom 8	{ uint32 0x0146 }
 }
 
 uint16 ofdmlrbw202gpo {
-	srom >= 11	{ 0x015E }
+	srom >= 11	{ uint16 0x015E }
 }
 
 uint8 opo {
-	srom 2-3	{ 0x0079 }
-	srom 8-10	{ 0x0143 }
+	srom 2-3	{ uint8 0x0079 }
+	srom 8-10	{ uint8 0x0143 }
 }
 
 uint16 pa0b0 {
-	srom 1-3	{ 0x005E }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint16 0x005E }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa0b1 {
-	srom 1-3	{ 0x0060 }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint16 0x0060 }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa0b2 {
-	srom 1-3	{ 0x0062 }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint16 0x0062 }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint8 pa0itssit {
-	srom 1-3	{ 0x0071 }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint8 0x0071 }
+	srom 8-10	{ uint8 0x0000 }
 }
 
 uint8 pa0maxpwr {
-	srom 1-3	{ 0x0069 }
-	srom 8-10	{ 0x0001 }
+	srom 1-3	{ uint8 0x0069 }
+	srom 8-10	{ uint8 0x0001 }
 }
 
 uint16 pa1b0 {
-	srom 1-3	{ 0x006A }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint16 0x006A }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1b1 {
-	srom 1-3	{ 0x006C }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint16 0x006C }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1b2 {
-	srom 1-3	{ 0x006E }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint16 0x006E }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1hib0 {
-	srom 2-3	{ 0x0042 }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint16 0x0042 }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1hib1 {
-	srom 2-3	{ 0x0044 }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint16 0x0044 }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1hib2 {
-	srom 2-3	{ 0x0046 }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint16 0x0046 }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint8 pa1himaxpwr {
-	srom 2-3	{ 0x003B }
-	srom 8-10	{ 0x0001 }
+	srom 2-3	{ uint8 0x003B }
+	srom 8-10	{ uint8 0x0001 }
 }
 
 uint8 pa1itssit {
-	srom 1-3	{ 0x0070 }
-	srom 8-10	{ 0x0000 }
+	srom 1-3	{ uint8 0x0070 }
+	srom 8-10	{ uint8 0x0000 }
 }
 
 uint16 pa1lob0 {
-	srom 2-3	{ 0x003C }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint16 0x003C }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1lob1 {
-	srom 2-3	{ 0x003E }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint16 0x003E }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint16 pa1lob2 {
-	srom 2-3	{ 0x0040 }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint16 0x0040 }
+	srom 8-10	{ uint16 0x0000 }
 }
 
 uint8 pa1lomaxpwr {
-	srom 2-3	{ 0x003A }
-	srom 8-10	{ 0x0000 }
+	srom 2-3	{ uint8 0x003A }
+	srom 8-10	{ uint8 0x0000 }
 }
 
 uint8 pa1maxpwr {
-	srom 1-3	{ 0x0068 }
-	srom 8-10	{ 0x0001 }
+	srom 1-3	{ uint8 0x0068 }
+	srom 8-10	{ uint8 0x0001 }
 }
 
 uint16[3] pa2gccka0 {
-	srom >= 11	{ 0x0102 }
+	srom >= 11	{ uint16[3] 0x0102 }
 }
 
 uint16[12] pa5gbw40a0 {
-	srom >= 11	{ 0x0110 }
+	srom >= 11	{ uint16[12] 0x0110 }
 }
 
 uint16[12] pa5gbw80a0 {
-	srom >= 11	{ 0x0138 }
+	srom >= 11	{ uint16[12] 0x0138 }
 }
 
 uint16[12] pa5gbw4080a0 {
-	srom >= 11	{ 0x0138 }
+	srom >= 11	{ uint16[12] 0x0138 }
 }
 
 uint16[12] pa5gbw4080a1 {
 	srom >= 11 {
-		0x00B6,
-		0x00BC,
-		0x00CE,
-		0x00D4,
-		0x0128,
-		0x012A,
-		0x012C,
-		0x012E,
-		0x0130,
-		0x0132,
-		0x0134,
-		0x0136
+		uint16 0x00B6,
+		uint16 0x00BC,
+		uint16 0x00CE,
+		uint16 0x00D4,
+		uint16 0x0128,
+		uint16 0x012A,
+		uint16 0x012C,
+		uint16 0x012E,
+		uint16 0x0130,
+		uint16 0x0132,
+		uint16 0x0134,
+		uint16 0x0136
 	}
 }
 
 uint8 paparambwver {
-	srom >= 11	{ 0x0190 (&0xF0, >>4) }
+	srom >= 11	{ uint8 0x0190 (&0xF0, >>4) }
 }
 
 uint8 papdcap2g {
-	srom >= 11	{ 0x00AA (&0x4, >>2) }
+	srom >= 11	{ uint8 0x00AA (&0x4, >>2) }
 }
 
 uint8 papdcap5g {
-	srom >= 11	{ 0x00AC (&0x4, >>2) }
+	srom >= 11	{ uint8 0x00AC (&0x4, >>2) }
 }
 
 uint8 pcieingress_war {
-	srom 8-10	{ 0x01A7 (&0xF) }
+	srom 8-10	{ uint8 0x01A7 (&0xF) }
 }
 
 uint8 pdetrange2g {
-	srom 8-10	{ 0x00AF (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x00AF (&0xF8, >>3) }
 }
 
 uint8 pdetrange5g {
-	srom 8-10	{ 0x00B1 (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x00B1 (&0xF8, >>3) }
 }
 
 uint8 pdgain2g {
@@ -880,135 +880,135 @@ uint8 pdgain5g {
 }
 
 uint8 pdoffset2g40ma0 {
-	srom >= 11	{ 0x00C9 (&0xF) }
+	srom >= 11	{ uint8 0x00C9 (&0xF) }
 }
 
 uint8 pdoffset2g40ma1 {
-	srom >= 11	{ 0x00C9 (&0xF0, >>4) }
+	srom >= 11	{ uint8 0x00C9 (&0xF0, >>4) }
 }
 
 uint8 pdoffset2g40ma2 {
-	srom >= 11	{ 0x00C8 (&0xF) }
+	srom >= 11	{ uint8 0x00C8 (&0xF) }
 }
 
 uint8 pdoffset2g40mvalid {
-	srom >= 11	{ 0x00C8 (&0x80, >>7) }
+	srom >= 11	{ uint8 0x00C8 (&0x80, >>7) }
 }
 
 uint16 pdoffset40ma0 {
-	srom >= 11	{ 0x00CA }
+	srom >= 11	{ uint16 0x00CA }
 }
 
 uint16 pdoffset40ma1 {
-	srom >= 11	{ 0x00CC }
+	srom >= 11	{ uint16 0x00CC }
 }
 
 uint16 pdoffset40ma2 {
-	srom >= 11	{ 0x00CE }
+	srom >= 11	{ uint16 0x00CE }
 }
 
 uint16 pdoffset80ma0 {
-	srom >= 11	{ 0x00D0 }
+	srom >= 11	{ uint16 0x00D0 }
 }
 
 uint16 pdoffset80ma1 {
-	srom >= 11	{ 0x00D2 }
+	srom >= 11	{ uint16 0x00D2 }
 }
 
 uint16 pdoffset80ma2 {
-	srom >= 11	{ 0x00D4 }
+	srom >= 11	{ uint16 0x00D4 }
 }
 
 uint8 pdoffsetcckma0 {
-	srom >= 11	{ 0x018F (&0xF) }
+	srom >= 11	{ uint8 0x018F (&0xF) }
 }
 
 uint8 pdoffsetcckma1 {
-	srom >= 11	{ 0x018F (&0xF0, >>4) }
+	srom >= 11	{ uint8 0x018F (&0xF0, >>4) }
 }
 
 uint8 pdoffsetcckma2 {
-	srom >= 11	{ 0x018E (&0xF) }
+	srom >= 11	{ uint8 0x018E (&0xF) }
 }
 
 uint8 phycal_tempdelta {
-	srom 8-10	{ 0x00BD }
-	srom >= 11	{ 0x00B9 }
+	srom 8-10	{ uint8 0x00BD }
+	srom >= 11	{ uint8 0x00B9 }
 }
 
 uint16 rawtempsense {
-	srom 8-10	{ 0x00B4 (&0x1FF) }
-	srom >= 11	{ 0x00B0 (&0x1FF) }
+	srom 8-10	{ uint16 0x00B4 (&0x1FF) }
+	srom >= 11	{ uint16 0x00B0 (&0x1FF) }
 }
 
 uint8 regrev {
-	srom 3	{ 0x0078 }
-	srom 4	{ 0x0055 }
-	srom 5-7	{ 0x0047 }
-	srom 8-10	{ 0x0095 }
-	srom >= 11	{ 0x0099 }
+	srom 3	{ uint8 0x0078 }
+	srom 4	{ uint8 0x0055 }
+	srom 5-7	{ uint8 0x0047 }
+	srom 8-10	{ uint8 0x0095 }
+	srom >= 11	{ uint8 0x0099 }
 }
 
 uint16 rpcal2g {
-	srom >= 11	{ 0x016C }
+	srom >= 11	{ uint16 0x016C }
 }
 
 uint16 rpcal5gb0 {
-	srom >= 11	{ 0x016E }
+	srom >= 11	{ uint16 0x016E }
 }
 
 uint16 rpcal5gb1 {
-	srom >= 11	{ 0x017C }
+	srom >= 11	{ uint16 0x017C }
 }
 
 uint16 rpcal5gb2 {
-	srom >= 11	{ 0x017E }
+	srom >= 11	{ uint16 0x017E }
 }
 
 uint16 rpcal5gb3 {
-	srom >= 11	{ 0x018C }
+	srom >= 11	{ uint16 0x018C }
 }
 
 uint8 rssisav2g {
-	srom 3	{ 0x0050 (&0x7) }
-	srom 8-10	{ 0x00A4 (&0x7) }
+	srom 3	{ uint8 0x0050 (&0x7) }
+	srom 8-10	{ uint8 0x00A4 (&0x7) }
 }
 
 uint8 rssisav5g {
-	srom 3	{ 0x0052 (&0x7) }
-	srom 8-10	{ 0x00A6 (&0x7) }
+	srom 3	{ uint8 0x0052 (&0x7) }
+	srom 8-10	{ uint8 0x00A6 (&0x7) }
 }
 
 uint8 rssismc2g {
-	srom 3	{ 0x0051 (&0xF0, >>4) }
-	srom 8-10	{ 0x00A5 (&0xF0, >>4) }
+	srom 3	{ uint8 0x0051 (&0xF0, >>4) }
+	srom 8-10	{ uint8 0x00A5 (&0xF0, >>4) }
 }
 
 uint8 rssismc5g {
-	srom 3	{ 0x0053 (&0xF0, >>4) }
-	srom 8-10	{ 0x00A7 (&0xF0, >>4) }
+	srom 3	{ uint8 0x0053 (&0xF0, >>4) }
+	srom 8-10	{ uint8 0x00A7 (&0xF0, >>4) }
 }
 
 uint8 rssismf2g {
-	srom 3	{ 0x0051 (&0xF) }
-	srom 8-10	{ 0x00A5 (&0xF) }
+	srom 3	{ uint8 0x0051 (&0xF) }
+	srom 8-10	{ uint8 0x00A5 (&0xF) }
 }
 
 uint8 rssismf5g {
-	srom 3	{ 0x0053 (&0xF) }
-	srom 8-10	{ 0x00A7 (&0xF) }
+	srom 3	{ uint8 0x0053 (&0xF) }
+	srom 8-10	{ uint8 0x00A7 (&0xF) }
 }
 
 uint8 rxchain {
 	all1	ignore
-	srom 4-7	{ 0x007B (&0xF0, >>4) }
-	srom 8-10	{ 0x00A3 (&0xF0, >>4) }
-	srom >= 11	{ 0x00A9 (&0xF0, >>4) }
+	srom 4-7	{ uint8 0x007B (&0xF0, >>4) }
+	srom 8-10	{ uint8 0x00A3 (&0xF0, >>4) }
+	srom >= 11	{ uint8 0x00A9 (&0xF0, >>4) }
 }
 
 uint8 rxgainerr2ga0 {
-	srom 8-10	{ 0x019B (&0x3F) }
-	srom >= 11	{ 0x01C7 (&0x3F) }
+	srom 8-10	{ uint8 0x019B (&0x3F) }
+	srom >= 11	{ uint8 0x01C7 (&0x3F) }
 }
 
 uint8 rxgainerr2ga1 {
@@ -1017,16 +1017,16 @@ uint8 rxgainerr2ga1 {
 }
 
 uint8 rxgainerr2ga2 {
-	srom 8-10	{ 0x019A (&0xF8, >>3) }
-	srom >= 11	{ 0x01C6 (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x019A (&0xF8, >>3) }
+	srom >= 11	{ uint8 0x01C6 (&0xF8, >>3) }
 }
 
 uint8[4] rxgainerr5ga0 {
 	srom >= 11 {
-		0x01C9 (&0x3F),
-		0x01CB (&0x3F),
-		0x01CD (&0x3F),
-		0x01CF (&0x3F)
+		uint8 0x01C9 (&0x3F),
+		uint8 0x01CB (&0x3F),
+		uint8 0x01CD (&0x3F),
+		uint8 0x01CF (&0x3F)
 	}
 }
 
@@ -1036,15 +1036,15 @@ uint8[4] rxgainerr5ga1 {
 
 uint8[4] rxgainerr5ga2 {
 	srom >= 11 {
-		0x01C8 (&0xF8, >>3),
-		0x01CA (&0xF8, >>3),
-		0x01CC (&0xF8, >>3),
-		0x01CE (&0xF8, >>3)
+		uint8 0x01C8 (&0xF8, >>3),
+		uint8 0x01CA (&0xF8, >>3),
+		uint8 0x01CC (&0xF8, >>3),
+		uint8 0x01CE (&0xF8, >>3)
 	}
 }
 
 uint8 rxgainerr5gha0 {
-	srom 8-10	{ 0x01A1 (&0x3F) }
+	srom 8-10	{ uint8 0x01A1 (&0x3F) }
 }
 
 uint8 rxgainerr5gha1 {
@@ -1052,11 +1052,11 @@ uint8 rxgainerr5gha1 {
 }
 
 uint8 rxgainerr5gha2 {
-	srom 8-10	{ 0x01A0 (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x01A0 (&0xF8, >>3) }
 }
 
 uint8 rxgainerr5gla0 {
-	srom 8-10	{ 0x019D (&0x3F) }
+	srom 8-10	{ uint8 0x019D (&0x3F) }
 }
 
 uint8 rxgainerr5gla1 {
@@ -1064,11 +1064,11 @@ uint8 rxgainerr5gla1 {
 }
 
 uint8 rxgainerr5gla2 {
-	srom 8-10	{ 0x019C (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x019C (&0xF8, >>3) }
 }
 
 uint8 rxgainerr5gma0 {
-	srom 8-10	{ 0x019F (&0x3F) }
+	srom 8-10	{ uint8 0x019F (&0x3F) }
 }
 
 uint8 rxgainerr5gma1 {
@@ -1076,11 +1076,11 @@ uint8 rxgainerr5gma1 {
 }
 
 uint8 rxgainerr5gma2 {
-	srom 8-10	{ 0x019E (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x019E (&0xF8, >>3) }
 }
 
 uint8 rxgainerr5gua0 {
-	srom 8-10	{ 0x01A3 (&0x3F) }
+	srom 8-10	{ uint8 0x01A3 (&0x3F) }
 }
 
 uint8 rxgainerr5gua1 {
@@ -1088,211 +1088,211 @@ uint8 rxgainerr5gua1 {
 }
 
 uint8 rxgainerr5gua2 {
-	srom 8-10	{ 0x01A2 (&0xF8, >>3) }
+	srom 8-10	{ uint8 0x01A2 (&0xF8, >>3) }
 }
 
 int8 rxpo2g {
 	fmt	sdec
-	srom 3	{ 0x005B }
-	srom 8-10	{ 0x00AD }
+	srom 3	{ uint8 0x005B }
+	srom 8-10	{ uint8 0x00AD }
 }
 
 int8 rxpo5g {
 	fmt	sdec
-	srom 3	{ 0x005A }
-	srom 8-10	{ 0x00AC }
+	srom 3	{ uint8 0x005A }
+	srom 8-10	{ uint8 0x00AC }
 }
 
 uint8 sar2g {
-	srom 9-10	{ 0x01A9 }
-	srom >= 11	{ 0x01BB }
+	srom 9-10	{ uint8 0x01A9 }
+	srom >= 11	{ uint8 0x01BB }
 }
 
 uint8 sar5g {
-	srom 9-10	{ 0x01A8 }
-	srom >= 11	{ 0x01BA }
+	srom 9-10	{ uint8 0x01A8 }
+	srom >= 11	{ uint8 0x01BA }
 }
 
 uint16 sb20in40hrpo {
-	srom >= 11	{ 0x0196 }
+	srom >= 11	{ uint16 0x0196 }
 }
 
 uint16 sb20in40lrpo {
-	srom >= 11	{ 0x01A4 }
+	srom >= 11	{ uint16 0x01A4 }
 }
 
 uint16 sb20in80and160hr5ghpo {
-	srom >= 11	{ 0x01A0 }
+	srom >= 11	{ uint16 0x01A0 }
 }
 
 uint16 sb20in80and160hr5glpo {
-	srom >= 11	{ 0x0198 }
+	srom >= 11	{ uint16 0x0198 }
 }
 
 uint16 sb20in80and160hr5gmpo {
-	srom >= 11	{ 0x019C }
+	srom >= 11	{ uint16 0x019C }
 }
 
 uint16 sb20in80and160lr5ghpo {
-	srom >= 11	{ 0x01AE }
+	srom >= 11	{ uint16 0x01AE }
 }
 
 uint16 sb20in80and160lr5glpo {
-	srom >= 11	{ 0x01A6 }
+	srom >= 11	{ uint16 0x01A6 }
 }
 
 uint16 sb20in80and160lr5gmpo {
-	srom >= 11	{ 0x01AA }
+	srom >= 11	{ uint16 0x01AA }
 }
 
 uint16 sb40and80hr5ghpo {
-	srom >= 11	{ 0x01A2 }
+	srom >= 11	{ uint16 0x01A2 }
 }
 
 uint16 sb40and80hr5glpo {
-	srom >= 11	{ 0x019A }
+	srom >= 11	{ uint16 0x019A }
 }
 
 uint16 sb40and80hr5gmpo {
-	srom >= 11	{ 0x019E }
+	srom >= 11	{ uint16 0x019E }
 }
 
 uint16 sb40and80lr5ghpo {
-	srom >= 11	{ 0x01B0 }
+	srom >= 11	{ uint16 0x01B0 }
 }
 
 uint16 sb40and80lr5glpo {
-	srom >= 11	{ 0x01A8 }
+	srom >= 11	{ uint16 0x01A8 }
 }
 
 uint16 sb40and80lr5gmpo {
-	srom >= 11	{ 0x01AC }
+	srom >= 11	{ uint16 0x01AC }
 }
 
 uint16 stbcpo {
-	srom 4-7	{ 0x018C }
-	srom 8	{ 0x0194 }
+	srom 4-7	{ uint16 0x018C }
+	srom 8	{ uint16 0x0194 }
 }
 
 uint16 subband5gver {
 	srom 8-10	{ uint8 0x01A5 (&0x7) }
-	srom >= 11	{ 0x00D6 }
+	srom >= 11	{ uint16 0x00D6 }
 }
 
 uint16 subvid {
-	srom >= 2	{ 0x0006 }
+	srom >= 2	{ uint16 0x0006 }
 }
 
 uint32[5] swctrlmap_2g {
 	srom 10 {
-		0x01B8,
-		0x01BC,
-		0x01C0,
-		0x01C4,
+		uint32 0x01B8,
+		uint32 0x01BC,
+		uint32 0x01C0,
+		uint32 0x01C4,
 		uint16 0x01C8
 	}
 }
 
 uint8 tempcorrx {
-	srom 8-10	{ 0x00B6 (&0xFC, >>2) }
-	srom >= 11	{ 0x00B2 (&0xFC, >>2) }
+	srom 8-10	{ uint8 0x00B6 (&0xFC, >>2) }
+	srom >= 11	{ uint8 0x00B2 (&0xFC, >>2) }
 }
 
 uint8 tempoffset {
-	srom 8-10	{ 0x00B3 }
-	srom >= 11	{ 0x00AF }
+	srom 8-10	{ uint8 0x00B3 }
+	srom >= 11	{ uint8 0x00AF }
 }
 
 uint8 temps_hysteresis {
-	srom 8-10	{ 0x00BC (&0xF0, >>4) }
-	srom >= 11	{ 0x00B8 (&0xF0, >>4) }
+	srom 8-10	{ uint8 0x00BC (&0xF0, >>4) }
+	srom >= 11	{ uint8 0x00B8 (&0xF0, >>4) }
 }
 
 uint8 temps_period {
-	srom 8-10	{ 0x00BC (&0xF) }
-	srom >= 11	{ 0x00B8 (&0xF) }
+	srom 8-10	{ uint8 0x00BC (&0xF) }
+	srom >= 11	{ uint8 0x00B8 (&0xF) }
 }
 
 uint8 tempsense_option {
-	srom 8-10	{ 0x00B6 (&0x3) }
-	srom >= 11	{ 0x00B2 (&0x3) }
+	srom 8-10	{ uint8 0x00B6 (&0x3) }
+	srom >= 11	{ uint8 0x00B2 (&0x3) }
 }
 
 uint8 tempsense_slope {
-	srom 8-10	{ 0x00B7 }
-	srom >= 11	{ 0x00B3 }
+	srom 8-10	{ uint8 0x00B7 }
+	srom >= 11	{ uint8 0x00B3 }
 }
 
 uint8 tempthresh {
-	srom 8-10	{ 0x00B2 }
-	srom >= 11	{ 0x00AE }
+	srom 8-10	{ uint8 0x00B2 }
+	srom >= 11	{ uint8 0x00AE }
 }
 
 uint8 tri2g {
-	srom 3	{ 0x0055 }
-	srom 8-10	{ 0x00A9 }
+	srom 3	{ uint8 0x0055 }
+	srom 8-10	{ uint8 0x00A9 }
 }
 
 uint8 tri5g {
-	srom 3	{ 0x0054 }
-	srom 8-10	{ 0x00A8 }
+	srom 3	{ uint8 0x0054 }
+	srom 8-10	{ uint8 0x00A8 }
 }
 
 uint8 tri5gh {
-	srom 3	{ 0x0056 }
-	srom 8-10	{ 0x00AA }
+	srom 3	{ uint8 0x0056 }
+	srom 8-10	{ uint8 0x00AA }
 }
 
 uint8 tri5gl {
-	srom 3	{ 0x0057 }
-	srom 8-10	{ 0x00AB }
+	srom 3	{ uint8 0x0057 }
+	srom 8-10	{ uint8 0x00AB }
 }
 
 uint8 triso2g {
-	srom 8-10	{ 0x00AE (&0x7) }
+	srom 8-10	{ uint8 0x00AE (&0x7) }
 }
 
 uint8 triso5g {
-	srom 8-10	{ 0x00B0 (&0x7) }
+	srom 8-10	{ uint8 0x00B0 (&0x7) }
 }
 
 uint16 tssifloor2g {
-	srom >= 11	{ 0x00BE (&0x3FF) }
+	srom >= 11	{ uint16 0x00BE (&0x3FF) }
 }
 
 uint16[4] tssifloor5g {
-	srom >= 11	{ 0x00C0 (&0x3FF) }
+	srom >= 11	{ uint16[4] 0x00C0 (&0x3FF) }
 }
 
 uint8 tssipos2g {
-	srom 8-10	{ 0x00AF (&0x1) }
+	srom 8-10	{ uint8 0x00AF (&0x1) }
 }
 
 uint8 tssipos5g {
-	srom 8-10	{ 0x00B1 (&0x1) }
+	srom 8-10	{ uint8 0x00B1 (&0x1) }
 }
 
 uint8 tssiposslope2g {
-	srom >= 11	{ 0x00AB (&0x1) }
+	srom >= 11	{ uint8 0x00AB (&0x1) }
 }
 
 uint8 tssiposslope5g {
-	srom >= 11	{ 0x00AD (&0x1) }
+	srom >= 11	{ uint8 0x00AD (&0x1) }
 }
 
 uint8 tworangetssi2g {
-	srom >= 11	{ 0x00AA (&0x2, >>1) }
+	srom >= 11	{ uint8 0x00AA (&0x2, >>1) }
 }
 
 uint8 tworangetssi5g {
-	srom >= 11	{ 0x00AC (&0x2, >>1) }
+	srom >= 11	{ uint8 0x00AC (&0x2, >>1) }
 }
 
 uint8 txchain {
 	all1	ignore
-	srom 4-7	{ 0x007B (&0xF) }
-	srom 8-10	{ 0x00A3 (&0xF) }
-	srom >= 11	{ 0x00A9 (&0xF) }
+	srom 4-7	{ uint8 0x007B (&0xF) }
+	srom 8-10	{ uint8 0x00A3 (&0xF) }
+	srom >= 11	{ uint8 0x00A9 (&0xF) }
 }
 
 uint8 txidxcap2g {
@@ -1304,71 +1304,71 @@ uint8 txidxcap5g {
 }
 
 uint8 txpid2ga0 {
-	srom 4-7	{ 0x0063 }
+	srom 4-7	{ uint8 0x0063 }
 }
 
 uint8 txpid2ga1 {
-	srom 4-7	{ 0x0062 }
+	srom 4-7	{ uint8 0x0062 }
 }
 
 uint8 txpid2ga2 {
-	srom 4-7	{ 0x0065 }
+	srom 4-7	{ uint8 0x0065 }
 }
 
 uint8 txpid2ga3 {
-	srom 4-7	{ 0x0064 }
+	srom 4-7	{ uint8 0x0064 }
 }
 
 uint8 txpid5ga0 {
-	srom 4-7	{ 0x0067 }
+	srom 4-7	{ uint8 0x0067 }
 }
 
 uint8 txpid5ga1 {
-	srom 4-7	{ 0x0066 }
+	srom 4-7	{ uint8 0x0066 }
 }
 
 uint8 txpid5ga2 {
-	srom 4-7	{ 0x0069 }
+	srom 4-7	{ uint8 0x0069 }
 }
 
 uint8 txpid5ga3 {
-	srom 4-7	{ 0x0068 }
+	srom 4-7	{ uint8 0x0068 }
 }
 
 uint8 txpid5gha0 {
-	srom 4-7	{ 0x006F }
+	srom 4-7	{ uint8 0x006F }
 }
 
 uint8 txpid5gha1 {
-	srom 4-7	{ 0x006E }
+	srom 4-7	{ uint8 0x006E }
 }
 
 uint8 txpid5gha2 {
-	srom 4-7	{ 0x0071 }
+	srom 4-7	{ uint8 0x0071 }
 }
 
 uint8 txpid5gha3 {
-	srom 4-7	{ 0x0070 }
+	srom 4-7	{ uint8 0x0070 }
 }
 
 uint8 txpid5gla0 {
-	srom 4-7	{ 0x006B }
+	srom 4-7	{ uint8 0x006B }
 }
 
 uint8 txpid5gla1 {
-	srom 4-7	{ 0x006A }
+	srom 4-7	{ uint8 0x006A }
 }
 
 uint8 txpid5gla2 {
-	srom 4-7	{ 0x006D }
+	srom 4-7	{ uint8 0x006D }
 }
 
 uint8 txpid5gla3 {
-	srom 4-7	{ 0x006C }
+	srom 4-7	{ uint8 0x006C }
 }
 
 uint16 xtalfreq {
-	srom >= 11	{ 0x00B4 }
+	srom >= 11	{ uint16 0x00B4 }
 }
 
 #
@@ -1388,172 +1388,172 @@ struct pathvars[] {
 	srom >= 11	[0x00D8, 0x0100, 0x0128]
 
 	uint8 itt2ga {
-		srom 4-7	{ 0x0000 }
-		srom 8-10	{ 0x0000 }
+		srom 4-7	{ uint8 0x0000 }
+		srom 8-10	{ uint8 0x0000 }
 	}
 
 	uint8 itt5ga {
-		srom 4-7	{ 0x000A }
-		srom 8-10	{ 0x0008 }
+		srom 4-7	{ uint8 0x000A }
+		srom 8-10	{ uint8 0x0008 }
 	}
 
 	uint8 maxp2ga {
-		srom 4-7	{ 0x0001 }
-		srom 8-10	{ 0x0001 }
-		srom >= 11	{ 0x0001 }
+		srom 4-7	{ uint8 0x0001 }
+		srom 8-10	{ uint8 0x0001 }
+		srom >= 11	{ uint8 0x0001 }
 	}
 
 	uint8[4] maxp5ga {
-		srom 4-7	{ 0x000B }
-		srom 8-10	{ 0x0009 }
+		srom 4-7	{ uint8 0x000B }
+		srom 8-10	{ uint8 0x0009 }
 		srom >= 11 {
-			0x000D,
-			0x000C,
-			0x000F,
-			0x000E
+			uint8 0x000D,
+			uint8 0x000C,
+			uint8 0x000F,
+			uint8 0x000E
 		}
 	}
 
 	uint8 maxp5gha {
-		srom 4-7	{ 0x000D }
-		srom 8-10	{ 0x000B }
+		srom 4-7	{ uint8 0x000D }
+		srom 8-10	{ uint8 0x000B }
 	}
 
 	uint8 maxp5gla {
-		srom 4-7	{ 0x000C }
-		srom 8-10	{ 0x000A }
+		srom 4-7	{ uint8 0x000C }
+		srom 8-10	{ uint8 0x000A }
 	}
 
 	uint16[3] pa2ga {
-		srom >= 11	{ 0x0002 }
+		srom >= 11	{ uint16[3] 0x0002 }
 	}
 
 	uint16 pa2gw0a {
-		srom 4-7	{ 0x0002 }
-		srom 8-10	{ 0x0002 }
+		srom 4-7	{ uint16 0x0002 }
+		srom 8-10	{ uint16 0x0002 }
 	}
 
 	uint16 pa2gw1a {
-		srom 4-7	{ 0x0004 }
-		srom 8-10	{ 0x0004 }
+		srom 4-7	{ uint16 0x0004 }
+		srom 8-10	{ uint16 0x0004 }
 	}
 
 	uint16 pa2gw2a {
-		srom 4-7	{ 0x0006 }
-		srom 8-10	{ 0x0006 }
+		srom 4-7	{ uint16 0x0006 }
+		srom 8-10	{ uint16 0x0006 }
 	}
 
 	uint16 pa2gw3a {
-		srom 4-7	{ 0x0008 }
+		srom 4-7	{ uint16 0x0008 }
 	}
 
 	uint16[12] pa5ga {
-		srom >= 11	{ 0x0010 }
+		srom >= 11	{ uint16[12] 0x0010 }
 	}
 
 	uint16 pa5ghw0a {
-		srom 4-7	{ 0x001E }
-		srom 8-10	{ 0x0018 }
+		srom 4-7	{ uint16 0x001E }
+		srom 8-10	{ uint16 0x0018 }
 	}
 
 	uint16 pa5ghw1a {
-		srom 4-7	{ 0x0020 }
-		srom 8-10	{ 0x001A }
+		srom 4-7	{ uint16 0x0020 }
+		srom 8-10	{ uint16 0x001A }
 	}
 
 	uint16 pa5ghw2a {
-		srom 4-7	{ 0x0022 }
-		srom 8-10	{ 0x001C }
+		srom 4-7	{ uint16 0x0022 }
+		srom 8-10	{ uint16 0x001C }
 	}
 
 	uint16 pa5ghw3a {
-		srom 4-7	{ 0x0024 }
+		srom 4-7	{ uint16 0x0024 }
 	}
 
 	uint16 pa5glw0a {
-		srom 4-7	{ 0x0016 }
-		srom 8-10	{ 0x0012 }
+		srom 4-7	{ uint16 0x0016 }
+		srom 8-10	{ uint16 0x0012 }
 	}
 
 	uint16 pa5glw1a {
-		srom 4-7	{ 0x0018 }
-		srom 8-10	{ 0x0014 }
+		srom 4-7	{ uint16 0x0018 }
+		srom 8-10	{ uint16 0x0014 }
 	}
 
 	uint16 pa5glw2a {
-		srom 4-7	{ 0x001A }
-		srom 8-10	{ 0x0016 }
+		srom 4-7	{ uint16 0x001A }
+		srom 8-10	{ uint16 0x0016 }
 	}
 
 	uint16 pa5glw3a {
-		srom 4-7	{ 0x001C }
+		srom 4-7	{ uint16 0x001C }
 	}
 
 	uint16 pa5gw0a {
-		srom 4-7	{ 0x000E }
-		srom 8-10	{ 0x000C }
+		srom 4-7	{ uint16 0x000E }
+		srom 8-10	{ uint16 0x000C }
 	}
 
 	uint16 pa5gw1a {
-		srom 4-7	{ 0x0010 }
-		srom 8-10	{ 0x000E }
+		srom 4-7	{ uint16 0x0010 }
+		srom 8-10	{ uint16 0x000E }
 	}
 
 	uint16 pa5gw2a {
-		srom 4-7	{ 0x0012 }
-		srom 8-10	{ 0x0010 }
+		srom 4-7	{ uint16 0x0012 }
+		srom 8-10	{ uint16 0x0010 }
 	}
 
 	uint16 pa5gw3a {
-		srom 4-7	{ 0x0014 }
+		srom 4-7	{ uint16 0x0014 }
 	}
 
 	uint8 rxgains2gelnagaina {
-		srom >= 11	{ 0x000B (&0x7) }
+		srom >= 11	{ uint8 0x000B (&0x7) }
 	}
 
 	uint8 rxgains2gtrelnabypa {
-		srom >= 11	{ 0x000B (&0x80, >>7) }
+		srom >= 11	{ uint8 0x000B (&0x80, >>7) }
 	}
 
 	uint8 rxgains2gtrisoa {
-		srom >= 11	{ 0x000B (&0x78, >>3) }
+		srom >= 11	{ uint8 0x000B (&0x78, >>3) }
 	}
 
 	uint8 rxgains5gelnagaina {
-		srom >= 11	{ 0x000A (&0x7) }
+		srom >= 11	{ uint8 0x000A (&0x7) }
 	}
 
 	uint8 rxgains5ghelnagaina {
-		srom >= 11	{ 0x0008 (&0x7) }
+		srom >= 11	{ uint8 0x0008 (&0x7) }
 	}
 
 	uint8 rxgains5ghtrelnabypa {
-		srom >= 11	{ 0x0008 (&0x80, >>7) }
+		srom >= 11	{ uint8 0x0008 (&0x80, >>7) }
 	}
 
 	uint8 rxgains5ghtrisoa {
-		srom >= 11	{ 0x0008 (&0x78, >>3) }
+		srom >= 11	{ uint8 0x0008 (&0x78, >>3) }
 	}
 
 	uint8 rxgains5gmelnagaina {
-		srom >= 11	{ 0x0009 (&0x7) }
+		srom >= 11	{ uint8 0x0009 (&0x7) }
 	}
 
 	uint8 rxgains5gmtrelnabypa {
-		srom >= 11	{ 0x0009 (&0x80, >>7) }
+		srom >= 11	{ uint8 0x0009 (&0x80, >>7) }
 	}
 
 	uint8 rxgains5gmtrisoa {
-		srom >= 11	{ 0x0009 (&0x78, >>3) }
+		srom >= 11	{ uint8 0x0009 (&0x78, >>3) }
 	}
 
 	uint8 rxgains5gtrelnabypa {
-		srom >= 11	{ 0x000A (&0x80, >>7) }
+		srom >= 11	{ uint8 0x000A (&0x80, >>7) }
 	}
 
 	uint8 rxgains5gtrisoa {
-		srom >= 11	{ 0x000A (&0x78, >>3) }
+		srom >= 11	{ uint8 0x000A (&0x78, >>3) }
 	}
 
 }

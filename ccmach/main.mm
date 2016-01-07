@@ -656,9 +656,10 @@ private:
                             dprintf("");
 
                         if (unified_array) {
-                            if (seg.width != v->elem_width() || v->elem_count() != unified_array)
+                            /* no implicit types */
+                            /* if (seg.width != v->elem_width() || v->elem_count() != unified_array) */
                                 printf("%s[%zu] ", seg.width_str(), unified_array);
-                        } else if (seg.width != v->elem_width()) {
+                        } else /* if (seg.width != v->elem_width()) */ /*impl types */ {
                             printf("%s ", seg.width_str());
                         }
                         printf("0x%04zX", seg.offset);
