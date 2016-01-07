@@ -583,7 +583,7 @@ private:
                 dprintf("all1\tignore\n");
             
             for (const auto &t : v->sprom_descs) {
-                dprintf("revs ");
+                dprintf("srev ");
                 if (t.compat.last == BHND_SPROMREV_MAX)
                     printf(">= %u", t.compat.first);
                 else if (t.compat.first == t.compat.last)
@@ -931,9 +931,9 @@ public:
             NSString *path_num;
             const char *revdesc;
         } pathcfgs[] = {
-            { @"SROM4_PATH",    @"MAX_PATH_SROM",       "revs 4-7" },
-            { @"SROM8_PATH",    @"MAX_PATH_SROM",       "revs 8-10" },
-            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    "revs >= 11" },
+            { @"SROM4_PATH",    @"MAX_PATH_SROM",       "srev 4-7" },
+            { @"SROM8_PATH",    @"MAX_PATH_SROM",       "srev 8-10" },
+            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    "srev >= 11" },
             { nil, nil }
         };
 
