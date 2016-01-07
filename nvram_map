@@ -1,1373 +1,1373 @@
-uint aa2g {
-	revs 2-15	{ u8 0x005C (&0x30, >>4) }
-	revs 16-255	{ u8 0x005D }
-	revs 256-2047	{ u8 0x009D }
-	revs >= 2048	{ u8 0x00A1 }
+uint8 aa2g {
+	srom 1-3	{ 0x005C (&0x30, >>4) }
+	srom 4-7	{ 0x005D }
+	srom 8-10	{ 0x009D }
+	srom >= 11	{ 0x00A1 }
 }
 
-uint aa5g {
-	revs 2-15	{ u8 0x005C (&0xC0, >>6) }
-	revs 16-255	{ u8 0x005C }
-	revs 256-2047	{ u8 0x009C }
-	revs >= 2048	{ u8 0x00A0 }
+uint8 aa5g {
+	srom 1-3	{ 0x005C (&0xC0, >>6) }
+	srom 4-7	{ 0x005C }
+	srom 8-10	{ 0x009C }
+	srom >= 11	{ 0x00A0 }
 }
 
-uint ag0 {
-	revs 2-15	{ u8 0x0075 }
-	revs 16-255	{ u8 0x005F }
-	revs 256-2047	{ u8 0x009F }
+uint8 ag0 {
+	srom 1-3	{ 0x0075 }
+	srom 4-7	{ 0x005F }
+	srom 8-10	{ 0x009F }
 }
 
-uint ag1 {
-	revs 2-15	{ u8 0x0074 }
-	revs 16-255	{ u8 0x005E }
-	revs 256-2047	{ u8 0x009E }
+uint8 ag1 {
+	srom 1-3	{ 0x0074 }
+	srom 4-7	{ 0x005E }
+	srom 8-10	{ 0x009E }
 }
 
-uint ag2 {
-	revs 16-255	{ u8 0x0061 }
-	revs 256-2047	{ u8 0x00A1 }
+uint8 ag2 {
+	srom 4-7	{ 0x0061 }
+	srom 8-10	{ 0x00A1 }
 }
 
-uint ag3 {
-	revs 16-255	{ u8 0x0060 }
-	revs 256-2047	{ u8 0x00A0 }
+uint8 ag3 {
+	srom 4-7	{ 0x0060 }
+	srom 8-10	{ 0x00A0 }
 }
 
-uint aga0 {
-	revs >= 2048	{ u8 0x00A5 }
+uint8 aga0 {
+	srom >= 11	{ 0x00A5 }
 }
 
-uint aga1 {
-	revs >= 2048	{ u8 0x00A6 }
+uint8 aga1 {
+	srom >= 11	{ 0x00A6 }
 }
 
-uint aga2 {
-	revs >= 2048	{ u8 0x00A7 }
+uint8 aga2 {
+	srom >= 11	{ 0x00A7 }
 }
 
-uint agbg0 {
-	revs >= 2048	{ u8 0x00A2 }
+uint8 agbg0 {
+	srom >= 11	{ 0x00A2 }
 }
 
-uint agbg1 {
-	revs >= 2048	{ u8 0x00A3 }
+uint8 agbg1 {
+	srom >= 11	{ 0x00A3 }
 }
 
-uint agbg2 {
-	revs >= 2048	{ u8 0x00A4 }
+uint8 agbg2 {
+	srom >= 11	{ 0x00A4 }
 }
 
-uint antswctl2g {
-	revs 256-2047	{ u8 0x00AE (&0xF8, >>3) }
+uint8 antswctl2g {
+	srom 8-10	{ 0x00AE (&0xF8, >>3) }
 }
 
-uint antswctl5g {
-	revs 256-2047	{ u8 0x00B0 (&0xF8, >>3) }
+uint8 antswctl5g {
+	srom 8-10	{ 0x00B0 (&0xF8, >>3) }
 }
 
-uint antswitch {
+uint8 antswitch {
 	all1	ignore
-	revs 16-255	{ u8 0x007A }
-	revs 256-2047	{ u8 0x00A2 }
-	revs >= 2048	{ u8 0x00A8 }
+	srom 4-7	{ 0x007A }
+	srom 8-10	{ 0x00A2 }
+	srom >= 11	{ 0x00A8 }
 }
 
-uint boardflags {
-	revs 2-3	{ u16 0x0072 }
-	revs 4-7	{ u16 0x0072 | u16 0x0038 (<<16) }
-	revs 8-15	{ u16 0x0072 | u16 0x007A (<<16) }
-	revs 16-31	{ u32 0x0044 }
-	revs 32-255	{ u32 0x004A }
-	revs >= 256	{ u32 0x0084 }
+uint32 boardflags {
+	srom 1	{ u16 0x0072 }
+	srom 2	{ u16 0x0072 | u16 0x0038 (<<16) }
+	srom 3	{ u16 0x0072 | u16 0x007A (<<16) }
+	srom 4	{ 0x0044 }
+	srom 5-7	{ 0x004A }
+	srom >= 8	{ 0x0084 }
 }
 
-uint boardflags2 {
-	revs 16-31	{ u32 0x0048 }
-	revs 32-255	{ u32 0x004E }
-	revs >= 256	{ u32 0x0088 }
+uint32 boardflags2 {
+	srom 4	{ 0x0048 }
+	srom 5-7	{ 0x004E }
+	srom >= 8	{ 0x0088 }
 }
 
-uint boardflags3 {
-	revs >= 2048	{ u32 0x008C }
+uint32 boardflags3 {
+	srom >= 11	{ 0x008C }
 }
 
-uint boardnum {
-	revs 2-7	{ u16 0x004C }
-	revs 8-15	{ u16 0x004E }
-	revs 16-31	{ u16 0x0050 }
-	revs 32-255	{ u16 0x0056 }
-	revs 256-2047	{ u16 0x0090 }
-	revs >= 2048	{ u16 0x0094 }
+uint16 boardnum {
+	srom 1-2	{ 0x004C }
+	srom 3	{ 0x004E }
+	srom 4	{ 0x0050 }
+	srom 5-7	{ 0x0056 }
+	srom 8-10	{ 0x0090 }
+	srom >= 11	{ 0x0094 }
 }
 
-uint boardrev {
-	revs 2-15	{ u8 0x005D }
-	revs 16-255	{ u16 0x0042 }
-	revs >= 256	{ u16 0x0082 }
+uint16 boardrev {
+	srom 1-3	{ u8 0x005D }
+	srom 4-7	{ 0x0042 }
+	srom >= 8	{ 0x0082 }
 }
 
-uint boardtype {
-	revs >= 4	{ u16 0x0004 }
+uint16 boardtype {
+	srom >= 2	{ 0x0004 }
 }
 
-uint bw40po {
-	revs 16-255	{ u16 0x018E }
-	revs 256-511	{ u16 0x0196 }
+uint16 bw40po {
+	srom 4-7	{ 0x018E }
+	srom 8	{ 0x0196 }
 }
 
-uint bwduppo {
-	revs 16-255	{ u16 0x0190 }
-	revs 256-511	{ u16 0x0198 }
+uint16 bwduppo {
+	srom 4-7	{ 0x0190 }
+	srom 8	{ 0x0198 }
 }
 
-uint bxa2g {
-	revs 8-15	{ u8 0x0050 (&0x18, >>3) }
-	revs 256-2047	{ u8 0x00A4 (&0x18, >>3) }
+uint8 bxa2g {
+	srom 3	{ 0x0050 (&0x18, >>3) }
+	srom 8-10	{ 0x00A4 (&0x18, >>3) }
 }
 
-uint bxa5g {
-	revs 8-15	{ u8 0x0052 (&0x18, >>3) }
-	revs 256-2047	{ u8 0x00A6 (&0x18, >>3) }
+uint8 bxa5g {
+	srom 3	{ 0x0052 (&0x18, >>3) }
+	srom 8-10	{ 0x00A6 (&0x18, >>3) }
 }
 
-uint cc {
-	revs 2-3	{ u8 0x005C (&0xF) }
+uint8 cc {
+	srom 1	{ 0x005C (&0xF) }
 }
 
-uint cck2gpo {
-	revs 16-255	{ u16 0x0138 }
-	revs 256-511	{ u16 0x0140 }
+uint16 cck2gpo {
+	srom 4-7	{ 0x0138 }
+	srom 8	{ 0x0140 }
 }
 
-uint cckPwrOffset {
-	revs 1024-2047	{ u16 0x01B4 }
+uint16 cckPwrOffset {
+	srom 10	{ 0x01B4 }
 }
 
-uint cckbw20ul2gpo {
-	revs 512-2047	{ u16 0x0142 }
-	revs >= 2048	{ u16 0x0152 }
+uint16 cckbw20ul2gpo {
+	srom 9-10	{ 0x0142 }
+	srom >= 11	{ 0x0152 }
 }
 
-uint cckbw202gpo {
-	revs 512-2047	{ u16 0x0140 }
-	revs >= 2048	{ u16 0x0150 }
+uint16 cckbw202gpo {
+	srom 9-10	{ 0x0140 }
+	srom >= 11	{ 0x0150 }
 }
 
-uint[] ccode {
+char[2] ccode {
 	sfmt	ascii
-	revs >= 1	{ u8[2] 0x0076 }
-	revs 16-31	{ u8[2] 0x0052 }
-	revs 32-255	{ u8[2] 0x0044 }
-	revs 256-2047	{ u8[2] 0x0092 }
-	revs >= 2048	{ u8[2] 0x0096 }
+	srom 0-3	{ 0x0077 }
+	srom 4	{ 0x0053 }
+	srom 5-7	{ 0x0045 }
+	srom 8-10	{ 0x0093 }
+	srom >= 11	{ 0x0097 }
 }
 
-uint cddpo {
-	revs 16-255	{ u16 0x018A }
-	revs 256-511	{ u16 0x0192 }
+uint16 cddpo {
+	srom 4-7	{ 0x018A }
+	srom 8	{ 0x0192 }
 }
 
-private uint devid {
-	revs >= 256	{ u16 0x0060 }
+private uint16 devid {
+	srom >= 8	{ 0x0060 }
 }
 
-uint dot11agduphrpo {
-	revs >= 2048	{ u16 0x01B2 }
+uint16 dot11agduphrpo {
+	srom >= 11	{ 0x01B2 }
 }
 
-uint dot11agduplrpo {
-	revs >= 2048	{ u16 0x01B4 }
+uint16 dot11agduplrpo {
+	srom >= 11	{ 0x01B4 }
 }
 
-uint dot11agofdmhrbw202gpo {
-	revs >= 2048	{ u16 0x015C }
+uint16 dot11agofdmhrbw202gpo {
+	srom >= 11	{ 0x015C }
 }
 
-uint elna2g {
-	revs 256-2047	{ u8 0x00BB }
+uint8 elna2g {
+	srom 8-10	{ 0x00BB }
 }
 
-uint elna5g {
-	revs 256-2047	{ u8 0x00BA }
+uint8 elna5g {
+	srom 8-10	{ 0x00BA }
 }
 
-uint epagain2g {
-	revs >= 2048	{ u8 0x00AB (&0xE, >>1) }
+uint8 epagain2g {
+	srom >= 11	{ 0x00AB (&0xE, >>1) }
 }
 
-uint epagain5g {
-	revs >= 2048	{ u8 0x00AD (&0xE, >>1) }
+uint8 epagain5g {
+	srom >= 11	{ 0x00AD (&0xE, >>1) }
 }
 
-uint[] et1macaddr {
+uint8[48] et1macaddr {
 	sfmt	macaddr
-	revs >= 1	{ u8[48] 0x0054 }
+	srom 0-2	{ 0x0055 }
 }
 
-uint eu_edthresh2g {
-	revs 256-511	{ u8 0x01A9 }
-	revs 512-1023	{ u8 0x0199 }
-	revs 1024-2047	{ u8 0x0199 }
-	revs 2048-4095	{ u8 0x01D1 }
+uint8 eu_edthresh2g {
+	srom 8	{ 0x01A9 }
+	srom 9	{ 0x0199 }
+	srom 10	{ 0x0199 }
+	srom 11	{ 0x01D1 }
 }
 
-uint eu_edthresh5g {
-	revs 256-511	{ u8 0x01A8 }
-	revs 512-1023	{ u8 0x0198 }
-	revs 1024-2047	{ u8 0x0198 }
-	revs 2048-4095	{ u8 0x01D0 }
+uint8 eu_edthresh5g {
+	srom 8	{ 0x01A8 }
+	srom 9	{ 0x0198 }
+	srom 10	{ 0x0198 }
+	srom 11	{ 0x01D0 }
 }
 
-uint extpagain2g {
-	revs 256-2047	{ u8 0x00AF (&0x6, >>1) }
+uint8 extpagain2g {
+	srom 8-10	{ 0x00AF (&0x6, >>1) }
 }
 
-uint extpagain5g {
-	revs 256-2047	{ u8 0x00B1 (&0x6, >>1) }
+uint8 extpagain5g {
+	srom 8-10	{ 0x00B1 (&0x6, >>1) }
 }
 
-uint femctrl {
-	revs >= 2048	{ u8 0x00AA (&0xF8, >>3) }
+uint8 femctrl {
+	srom >= 11	{ 0x00AA (&0xF8, >>3) }
 }
 
-uint freqoffset_corr {
-	revs 256-2047	{ u8 0x00B9 (&0xF) }
+uint8 freqoffset_corr {
+	srom 8-10	{ 0x00B9 (&0xF) }
 }
 
-uint gainctrlsph {
-	revs >= 2048	{ u8 0x00AC (&0xF8, >>3) }
+uint8 gainctrlsph {
+	srom >= 11	{ 0x00AC (&0xF8, >>3) }
 }
 
-uint hw_iqcal_en {
-	revs 256-2047	{ u8 0x00B9 (&0x20, >>5) }
+uint8 hw_iqcal_en {
+	srom 8-10	{ 0x00B9 (&0x20, >>5) }
 }
 
-uint[] il0macaddr {
+uint8[48] il0macaddr {
 	sfmt	macaddr
-	revs >= 1	{ u8[48] 0x0048 }
+	srom 0-2	{ 0x0049 }
 }
 
-uint iqcal_swp_dis {
-	revs 256-2047	{ u8 0x00B9 (&0x10, >>4) }
+uint8 iqcal_swp_dis {
+	srom 8-10	{ 0x00B9 (&0x10, >>4) }
 }
 
-uint ledbh0 {
+uint8 ledbh0 {
 	all1	ignore
-	revs 2-15	{ u8 0x0065 }
-	revs 16-31	{ u8 0x0057 }
-	revs 32-255	{ u8 0x0077 }
-	revs 256-2047	{ u8 0x0097 }
-	revs >= 2048	{ u8 0x009B }
+	srom 1-3	{ 0x0065 }
+	srom 4	{ 0x0057 }
+	srom 5-7	{ 0x0077 }
+	srom 8-10	{ 0x0097 }
+	srom >= 11	{ 0x009B }
 }
 
-uint ledbh1 {
+uint8 ledbh1 {
 	all1	ignore
-	revs 2-15	{ u8 0x0064 }
-	revs 16-31	{ u8 0x0056 }
-	revs 32-255	{ u8 0x0076 }
-	revs 256-2047	{ u8 0x0096 }
-	revs >= 2048	{ u8 0x009A }
+	srom 1-3	{ 0x0064 }
+	srom 4	{ 0x0056 }
+	srom 5-7	{ 0x0076 }
+	srom 8-10	{ 0x0096 }
+	srom >= 11	{ 0x009A }
 }
 
-uint ledbh2 {
+uint8 ledbh2 {
 	all1	ignore
-	revs 2-15	{ u8 0x0067 }
-	revs 16-31	{ u8 0x0059 }
-	revs 32-255	{ u8 0x0079 }
-	revs 256-2047	{ u8 0x0099 }
-	revs >= 2048	{ u8 0x009D }
+	srom 1-3	{ 0x0067 }
+	srom 4	{ 0x0059 }
+	srom 5-7	{ 0x0079 }
+	srom 8-10	{ 0x0099 }
+	srom >= 11	{ 0x009D }
 }
 
-uint ledbh3 {
+uint8 ledbh3 {
 	all1	ignore
-	revs 2-15	{ u8 0x0066 }
-	revs 16-31	{ u8 0x0058 }
-	revs 32-255	{ u8 0x0078 }
-	revs 256-2047	{ u8 0x0098 }
-	revs >= 2048	{ u8 0x009C }
+	srom 1-3	{ 0x0066 }
+	srom 4	{ 0x0058 }
+	srom 5-7	{ 0x0078 }
+	srom 8-10	{ 0x0098 }
+	srom >= 11	{ 0x009C }
 }
 
-led leddc {
+led16 leddc {
 	all1	ignore
-	revs 256-2047	{ u16 0x009A }
-	revs 32-255	{ u16 0x005A }
-	revs 16-31	{ u16 0x005A }
-	revs 8-15	{ u16 0x007C }
-	revs >= 2048	{ u16 0x009E }
+	srom 8-10	{ 0x009A }
+	srom 5-7	{ 0x005A }
+	srom 4	{ 0x005A }
+	srom 3	{ 0x007C }
+	srom >= 11	{ 0x009E }
 }
 
-uint legofdm40duppo {
-	revs 512-2047	{ u16 0x0196 }
+uint16 legofdm40duppo {
+	srom 9-10	{ 0x0196 }
 }
 
-uint legofdmbw20ul2gpo {
-	revs 512-2047	{ u32 0x0148 }
+uint32 legofdmbw20ul2gpo {
+	srom 9-10	{ 0x0148 }
 }
 
-uint legofdmbw20ul5ghpo {
-	revs 512-2047	{ u32 0x0160 }
+uint32 legofdmbw20ul5ghpo {
+	srom 9-10	{ 0x0160 }
 }
 
-uint legofdmbw20ul5glpo {
-	revs 512-2047	{ u32 0x0150 }
+uint32 legofdmbw20ul5glpo {
+	srom 9-10	{ 0x0150 }
 }
 
-uint legofdmbw20ul5gmpo {
-	revs 512-2047	{ u32 0x0158 }
+uint32 legofdmbw20ul5gmpo {
+	srom 9-10	{ 0x0158 }
 }
 
-uint legofdmbw202gpo {
-	revs 512-2047	{ u32 0x0144 }
+uint32 legofdmbw202gpo {
+	srom 9-10	{ 0x0144 }
 }
 
-uint legofdmbw205ghpo {
-	revs 512-2047	{ u32 0x015C }
+uint32 legofdmbw205ghpo {
+	srom 9-10	{ 0x015C }
 }
 
-uint legofdmbw205glpo {
-	revs 512-2047	{ u32 0x014C }
+uint32 legofdmbw205glpo {
+	srom 9-10	{ 0x014C }
 }
 
-uint legofdmbw205gmpo {
-	revs 512-2047	{ u32 0x0154 }
+uint32 legofdmbw205gmpo {
+	srom 9-10	{ 0x0154 }
 }
 
-uint[] macaddr {
+uint8[48] macaddr {
 	sfmt	macaddr
-	revs 256-2047	{ u8[48] 0x008C }
-	revs 32-255	{ u8[48] 0x0052 }
-	revs 16-31	{ u8[48] 0x004C }
-	revs 8-15	{ u8[48] 0x004A }
-	revs >= 2048	{ u8[48] 0x0090 }
+	srom 8-10	{ 0x008D }
+	srom 5-7	{ 0x0053 }
+	srom 4	{ 0x004D }
+	srom 3	{ 0x004B }
+	srom >= 11	{ 0x0091 }
 }
 
-uint mcs2gpo0 {
-	revs 16-255	{ u16 0x014A }
-	revs 256-511	{ u16 0x0152 }
+uint16 mcs2gpo0 {
+	srom 4-7	{ 0x014A }
+	srom 8	{ 0x0152 }
 }
 
-uint mcs2gpo1 {
-	revs 16-255	{ u16 0x014C }
-	revs 256-511	{ u16 0x0154 }
+uint16 mcs2gpo1 {
+	srom 4-7	{ 0x014C }
+	srom 8	{ 0x0154 }
 }
 
-uint mcs2gpo2 {
-	revs 16-255	{ u16 0x014E }
-	revs 256-511	{ u16 0x0156 }
+uint16 mcs2gpo2 {
+	srom 4-7	{ 0x014E }
+	srom 8	{ 0x0156 }
 }
 
-uint mcs2gpo3 {
-	revs 16-255	{ u16 0x0150 }
-	revs 256-511	{ u16 0x0158 }
+uint16 mcs2gpo3 {
+	srom 4-7	{ 0x0150 }
+	srom 8	{ 0x0158 }
 }
 
-uint mcs2gpo4 {
-	revs 16-255	{ u16 0x0152 }
-	revs 256-511	{ u16 0x015A }
+uint16 mcs2gpo4 {
+	srom 4-7	{ 0x0152 }
+	srom 8	{ 0x015A }
 }
 
-uint mcs2gpo5 {
-	revs 16-255	{ u16 0x0154 }
-	revs 256-511	{ u16 0x015C }
+uint16 mcs2gpo5 {
+	srom 4-7	{ 0x0154 }
+	srom 8	{ 0x015C }
 }
 
-uint mcs2gpo6 {
-	revs 16-255	{ u16 0x0156 }
-	revs 256-511	{ u16 0x015E }
+uint16 mcs2gpo6 {
+	srom 4-7	{ 0x0156 }
+	srom 8	{ 0x015E }
 }
 
-uint mcs2gpo7 {
-	revs 16-255	{ u16 0x0158 }
-	revs 256-511	{ u16 0x0160 }
+uint16 mcs2gpo7 {
+	srom 4-7	{ 0x0158 }
+	srom 8	{ 0x0160 }
 }
 
-uint mcs5ghpo0 {
-	revs 16-255	{ u16 0x017A }
-	revs 256-511	{ u16 0x0182 }
+uint16 mcs5ghpo0 {
+	srom 4-7	{ 0x017A }
+	srom 8	{ 0x0182 }
 }
 
-uint mcs5ghpo1 {
-	revs 16-255	{ u16 0x017C }
-	revs 256-511	{ u16 0x0184 }
+uint16 mcs5ghpo1 {
+	srom 4-7	{ 0x017C }
+	srom 8	{ 0x0184 }
 }
 
-uint mcs5ghpo2 {
-	revs 16-255	{ u16 0x017E }
-	revs 256-511	{ u16 0x0186 }
+uint16 mcs5ghpo2 {
+	srom 4-7	{ 0x017E }
+	srom 8	{ 0x0186 }
 }
 
-uint mcs5ghpo3 {
-	revs 16-255	{ u16 0x0180 }
-	revs 256-511	{ u16 0x0188 }
+uint16 mcs5ghpo3 {
+	srom 4-7	{ 0x0180 }
+	srom 8	{ 0x0188 }
 }
 
-uint mcs5ghpo4 {
-	revs 16-255	{ u16 0x0182 }
-	revs 256-511	{ u16 0x018A }
+uint16 mcs5ghpo4 {
+	srom 4-7	{ 0x0182 }
+	srom 8	{ 0x018A }
 }
 
-uint mcs5ghpo5 {
-	revs 16-255	{ u16 0x0184 }
-	revs 256-511	{ u16 0x018C }
+uint16 mcs5ghpo5 {
+	srom 4-7	{ 0x0184 }
+	srom 8	{ 0x018C }
 }
 
-uint mcs5ghpo6 {
-	revs 16-255	{ u16 0x0186 }
-	revs 256-511	{ u16 0x018E }
+uint16 mcs5ghpo6 {
+	srom 4-7	{ 0x0186 }
+	srom 8	{ 0x018E }
 }
 
-uint mcs5ghpo7 {
-	revs 16-255	{ u16 0x0188 }
-	revs 256-511	{ u16 0x0190 }
+uint16 mcs5ghpo7 {
+	srom 4-7	{ 0x0188 }
+	srom 8	{ 0x0190 }
 }
 
-uint mcs5glpo0 {
-	revs 16-255	{ u16 0x016A }
-	revs 256-511	{ u16 0x0172 }
+uint16 mcs5glpo0 {
+	srom 4-7	{ 0x016A }
+	srom 8	{ 0x0172 }
 }
 
-uint mcs5glpo1 {
-	revs 16-255	{ u16 0x016C }
-	revs 256-511	{ u16 0x0174 }
+uint16 mcs5glpo1 {
+	srom 4-7	{ 0x016C }
+	srom 8	{ 0x0174 }
 }
 
-uint mcs5glpo2 {
-	revs 16-255	{ u16 0x016E }
-	revs 256-511	{ u16 0x0176 }
+uint16 mcs5glpo2 {
+	srom 4-7	{ 0x016E }
+	srom 8	{ 0x0176 }
 }
 
-uint mcs5glpo3 {
-	revs 16-255	{ u16 0x0170 }
-	revs 256-511	{ u16 0x0178 }
+uint16 mcs5glpo3 {
+	srom 4-7	{ 0x0170 }
+	srom 8	{ 0x0178 }
 }
 
-uint mcs5glpo4 {
-	revs 16-255	{ u16 0x0172 }
-	revs 256-511	{ u16 0x017A }
+uint16 mcs5glpo4 {
+	srom 4-7	{ 0x0172 }
+	srom 8	{ 0x017A }
 }
 
-uint mcs5glpo5 {
-	revs 16-255	{ u16 0x0174 }
-	revs 256-511	{ u16 0x017C }
+uint16 mcs5glpo5 {
+	srom 4-7	{ 0x0174 }
+	srom 8	{ 0x017C }
 }
 
-uint mcs5glpo6 {
-	revs 16-255	{ u16 0x0176 }
-	revs 256-511	{ u16 0x017E }
+uint16 mcs5glpo6 {
+	srom 4-7	{ 0x0176 }
+	srom 8	{ 0x017E }
 }
 
-uint mcs5glpo7 {
-	revs 16-255	{ u16 0x0178 }
-	revs 256-511	{ u16 0x0180 }
+uint16 mcs5glpo7 {
+	srom 4-7	{ 0x0178 }
+	srom 8	{ 0x0180 }
 }
 
-uint mcs5gpo0 {
-	revs 16-255	{ u16 0x015A }
-	revs 256-511	{ u16 0x0162 }
+uint16 mcs5gpo0 {
+	srom 4-7	{ 0x015A }
+	srom 8	{ 0x0162 }
 }
 
-uint mcs5gpo1 {
-	revs 16-255	{ u16 0x015C }
-	revs 256-511	{ u16 0x0164 }
+uint16 mcs5gpo1 {
+	srom 4-7	{ 0x015C }
+	srom 8	{ 0x0164 }
 }
 
-uint mcs5gpo2 {
-	revs 16-255	{ u16 0x015E }
-	revs 256-511	{ u16 0x0166 }
+uint16 mcs5gpo2 {
+	srom 4-7	{ 0x015E }
+	srom 8	{ 0x0166 }
 }
 
-uint mcs5gpo3 {
-	revs 16-255	{ u16 0x0160 }
-	revs 256-511	{ u16 0x0168 }
+uint16 mcs5gpo3 {
+	srom 4-7	{ 0x0160 }
+	srom 8	{ 0x0168 }
 }
 
-uint mcs5gpo4 {
-	revs 16-255	{ u16 0x0162 }
-	revs 256-511	{ u16 0x016A }
+uint16 mcs5gpo4 {
+	srom 4-7	{ 0x0162 }
+	srom 8	{ 0x016A }
 }
 
-uint mcs5gpo5 {
-	revs 16-255	{ u16 0x0164 }
-	revs 256-511	{ u16 0x016C }
+uint16 mcs5gpo5 {
+	srom 4-7	{ 0x0164 }
+	srom 8	{ 0x016C }
 }
 
-uint mcs5gpo6 {
-	revs 16-255	{ u16 0x0166 }
-	revs 256-511	{ u16 0x016E }
+uint16 mcs5gpo6 {
+	srom 4-7	{ 0x0166 }
+	srom 8	{ 0x016E }
 }
 
-uint mcs5gpo7 {
-	revs 16-255	{ u16 0x0168 }
-	revs 256-511	{ u16 0x0170 }
+uint16 mcs5gpo7 {
+	srom 4-7	{ 0x0168 }
+	srom 8	{ 0x0170 }
 }
 
-uint mcs32po {
-	revs 512-2047	{ u16 0x0194 }
+uint16 mcs32po {
+	srom 9-10	{ 0x0194 }
 }
 
-uint mcsbw20ul2gpo {
-	revs 512-2047	{ u32 0x0168 }
+uint32 mcsbw20ul2gpo {
+	srom 9-10	{ 0x0168 }
 }
 
-uint mcsbw20ul5ghpo {
-	revs 512-2047	{ u32 0x018C }
+uint32 mcsbw20ul5ghpo {
+	srom 9-10	{ 0x018C }
 }
 
-uint mcsbw20ul5glpo {
-	revs 512-2047	{ u32 0x0174 }
+uint32 mcsbw20ul5glpo {
+	srom 9-10	{ 0x0174 }
 }
 
-uint mcsbw20ul5gmpo {
-	revs 512-2047	{ u32 0x0180 }
+uint32 mcsbw20ul5gmpo {
+	srom 9-10	{ 0x0180 }
 }
 
-uint mcsbw202gpo {
-	revs 512-2047	{ u32 0x0164 }
-	revs >= 2048	{ u32 0x0154 }
+uint32 mcsbw202gpo {
+	srom 9-10	{ 0x0164 }
+	srom >= 11	{ 0x0154 }
 }
 
-uint mcsbw205ghpo {
-	revs 512-2047	{ u32 0x0188 }
-	revs >= 2048	{ u32 0x0180 }
+uint32 mcsbw205ghpo {
+	srom 9-10	{ 0x0188 }
+	srom >= 11	{ 0x0180 }
 }
 
-uint mcsbw205glpo {
-	revs 512-2047	{ u32 0x0170 }
-	revs >= 2048	{ u32 0x0160 }
+uint32 mcsbw205glpo {
+	srom 9-10	{ 0x0170 }
+	srom >= 11	{ 0x0160 }
 }
 
-uint mcsbw205gmpo {
-	revs 512-2047	{ u32 0x017C }
-	revs >= 2048	{ u32 0x0170 }
+uint32 mcsbw205gmpo {
+	srom 9-10	{ 0x017C }
+	srom >= 11	{ 0x0170 }
 }
 
-uint mcsbw402gpo {
-	revs 512-2047	{ u32 0x016C }
-	revs >= 2048	{ u32 0x0158 }
+uint32 mcsbw402gpo {
+	srom 9-10	{ 0x016C }
+	srom >= 11	{ 0x0158 }
 }
 
-uint mcsbw405ghpo {
-	revs 512-2047	{ u32 0x0190 }
-	revs >= 2048	{ u32 0x0184 }
+uint32 mcsbw405ghpo {
+	srom 9-10	{ 0x0190 }
+	srom >= 11	{ 0x0184 }
 }
 
-uint mcsbw405glpo {
-	revs 512-2047	{ u32 0x0178 }
-	revs >= 2048	{ u32 0x0164 }
+uint32 mcsbw405glpo {
+	srom 9-10	{ 0x0178 }
+	srom >= 11	{ 0x0164 }
 }
 
-uint mcsbw405gmpo {
-	revs 512-2047	{ u32 0x0184 }
-	revs >= 2048	{ u32 0x0174 }
+uint32 mcsbw405gmpo {
+	srom 9-10	{ 0x0184 }
+	srom >= 11	{ 0x0174 }
 }
 
-uint mcsbw805ghpo {
-	revs >= 2048	{ u32 0x0188 }
+uint32 mcsbw805ghpo {
+	srom >= 11	{ 0x0188 }
 }
 
-uint mcsbw805glpo {
-	revs >= 2048	{ u32 0x0168 }
+uint32 mcsbw805glpo {
+	srom >= 11	{ 0x0168 }
 }
 
-uint mcsbw805gmpo {
-	revs >= 2048	{ u32 0x0178 }
+uint32 mcsbw805gmpo {
+	srom >= 11	{ 0x0178 }
 }
 
-uint mcslr5ghpo {
-	revs >= 2048	{ u16 0x0194 }
+uint16 mcslr5ghpo {
+	srom >= 11	{ 0x0194 }
 }
 
-uint mcslr5glpo {
-	revs >= 2048	{ u16 0x0190 (&0xFFF) }
+uint16 mcslr5glpo {
+	srom >= 11	{ 0x0190 (&0xFFF) }
 }
 
-uint mcslr5gmpo {
-	revs >= 2048	{ u16 0x0192 }
+uint16 mcslr5gmpo {
+	srom >= 11	{ 0x0192 }
 }
 
-uint measpower {
-	revs 256-2047	{ u8 0x00B4 (&0xFE, >>1) }
-	revs >= 2048	{ u8 0x00B0 (&0xFE, >>1) }
+uint8 measpower {
+	srom 8-10	{ 0x00B4 (&0xFE, >>1) }
+	srom >= 11	{ 0x00B0 (&0xFE, >>1) }
 }
 
-uint measpower1 {
-	revs 256-2047	{ u8 0x00BF (&0x7F) }
-	revs >= 2048	{ u8 0x00BB (&0x7F) }
+uint8 measpower1 {
+	srom 8-10	{ 0x00BF (&0x7F) }
+	srom >= 11	{ 0x00BB (&0x7F) }
 }
 
-uint measpower2 {
-	revs 256-2047	{ u16 0x00BE (&0x3F80, >>7) }
-	revs >= 2048	{ u16 0x00BA (&0x3F80, >>7) }
+uint8 measpower2 {
+	srom 8-10	{ u16 0x00BE (&0x3F80, >>7) }
+	srom >= 11	{ u16 0x00BA (&0x3F80, >>7) }
 }
 
-uint noisecaloffset {
-	revs 256-1023	{ u8 0x01B5 }
+uint8 noisecaloffset {
+	srom 8-9	{ 0x01B5 }
 }
 
-uint noisecaloffset5g {
-	revs 256-1023	{ u8 0x01B4 }
+uint8 noisecaloffset5g {
+	srom 8-9	{ 0x01B4 }
 }
 
-uint noiselvl2ga0 {
-	revs 256-2047	{ u8 0x01AB (&0x1F) }
-	revs >= 2048	{ u8 0x01BD (&0x1F) }
+uint8 noiselvl2ga0 {
+	srom 8-10	{ 0x01AB (&0x1F) }
+	srom >= 11	{ 0x01BD (&0x1F) }
 }
 
-uint noiselvl2ga1 {
-	revs 256-2047	{ u16 0x01AA (&0x3E0, >>5) }
-	revs >= 2048	{ u16 0x01BC (&0x3E0, >>5) }
+uint8 noiselvl2ga1 {
+	srom 8-10	{ u16 0x01AA (&0x3E0, >>5) }
+	srom >= 11	{ u16 0x01BC (&0x3E0, >>5) }
 }
 
-uint noiselvl2ga2 {
-	revs 256-2047	{ u8 0x01AA (&0x7C, >>2) }
-	revs >= 2048	{ u8 0x01BC (&0x7C, >>2) }
+uint8 noiselvl2ga2 {
+	srom 8-10	{ 0x01AA (&0x7C, >>2) }
+	srom >= 11	{ 0x01BC (&0x7C, >>2) }
 }
 
-uint[] noiselvl5ga0 {
-	revs >= 2048 {
-		u8 0x01BF (&0x1F),
-		u8 0x01C1 (&0x1F),
-		u8 0x01C3 (&0x1F),
-		u8 0x01C5 (&0x1F)
+uint8[4] noiselvl5ga0 {
+	srom >= 11 {
+		0x01BF (&0x1F),
+		0x01C1 (&0x1F),
+		0x01C3 (&0x1F),
+		0x01C5 (&0x1F)
 	}
 }
 
-uint[] noiselvl5ga1 {
-	revs >= 2048	{ u16[4] 0x01BE (&0x3E0, >>5) }
+uint8[4] noiselvl5ga1 {
+	srom >= 11	{ u16[4] 0x01BE (&0x3E0, >>5) }
 }
 
-uint[] noiselvl5ga2 {
-	revs >= 2048 {
-		u8 0x01BE (&0x7C, >>2),
-		u8 0x01C0 (&0x7C, >>2),
-		u8 0x01C2 (&0x7C, >>2),
-		u8 0x01C4 (&0x7C, >>2)
+uint8[4] noiselvl5ga2 {
+	srom >= 11 {
+		0x01BE (&0x7C, >>2),
+		0x01C0 (&0x7C, >>2),
+		0x01C2 (&0x7C, >>2),
+		0x01C4 (&0x7C, >>2)
 	}
 }
 
-uint noiselvl5gha0 {
-	revs 256-2047	{ u8 0x01B1 (&0x1F) }
+uint8 noiselvl5gha0 {
+	srom 8-10	{ 0x01B1 (&0x1F) }
 }
 
-uint noiselvl5gha1 {
-	revs 256-2047	{ u16 0x01B0 (&0x3E0, >>5) }
+uint8 noiselvl5gha1 {
+	srom 8-10	{ u16 0x01B0 (&0x3E0, >>5) }
 }
 
-uint noiselvl5gha2 {
-	revs 256-2047	{ u8 0x01B0 (&0x7C, >>2) }
+uint8 noiselvl5gha2 {
+	srom 8-10	{ 0x01B0 (&0x7C, >>2) }
 }
 
-uint noiselvl5gla0 {
-	revs 256-2047	{ u8 0x01AD (&0x1F) }
+uint8 noiselvl5gla0 {
+	srom 8-10	{ 0x01AD (&0x1F) }
 }
 
-uint noiselvl5gla1 {
-	revs 256-2047	{ u16 0x01AC (&0x3E0, >>5) }
+uint8 noiselvl5gla1 {
+	srom 8-10	{ u16 0x01AC (&0x3E0, >>5) }
 }
 
-uint noiselvl5gla2 {
-	revs 256-2047	{ u8 0x01AC (&0x7C, >>2) }
+uint8 noiselvl5gla2 {
+	srom 8-10	{ 0x01AC (&0x7C, >>2) }
 }
 
-uint noiselvl5gma0 {
-	revs 256-2047	{ u8 0x01AF (&0x1F) }
+uint8 noiselvl5gma0 {
+	srom 8-10	{ 0x01AF (&0x1F) }
 }
 
-uint noiselvl5gma1 {
-	revs 256-2047	{ u16 0x01AE (&0x3E0, >>5) }
+uint8 noiselvl5gma1 {
+	srom 8-10	{ u16 0x01AE (&0x3E0, >>5) }
 }
 
-uint noiselvl5gma2 {
-	revs 256-2047	{ u8 0x01AE (&0x7C, >>2) }
+uint8 noiselvl5gma2 {
+	srom 8-10	{ 0x01AE (&0x7C, >>2) }
 }
 
-uint noiselvl5gua0 {
-	revs 256-2047	{ u8 0x01B3 (&0x1F) }
+uint8 noiselvl5gua0 {
+	srom 8-10	{ 0x01B3 (&0x1F) }
 }
 
-uint noiselvl5gua1 {
-	revs 256-2047	{ u16 0x01B2 (&0x3E0, >>5) }
+uint8 noiselvl5gua1 {
+	srom 8-10	{ u16 0x01B2 (&0x3E0, >>5) }
 }
 
-uint noiselvl5gua2 {
-	revs 256-2047	{ u8 0x01B2 (&0x7C, >>2) }
+uint8 noiselvl5gua2 {
+	srom 8-10	{ 0x01B2 (&0x7C, >>2) }
 }
 
-uint ofdm2gpo {
-	revs 16-255	{ u32 0x013A }
-	revs 256-511	{ u32 0x0142 }
+uint32 ofdm2gpo {
+	srom 4-7	{ 0x013A }
+	srom 8	{ 0x0142 }
 }
 
-uint ofdm5ghpo {
-	revs 16-255	{ u32 0x0146 }
-	revs 256-511	{ u32 0x014E }
+uint32 ofdm5ghpo {
+	srom 4-7	{ 0x0146 }
+	srom 8	{ 0x014E }
 }
 
-uint ofdm5glpo {
-	revs 16-255	{ u32 0x0142 }
-	revs 256-511	{ u32 0x014A }
+uint32 ofdm5glpo {
+	srom 4-7	{ 0x0142 }
+	srom 8	{ 0x014A }
 }
 
-uint ofdm5gpo {
-	revs 16-255	{ u32 0x013E }
-	revs 256-511	{ u32 0x0146 }
+uint32 ofdm5gpo {
+	srom 4-7	{ 0x013E }
+	srom 8	{ 0x0146 }
 }
 
-uint ofdmlrbw202gpo {
-	revs >= 2048	{ u16 0x015E }
+uint16 ofdmlrbw202gpo {
+	srom >= 11	{ 0x015E }
 }
 
-uint opo {
-	revs 4-15	{ u8 0x0079 }
-	revs 256-2047	{ u8 0x0143 }
+uint8 opo {
+	srom 2-3	{ 0x0079 }
+	srom 8-10	{ 0x0143 }
 }
 
-uint pa0b0 {
-	revs 2-15	{ u16 0x005E }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa0b0 {
+	srom 1-3	{ 0x005E }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa0b1 {
-	revs 2-15	{ u16 0x0060 }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa0b1 {
+	srom 1-3	{ 0x0060 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa0b2 {
-	revs 2-15	{ u16 0x0062 }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa0b2 {
+	srom 1-3	{ 0x0062 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa0itssit {
-	revs 2-15	{ u8 0x0071 }
-	revs 256-2047	{ u8 0x0000 }
+uint8 pa0itssit {
+	srom 1-3	{ 0x0071 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa0maxpwr {
-	revs 2-15	{ u8 0x0069 }
-	revs 256-2047	{ u8 0x0001 }
+uint8 pa0maxpwr {
+	srom 1-3	{ 0x0069 }
+	srom 8-10	{ 0x0001 }
 }
 
-uint pa1b0 {
-	revs 2-15	{ u16 0x006A }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1b0 {
+	srom 1-3	{ 0x006A }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1b1 {
-	revs 2-15	{ u16 0x006C }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1b1 {
+	srom 1-3	{ 0x006C }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1b2 {
-	revs 2-15	{ u16 0x006E }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1b2 {
+	srom 1-3	{ 0x006E }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1hib0 {
-	revs 4-15	{ u16 0x0042 }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1hib0 {
+	srom 2-3	{ 0x0042 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1hib1 {
-	revs 4-15	{ u16 0x0044 }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1hib1 {
+	srom 2-3	{ 0x0044 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1hib2 {
-	revs 4-15	{ u16 0x0046 }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1hib2 {
+	srom 2-3	{ 0x0046 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1himaxpwr {
-	revs 4-15	{ u8 0x003B }
-	revs 256-2047	{ u8 0x0001 }
+uint8 pa1himaxpwr {
+	srom 2-3	{ 0x003B }
+	srom 8-10	{ 0x0001 }
 }
 
-uint pa1itssit {
-	revs 2-15	{ u8 0x0070 }
-	revs 256-2047	{ u8 0x0000 }
+uint8 pa1itssit {
+	srom 1-3	{ 0x0070 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1lob0 {
-	revs 4-15	{ u16 0x003C }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1lob0 {
+	srom 2-3	{ 0x003C }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1lob1 {
-	revs 4-15	{ u16 0x003E }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1lob1 {
+	srom 2-3	{ 0x003E }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1lob2 {
-	revs 4-15	{ u16 0x0040 }
-	revs 256-2047	{ u16 0x0000 }
+uint16 pa1lob2 {
+	srom 2-3	{ 0x0040 }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1lomaxpwr {
-	revs 4-15	{ u8 0x003A }
-	revs 256-2047	{ u8 0x0000 }
+uint8 pa1lomaxpwr {
+	srom 2-3	{ 0x003A }
+	srom 8-10	{ 0x0000 }
 }
 
-uint pa1maxpwr {
-	revs 2-15	{ u8 0x0068 }
-	revs 256-2047	{ u8 0x0001 }
+uint8 pa1maxpwr {
+	srom 1-3	{ 0x0068 }
+	srom 8-10	{ 0x0001 }
 }
 
-uint[] pa2gccka0 {
-	revs >= 2048	{ u16[3] 0x0102 }
+uint16[3] pa2gccka0 {
+	srom >= 11	{ 0x0102 }
 }
 
-uint[] pa5gbw40a0 {
-	revs >= 2048	{ u16[12] 0x0110 }
+uint16[12] pa5gbw40a0 {
+	srom >= 11	{ 0x0110 }
 }
 
-uint[] pa5gbw80a0 {
-	revs >= 2048	{ u16[12] 0x0138 }
+uint16[12] pa5gbw80a0 {
+	srom >= 11	{ 0x0138 }
 }
 
-uint[] pa5gbw4080a0 {
-	revs >= 2048	{ u16[12] 0x0138 }
+uint16[12] pa5gbw4080a0 {
+	srom >= 11	{ 0x0138 }
 }
 
-uint[] pa5gbw4080a1 {
-	revs >= 2048 {
-		u16 0x00B6,
-		u16 0x00BC,
-		u16 0x00CE,
-		u16 0x00D4,
-		u16 0x0128,
-		u16 0x012A,
-		u16 0x012C,
-		u16 0x012E,
-		u16 0x0130,
-		u16 0x0132,
-		u16 0x0134,
-		u16 0x0136
+uint16[12] pa5gbw4080a1 {
+	srom >= 11 {
+		0x00B6,
+		0x00BC,
+		0x00CE,
+		0x00D4,
+		0x0128,
+		0x012A,
+		0x012C,
+		0x012E,
+		0x0130,
+		0x0132,
+		0x0134,
+		0x0136
 	}
 }
 
-uint paparambwver {
-	revs >= 2048	{ u8 0x0190 (&0xF0, >>4) }
+uint8 paparambwver {
+	srom >= 11	{ 0x0190 (&0xF0, >>4) }
 }
 
-uint papdcap2g {
-	revs >= 2048	{ u8 0x00AA (&0x4, >>2) }
+uint8 papdcap2g {
+	srom >= 11	{ 0x00AA (&0x4, >>2) }
 }
 
-uint papdcap5g {
-	revs >= 2048	{ u8 0x00AC (&0x4, >>2) }
+uint8 papdcap5g {
+	srom >= 11	{ 0x00AC (&0x4, >>2) }
 }
 
-uint pcieingress_war {
-	revs 256-2047	{ u8 0x01A7 (&0xF) }
+uint8 pcieingress_war {
+	srom 8-10	{ 0x01A7 (&0xF) }
 }
 
-uint pdetrange2g {
-	revs 256-2047	{ u8 0x00AF (&0xF8, >>3) }
+uint8 pdetrange2g {
+	srom 8-10	{ 0x00AF (&0xF8, >>3) }
 }
 
-uint pdetrange5g {
-	revs 256-2047	{ u8 0x00B1 (&0xF8, >>3) }
+uint8 pdetrange5g {
+	srom 8-10	{ 0x00B1 (&0xF8, >>3) }
 }
 
-uint pdgain2g {
-	revs >= 2048	{ u16 0x00AA (&0x1F0, >>4) }
+uint8 pdgain2g {
+	srom >= 11	{ u16 0x00AA (&0x1F0, >>4) }
 }
 
-uint pdgain5g {
-	revs >= 2048	{ u16 0x00AC (&0x1F0, >>4) }
+uint8 pdgain5g {
+	srom >= 11	{ u16 0x00AC (&0x1F0, >>4) }
 }
 
-uint pdoffset2g40ma0 {
-	revs >= 2048	{ u8 0x00C9 (&0xF) }
+uint8 pdoffset2g40ma0 {
+	srom >= 11	{ 0x00C9 (&0xF) }
 }
 
-uint pdoffset2g40ma1 {
-	revs >= 2048	{ u8 0x00C9 (&0xF0, >>4) }
+uint8 pdoffset2g40ma1 {
+	srom >= 11	{ 0x00C9 (&0xF0, >>4) }
 }
 
-uint pdoffset2g40ma2 {
-	revs >= 2048	{ u8 0x00C8 (&0xF) }
+uint8 pdoffset2g40ma2 {
+	srom >= 11	{ 0x00C8 (&0xF) }
 }
 
-uint pdoffset2g40mvalid {
-	revs >= 2048	{ u8 0x00C8 (&0x80, >>7) }
+uint8 pdoffset2g40mvalid {
+	srom >= 11	{ 0x00C8 (&0x80, >>7) }
 }
 
-uint pdoffset40ma0 {
-	revs >= 2048	{ u16 0x00CA }
+uint16 pdoffset40ma0 {
+	srom >= 11	{ 0x00CA }
 }
 
-uint pdoffset40ma1 {
-	revs >= 2048	{ u16 0x00CC }
+uint16 pdoffset40ma1 {
+	srom >= 11	{ 0x00CC }
 }
 
-uint pdoffset40ma2 {
-	revs >= 2048	{ u16 0x00CE }
+uint16 pdoffset40ma2 {
+	srom >= 11	{ 0x00CE }
 }
 
-uint pdoffset80ma0 {
-	revs >= 2048	{ u16 0x00D0 }
+uint16 pdoffset80ma0 {
+	srom >= 11	{ 0x00D0 }
 }
 
-uint pdoffset80ma1 {
-	revs >= 2048	{ u16 0x00D2 }
+uint16 pdoffset80ma1 {
+	srom >= 11	{ 0x00D2 }
 }
 
-uint pdoffset80ma2 {
-	revs >= 2048	{ u16 0x00D4 }
+uint16 pdoffset80ma2 {
+	srom >= 11	{ 0x00D4 }
 }
 
-uint pdoffsetcckma0 {
-	revs >= 2048	{ u8 0x018F (&0xF) }
+uint8 pdoffsetcckma0 {
+	srom >= 11	{ 0x018F (&0xF) }
 }
 
-uint pdoffsetcckma1 {
-	revs >= 2048	{ u8 0x018F (&0xF0, >>4) }
+uint8 pdoffsetcckma1 {
+	srom >= 11	{ 0x018F (&0xF0, >>4) }
 }
 
-uint pdoffsetcckma2 {
-	revs >= 2048	{ u8 0x018E (&0xF) }
+uint8 pdoffsetcckma2 {
+	srom >= 11	{ 0x018E (&0xF) }
 }
 
-uint phycal_tempdelta {
-	revs 256-2047	{ u8 0x00BD }
-	revs >= 2048	{ u8 0x00B9 }
+uint8 phycal_tempdelta {
+	srom 8-10	{ 0x00BD }
+	srom >= 11	{ 0x00B9 }
 }
 
-uint rawtempsense {
-	revs 256-2047	{ u16 0x00B4 (&0x1FF) }
-	revs >= 2048	{ u16 0x00B0 (&0x1FF) }
+uint16 rawtempsense {
+	srom 8-10	{ 0x00B4 (&0x1FF) }
+	srom >= 11	{ 0x00B0 (&0x1FF) }
 }
 
-uint regrev {
-	revs 8-15	{ u8 0x0078 }
-	revs 16-31	{ u8 0x0055 }
-	revs 32-255	{ u8 0x0047 }
-	revs 256-2047	{ u8 0x0095 }
-	revs >= 2048	{ u8 0x0099 }
+uint8 regrev {
+	srom 3	{ 0x0078 }
+	srom 4	{ 0x0055 }
+	srom 5-7	{ 0x0047 }
+	srom 8-10	{ 0x0095 }
+	srom >= 11	{ 0x0099 }
 }
 
-uint rpcal2g {
-	revs >= 2048	{ u16 0x016C }
+uint16 rpcal2g {
+	srom >= 11	{ 0x016C }
 }
 
-uint rpcal5gb0 {
-	revs >= 2048	{ u16 0x016E }
+uint16 rpcal5gb0 {
+	srom >= 11	{ 0x016E }
 }
 
-uint rpcal5gb1 {
-	revs >= 2048	{ u16 0x017C }
+uint16 rpcal5gb1 {
+	srom >= 11	{ 0x017C }
 }
 
-uint rpcal5gb2 {
-	revs >= 2048	{ u16 0x017E }
+uint16 rpcal5gb2 {
+	srom >= 11	{ 0x017E }
 }
 
-uint rpcal5gb3 {
-	revs >= 2048	{ u16 0x018C }
+uint16 rpcal5gb3 {
+	srom >= 11	{ 0x018C }
 }
 
-uint rssisav2g {
-	revs 8-15	{ u8 0x0050 (&0x7) }
-	revs 256-2047	{ u8 0x00A4 (&0x7) }
+uint8 rssisav2g {
+	srom 3	{ 0x0050 (&0x7) }
+	srom 8-10	{ 0x00A4 (&0x7) }
 }
 
-uint rssisav5g {
-	revs 8-15	{ u8 0x0052 (&0x7) }
-	revs 256-2047	{ u8 0x00A6 (&0x7) }
+uint8 rssisav5g {
+	srom 3	{ 0x0052 (&0x7) }
+	srom 8-10	{ 0x00A6 (&0x7) }
 }
 
-uint rssismc2g {
-	revs 8-15	{ u8 0x0051 (&0xF0, >>4) }
-	revs 256-2047	{ u8 0x00A5 (&0xF0, >>4) }
+uint8 rssismc2g {
+	srom 3	{ 0x0051 (&0xF0, >>4) }
+	srom 8-10	{ 0x00A5 (&0xF0, >>4) }
 }
 
-uint rssismc5g {
-	revs 8-15	{ u8 0x0053 (&0xF0, >>4) }
-	revs 256-2047	{ u8 0x00A7 (&0xF0, >>4) }
+uint8 rssismc5g {
+	srom 3	{ 0x0053 (&0xF0, >>4) }
+	srom 8-10	{ 0x00A7 (&0xF0, >>4) }
 }
 
-uint rssismf2g {
-	revs 8-15	{ u8 0x0051 (&0xF) }
-	revs 256-2047	{ u8 0x00A5 (&0xF) }
+uint8 rssismf2g {
+	srom 3	{ 0x0051 (&0xF) }
+	srom 8-10	{ 0x00A5 (&0xF) }
 }
 
-uint rssismf5g {
-	revs 8-15	{ u8 0x0053 (&0xF) }
-	revs 256-2047	{ u8 0x00A7 (&0xF) }
+uint8 rssismf5g {
+	srom 3	{ 0x0053 (&0xF) }
+	srom 8-10	{ 0x00A7 (&0xF) }
 }
 
-uint rxchain {
+uint8 rxchain {
 	all1	ignore
-	revs 16-255	{ u8 0x007B (&0xF0, >>4) }
-	revs 256-2047	{ u8 0x00A3 (&0xF0, >>4) }
-	revs >= 2048	{ u8 0x00A9 (&0xF0, >>4) }
+	srom 4-7	{ 0x007B (&0xF0, >>4) }
+	srom 8-10	{ 0x00A3 (&0xF0, >>4) }
+	srom >= 11	{ 0x00A9 (&0xF0, >>4) }
 }
 
-uint rxgainerr2ga0 {
-	revs 256-2047	{ u8 0x019B (&0x3F) }
-	revs >= 2048	{ u8 0x01C7 (&0x3F) }
+uint8 rxgainerr2ga0 {
+	srom 8-10	{ 0x019B (&0x3F) }
+	srom >= 11	{ 0x01C7 (&0x3F) }
 }
 
-uint rxgainerr2ga1 {
-	revs 256-2047	{ u16 0x019A (&0x7C0, >>6) }
-	revs >= 2048	{ u16 0x01C6 (&0x7C0, >>6) }
+uint8 rxgainerr2ga1 {
+	srom 8-10	{ u16 0x019A (&0x7C0, >>6) }
+	srom >= 11	{ u16 0x01C6 (&0x7C0, >>6) }
 }
 
-uint rxgainerr2ga2 {
-	revs 256-2047	{ u8 0x019A (&0xF8, >>3) }
-	revs >= 2048	{ u8 0x01C6 (&0xF8, >>3) }
+uint8 rxgainerr2ga2 {
+	srom 8-10	{ 0x019A (&0xF8, >>3) }
+	srom >= 11	{ 0x01C6 (&0xF8, >>3) }
 }
 
-uint[] rxgainerr5ga0 {
-	revs >= 2048 {
-		u8 0x01C9 (&0x3F),
-		u8 0x01CB (&0x3F),
-		u8 0x01CD (&0x3F),
-		u8 0x01CF (&0x3F)
+uint8[4] rxgainerr5ga0 {
+	srom >= 11 {
+		0x01C9 (&0x3F),
+		0x01CB (&0x3F),
+		0x01CD (&0x3F),
+		0x01CF (&0x3F)
 	}
 }
 
-uint[] rxgainerr5ga1 {
-	revs >= 2048	{ u16[4] 0x01C8 (&0x7C0, >>6) }
+uint8[4] rxgainerr5ga1 {
+	srom >= 11	{ u16[4] 0x01C8 (&0x7C0, >>6) }
 }
 
-uint[] rxgainerr5ga2 {
-	revs >= 2048 {
-		u8 0x01C8 (&0xF8, >>3),
-		u8 0x01CA (&0xF8, >>3),
-		u8 0x01CC (&0xF8, >>3),
-		u8 0x01CE (&0xF8, >>3)
+uint8[4] rxgainerr5ga2 {
+	srom >= 11 {
+		0x01C8 (&0xF8, >>3),
+		0x01CA (&0xF8, >>3),
+		0x01CC (&0xF8, >>3),
+		0x01CE (&0xF8, >>3)
 	}
 }
 
-uint rxgainerr5gha0 {
-	revs 256-2047	{ u8 0x01A1 (&0x3F) }
+uint8 rxgainerr5gha0 {
+	srom 8-10	{ 0x01A1 (&0x3F) }
 }
 
-uint rxgainerr5gha1 {
-	revs 256-2047	{ u16 0x01A0 (&0x7C0, >>6) }
+uint8 rxgainerr5gha1 {
+	srom 8-10	{ u16 0x01A0 (&0x7C0, >>6) }
 }
 
-uint rxgainerr5gha2 {
-	revs 256-2047	{ u8 0x01A0 (&0xF8, >>3) }
+uint8 rxgainerr5gha2 {
+	srom 8-10	{ 0x01A0 (&0xF8, >>3) }
 }
 
-uint rxgainerr5gla0 {
-	revs 256-2047	{ u8 0x019D (&0x3F) }
+uint8 rxgainerr5gla0 {
+	srom 8-10	{ 0x019D (&0x3F) }
 }
 
-uint rxgainerr5gla1 {
-	revs 256-2047	{ u16 0x019C (&0x7C0, >>6) }
+uint8 rxgainerr5gla1 {
+	srom 8-10	{ u16 0x019C (&0x7C0, >>6) }
 }
 
-uint rxgainerr5gla2 {
-	revs 256-2047	{ u8 0x019C (&0xF8, >>3) }
+uint8 rxgainerr5gla2 {
+	srom 8-10	{ 0x019C (&0xF8, >>3) }
 }
 
-uint rxgainerr5gma0 {
-	revs 256-2047	{ u8 0x019F (&0x3F) }
+uint8 rxgainerr5gma0 {
+	srom 8-10	{ 0x019F (&0x3F) }
 }
 
-uint rxgainerr5gma1 {
-	revs 256-2047	{ u16 0x019E (&0x7C0, >>6) }
+uint8 rxgainerr5gma1 {
+	srom 8-10	{ u16 0x019E (&0x7C0, >>6) }
 }
 
-uint rxgainerr5gma2 {
-	revs 256-2047	{ u8 0x019E (&0xF8, >>3) }
+uint8 rxgainerr5gma2 {
+	srom 8-10	{ 0x019E (&0xF8, >>3) }
 }
 
-uint rxgainerr5gua0 {
-	revs 256-2047	{ u8 0x01A3 (&0x3F) }
+uint8 rxgainerr5gua0 {
+	srom 8-10	{ 0x01A3 (&0x3F) }
 }
 
-uint rxgainerr5gua1 {
-	revs 256-2047	{ u16 0x01A2 (&0x7C0, >>6) }
+uint8 rxgainerr5gua1 {
+	srom 8-10	{ u16 0x01A2 (&0x7C0, >>6) }
 }
 
-uint rxgainerr5gua2 {
-	revs 256-2047	{ u8 0x01A2 (&0xF8, >>3) }
+uint8 rxgainerr5gua2 {
+	srom 8-10	{ 0x01A2 (&0xF8, >>3) }
 }
 
-sint rxpo2g {
+int8 rxpo2g {
 	sfmt	sdec
-	revs 8-15	{ u8 0x005B }
-	revs 256-2047	{ u8 0x00AD }
+	srom 3	{ 0x005B }
+	srom 8-10	{ 0x00AD }
 }
 
-sint rxpo5g {
+int8 rxpo5g {
 	sfmt	sdec
-	revs 8-15	{ u8 0x005A }
-	revs 256-2047	{ u8 0x00AC }
+	srom 3	{ 0x005A }
+	srom 8-10	{ 0x00AC }
 }
 
-uint sar2g {
-	revs 512-2047	{ u8 0x01A9 }
-	revs >= 2048	{ u8 0x01BB }
+uint8 sar2g {
+	srom 9-10	{ 0x01A9 }
+	srom >= 11	{ 0x01BB }
 }
 
-uint sar5g {
-	revs 512-2047	{ u8 0x01A8 }
-	revs >= 2048	{ u8 0x01BA }
+uint8 sar5g {
+	srom 9-10	{ 0x01A8 }
+	srom >= 11	{ 0x01BA }
 }
 
-uint sb20in40hrpo {
-	revs >= 2048	{ u16 0x0196 }
+uint16 sb20in40hrpo {
+	srom >= 11	{ 0x0196 }
 }
 
-uint sb20in40lrpo {
-	revs >= 2048	{ u16 0x01A4 }
+uint16 sb20in40lrpo {
+	srom >= 11	{ 0x01A4 }
 }
 
-uint sb20in80and160hr5ghpo {
-	revs >= 2048	{ u16 0x01A0 }
+uint16 sb20in80and160hr5ghpo {
+	srom >= 11	{ 0x01A0 }
 }
 
-uint sb20in80and160hr5glpo {
-	revs >= 2048	{ u16 0x0198 }
+uint16 sb20in80and160hr5glpo {
+	srom >= 11	{ 0x0198 }
 }
 
-uint sb20in80and160hr5gmpo {
-	revs >= 2048	{ u16 0x019C }
+uint16 sb20in80and160hr5gmpo {
+	srom >= 11	{ 0x019C }
 }
 
-uint sb20in80and160lr5ghpo {
-	revs >= 2048	{ u16 0x01AE }
+uint16 sb20in80and160lr5ghpo {
+	srom >= 11	{ 0x01AE }
 }
 
-uint sb20in80and160lr5glpo {
-	revs >= 2048	{ u16 0x01A6 }
+uint16 sb20in80and160lr5glpo {
+	srom >= 11	{ 0x01A6 }
 }
 
-uint sb20in80and160lr5gmpo {
-	revs >= 2048	{ u16 0x01AA }
+uint16 sb20in80and160lr5gmpo {
+	srom >= 11	{ 0x01AA }
 }
 
-uint sb40and80hr5ghpo {
-	revs >= 2048	{ u16 0x01A2 }
+uint16 sb40and80hr5ghpo {
+	srom >= 11	{ 0x01A2 }
 }
 
-uint sb40and80hr5glpo {
-	revs >= 2048	{ u16 0x019A }
+uint16 sb40and80hr5glpo {
+	srom >= 11	{ 0x019A }
 }
 
-uint sb40and80hr5gmpo {
-	revs >= 2048	{ u16 0x019E }
+uint16 sb40and80hr5gmpo {
+	srom >= 11	{ 0x019E }
 }
 
-uint sb40and80lr5ghpo {
-	revs >= 2048	{ u16 0x01B0 }
+uint16 sb40and80lr5ghpo {
+	srom >= 11	{ 0x01B0 }
 }
 
-uint sb40and80lr5glpo {
-	revs >= 2048	{ u16 0x01A8 }
+uint16 sb40and80lr5glpo {
+	srom >= 11	{ 0x01A8 }
 }
 
-uint sb40and80lr5gmpo {
-	revs >= 2048	{ u16 0x01AC }
+uint16 sb40and80lr5gmpo {
+	srom >= 11	{ 0x01AC }
 }
 
-uint stbcpo {
-	revs 16-255	{ u16 0x018C }
-	revs 256-511	{ u16 0x0194 }
+uint16 stbcpo {
+	srom 4-7	{ 0x018C }
+	srom 8	{ 0x0194 }
 }
 
-uint subband5gver {
-	revs 256-2047	{ u8 0x01A5 (&0x7) }
-	revs >= 2048	{ u16 0x00D6 }
+uint16 subband5gver {
+	srom 8-10	{ u8 0x01A5 (&0x7) }
+	srom >= 11	{ 0x00D6 }
 }
 
-uint subvid {
-	revs >= 4	{ u16 0x0006 }
+uint16 subvid {
+	srom >= 2	{ 0x0006 }
 }
 
-uint[] swctrlmap_2g {
-	revs 1024-2047 {
-		u32 0x01B8,
-		u32 0x01BC,
-		u32 0x01C0,
-		u32 0x01C4,
+uint32[5] swctrlmap_2g {
+	srom 10 {
+		0x01B8,
+		0x01BC,
+		0x01C0,
+		0x01C4,
 		u16 0x01C8
 	}
 }
 
-uint tempcorrx {
-	revs 256-2047	{ u8 0x00B6 (&0xFC, >>2) }
-	revs >= 2048	{ u8 0x00B2 (&0xFC, >>2) }
+uint8 tempcorrx {
+	srom 8-10	{ 0x00B6 (&0xFC, >>2) }
+	srom >= 11	{ 0x00B2 (&0xFC, >>2) }
 }
 
-uint tempoffset {
-	revs 256-2047	{ u8 0x00B3 }
-	revs >= 2048	{ u8 0x00AF }
+uint8 tempoffset {
+	srom 8-10	{ 0x00B3 }
+	srom >= 11	{ 0x00AF }
 }
 
-uint temps_hysteresis {
-	revs 256-2047	{ u8 0x00BC (&0xF0, >>4) }
-	revs >= 2048	{ u8 0x00B8 (&0xF0, >>4) }
+uint8 temps_hysteresis {
+	srom 8-10	{ 0x00BC (&0xF0, >>4) }
+	srom >= 11	{ 0x00B8 (&0xF0, >>4) }
 }
 
-uint temps_period {
-	revs 256-2047	{ u8 0x00BC (&0xF) }
-	revs >= 2048	{ u8 0x00B8 (&0xF) }
+uint8 temps_period {
+	srom 8-10	{ 0x00BC (&0xF) }
+	srom >= 11	{ 0x00B8 (&0xF) }
 }
 
-uint tempsense_option {
-	revs 256-2047	{ u8 0x00B6 (&0x3) }
-	revs >= 2048	{ u8 0x00B2 (&0x3) }
+uint8 tempsense_option {
+	srom 8-10	{ 0x00B6 (&0x3) }
+	srom >= 11	{ 0x00B2 (&0x3) }
 }
 
-uint tempsense_slope {
-	revs 256-2047	{ u8 0x00B7 }
-	revs >= 2048	{ u8 0x00B3 }
+uint8 tempsense_slope {
+	srom 8-10	{ 0x00B7 }
+	srom >= 11	{ 0x00B3 }
 }
 
-uint tempthresh {
-	revs 256-2047	{ u8 0x00B2 }
-	revs >= 2048	{ u8 0x00AE }
+uint8 tempthresh {
+	srom 8-10	{ 0x00B2 }
+	srom >= 11	{ 0x00AE }
 }
 
-uint tri2g {
-	revs 8-15	{ u8 0x0055 }
-	revs 256-2047	{ u8 0x00A9 }
+uint8 tri2g {
+	srom 3	{ 0x0055 }
+	srom 8-10	{ 0x00A9 }
 }
 
-uint tri5g {
-	revs 8-15	{ u8 0x0054 }
-	revs 256-2047	{ u8 0x00A8 }
+uint8 tri5g {
+	srom 3	{ 0x0054 }
+	srom 8-10	{ 0x00A8 }
 }
 
-uint tri5gh {
-	revs 8-15	{ u8 0x0056 }
-	revs 256-2047	{ u8 0x00AA }
+uint8 tri5gh {
+	srom 3	{ 0x0056 }
+	srom 8-10	{ 0x00AA }
 }
 
-uint tri5gl {
-	revs 8-15	{ u8 0x0057 }
-	revs 256-2047	{ u8 0x00AB }
+uint8 tri5gl {
+	srom 3	{ 0x0057 }
+	srom 8-10	{ 0x00AB }
 }
 
-uint triso2g {
-	revs 256-2047	{ u8 0x00AE (&0x7) }
+uint8 triso2g {
+	srom 8-10	{ 0x00AE (&0x7) }
 }
 
-uint triso5g {
-	revs 256-2047	{ u8 0x00B0 (&0x7) }
+uint8 triso5g {
+	srom 8-10	{ 0x00B0 (&0x7) }
 }
 
-uint tssifloor2g {
-	revs >= 2048	{ u16 0x00BE (&0x3FF) }
+uint16 tssifloor2g {
+	srom >= 11	{ 0x00BE (&0x3FF) }
 }
 
-uint[] tssifloor5g {
-	revs >= 2048	{ u16[4] 0x00C0 (&0x3FF) }
+uint16[4] tssifloor5g {
+	srom >= 11	{ 0x00C0 (&0x3FF) }
 }
 
-uint tssipos2g {
-	revs 256-2047	{ u8 0x00AF (&0x1) }
+uint8 tssipos2g {
+	srom 8-10	{ 0x00AF (&0x1) }
 }
 
-uint tssipos5g {
-	revs 256-2047	{ u8 0x00B1 (&0x1) }
+uint8 tssipos5g {
+	srom 8-10	{ 0x00B1 (&0x1) }
 }
 
-uint tssiposslope2g {
-	revs >= 2048	{ u8 0x00AB (&0x1) }
+uint8 tssiposslope2g {
+	srom >= 11	{ 0x00AB (&0x1) }
 }
 
-uint tssiposslope5g {
-	revs >= 2048	{ u8 0x00AD (&0x1) }
+uint8 tssiposslope5g {
+	srom >= 11	{ 0x00AD (&0x1) }
 }
 
-uint tworangetssi2g {
-	revs >= 2048	{ u8 0x00AA (&0x2, >>1) }
+uint8 tworangetssi2g {
+	srom >= 11	{ 0x00AA (&0x2, >>1) }
 }
 
-uint tworangetssi5g {
-	revs >= 2048	{ u8 0x00AC (&0x2, >>1) }
+uint8 tworangetssi5g {
+	srom >= 11	{ 0x00AC (&0x2, >>1) }
 }
 
-uint txchain {
+uint8 txchain {
 	all1	ignore
-	revs 16-255	{ u8 0x007B (&0xF) }
-	revs 256-2047	{ u8 0x00A3 (&0xF) }
-	revs >= 2048	{ u8 0x00A9 (&0xF) }
+	srom 4-7	{ 0x007B (&0xF) }
+	srom 8-10	{ 0x00A3 (&0xF) }
+	srom >= 11	{ 0x00A9 (&0xF) }
 }
 
-uint txidxcap2g {
-	revs >= 2048	{ u16 0x01A8 (&0xFF0, >>4) }
+uint8 txidxcap2g {
+	srom >= 11	{ u16 0x01A8 (&0xFF0, >>4) }
 }
 
-uint txidxcap5g {
-	revs >= 2048	{ u16 0x01AC (&0xFF0, >>4) }
+uint8 txidxcap5g {
+	srom >= 11	{ u16 0x01AC (&0xFF0, >>4) }
 }
 
-uint txpid2ga0 {
-	revs 16-255	{ u8 0x0063 }
+uint8 txpid2ga0 {
+	srom 4-7	{ 0x0063 }
 }
 
-uint txpid2ga1 {
-	revs 16-255	{ u8 0x0062 }
+uint8 txpid2ga1 {
+	srom 4-7	{ 0x0062 }
 }
 
-uint txpid2ga2 {
-	revs 16-255	{ u8 0x0065 }
+uint8 txpid2ga2 {
+	srom 4-7	{ 0x0065 }
 }
 
-uint txpid2ga3 {
-	revs 16-255	{ u8 0x0064 }
+uint8 txpid2ga3 {
+	srom 4-7	{ 0x0064 }
 }
 
-uint txpid5ga0 {
-	revs 16-255	{ u8 0x0067 }
+uint8 txpid5ga0 {
+	srom 4-7	{ 0x0067 }
 }
 
-uint txpid5ga1 {
-	revs 16-255	{ u8 0x0066 }
+uint8 txpid5ga1 {
+	srom 4-7	{ 0x0066 }
 }
 
-uint txpid5ga2 {
-	revs 16-255	{ u8 0x0069 }
+uint8 txpid5ga2 {
+	srom 4-7	{ 0x0069 }
 }
 
-uint txpid5ga3 {
-	revs 16-255	{ u8 0x0068 }
+uint8 txpid5ga3 {
+	srom 4-7	{ 0x0068 }
 }
 
-uint txpid5gha0 {
-	revs 16-255	{ u8 0x006F }
+uint8 txpid5gha0 {
+	srom 4-7	{ 0x006F }
 }
 
-uint txpid5gha1 {
-	revs 16-255	{ u8 0x006E }
+uint8 txpid5gha1 {
+	srom 4-7	{ 0x006E }
 }
 
-uint txpid5gha2 {
-	revs 16-255	{ u8 0x0071 }
+uint8 txpid5gha2 {
+	srom 4-7	{ 0x0071 }
 }
 
-uint txpid5gha3 {
-	revs 16-255	{ u8 0x0070 }
+uint8 txpid5gha3 {
+	srom 4-7	{ 0x0070 }
 }
 
-uint txpid5gla0 {
-	revs 16-255	{ u8 0x006B }
+uint8 txpid5gla0 {
+	srom 4-7	{ 0x006B }
 }
 
-uint txpid5gla1 {
-	revs 16-255	{ u8 0x006A }
+uint8 txpid5gla1 {
+	srom 4-7	{ 0x006A }
 }
 
-uint txpid5gla2 {
-	revs 16-255	{ u8 0x006D }
+uint8 txpid5gla2 {
+	srom 4-7	{ 0x006D }
 }
 
-uint txpid5gla3 {
-	revs 16-255	{ u8 0x006C }
+uint8 txpid5gla3 {
+	srom 4-7	{ 0x006C }
 }
 
-uint xtalfreq {
-	revs >= 2048	{ u16 0x00B4 }
+uint16 xtalfreq {
+	srom >= 11	{ 0x00B4 }
 }
 
 #
@@ -1382,177 +1382,177 @@ uint xtalfreq {
 # noiselvl5ga2, noiselvl5ga3 ...)
 #
 struct pathvars[] {
-	revs 4-7	[0x0080, 0x00AE, 0x00DC, 0x010A]
-	revs 8-10	[0x00C0, 0x00E0, 0x0100, 0x0120]
-	revs >= 11	[0x00D8, 0x0100, 0x0128]
+	srom 4-7	[0x0080, 0x00AE, 0x00DC, 0x010A]
+	srom 8-10	[0x00C0, 0x00E0, 0x0100, 0x0120]
+	srom >= 11	[0x00D8, 0x0100, 0x0128]
 
-	uint itt2ga {
-		revs 16-255	{ u8 0x0000 }
-		revs 256-2047	{ u8 0x0000 }
+	uint8 itt2ga {
+		srom 4-7	{ 0x0000 }
+		srom 8-10	{ 0x0000 }
 	}
 
-	uint itt5ga {
-		revs 16-255	{ u8 0x000A }
-		revs 256-2047	{ u8 0x0008 }
+	uint8 itt5ga {
+		srom 4-7	{ 0x000A }
+		srom 8-10	{ 0x0008 }
 	}
 
-	uint maxp2ga {
-		revs 16-255	{ u8 0x0001 }
-		revs 256-2047	{ u8 0x0001 }
-		revs >= 2048	{ u8 0x0001 }
+	uint8 maxp2ga {
+		srom 4-7	{ 0x0001 }
+		srom 8-10	{ 0x0001 }
+		srom >= 11	{ 0x0001 }
 	}
 
-	uint[] maxp5ga {
-		revs 16-255	{ u8 0x000B }
-		revs 256-2047	{ u8 0x0009 }
-		revs >= 2048 {
-			u8 0x000D,
-			u8 0x000C,
-			u8 0x000F,
-			u8 0x000E
+	uint8[4] maxp5ga {
+		srom 4-7	{ 0x000B }
+		srom 8-10	{ 0x0009 }
+		srom >= 11 {
+			0x000D,
+			0x000C,
+			0x000F,
+			0x000E
 		}
 	}
 
-	uint maxp5gha {
-		revs 16-255	{ u8 0x000D }
-		revs 256-2047	{ u8 0x000B }
+	uint8 maxp5gha {
+		srom 4-7	{ 0x000D }
+		srom 8-10	{ 0x000B }
 	}
 
-	uint maxp5gla {
-		revs 16-255	{ u8 0x000C }
-		revs 256-2047	{ u8 0x000A }
+	uint8 maxp5gla {
+		srom 4-7	{ 0x000C }
+		srom 8-10	{ 0x000A }
 	}
 
-	uint[] pa2ga {
-		revs >= 2048	{ u16[3] 0x0002 }
+	uint16[3] pa2ga {
+		srom >= 11	{ 0x0002 }
 	}
 
-	uint pa2gw0a {
-		revs 16-255	{ u16 0x0002 }
-		revs 256-2047	{ u16 0x0002 }
+	uint16 pa2gw0a {
+		srom 4-7	{ 0x0002 }
+		srom 8-10	{ 0x0002 }
 	}
 
-	uint pa2gw1a {
-		revs 16-255	{ u16 0x0004 }
-		revs 256-2047	{ u16 0x0004 }
+	uint16 pa2gw1a {
+		srom 4-7	{ 0x0004 }
+		srom 8-10	{ 0x0004 }
 	}
 
-	uint pa2gw2a {
-		revs 16-255	{ u16 0x0006 }
-		revs 256-2047	{ u16 0x0006 }
+	uint16 pa2gw2a {
+		srom 4-7	{ 0x0006 }
+		srom 8-10	{ 0x0006 }
 	}
 
-	uint pa2gw3a {
-		revs 16-255	{ u16 0x0008 }
+	uint16 pa2gw3a {
+		srom 4-7	{ 0x0008 }
 	}
 
-	uint[] pa5ga {
-		revs >= 2048	{ u16[12] 0x0010 }
+	uint16[12] pa5ga {
+		srom >= 11	{ 0x0010 }
 	}
 
-	uint pa5ghw0a {
-		revs 16-255	{ u16 0x001E }
-		revs 256-2047	{ u16 0x0018 }
+	uint16 pa5ghw0a {
+		srom 4-7	{ 0x001E }
+		srom 8-10	{ 0x0018 }
 	}
 
-	uint pa5ghw1a {
-		revs 16-255	{ u16 0x0020 }
-		revs 256-2047	{ u16 0x001A }
+	uint16 pa5ghw1a {
+		srom 4-7	{ 0x0020 }
+		srom 8-10	{ 0x001A }
 	}
 
-	uint pa5ghw2a {
-		revs 16-255	{ u16 0x0022 }
-		revs 256-2047	{ u16 0x001C }
+	uint16 pa5ghw2a {
+		srom 4-7	{ 0x0022 }
+		srom 8-10	{ 0x001C }
 	}
 
-	uint pa5ghw3a {
-		revs 16-255	{ u16 0x0024 }
+	uint16 pa5ghw3a {
+		srom 4-7	{ 0x0024 }
 	}
 
-	uint pa5glw0a {
-		revs 16-255	{ u16 0x0016 }
-		revs 256-2047	{ u16 0x0012 }
+	uint16 pa5glw0a {
+		srom 4-7	{ 0x0016 }
+		srom 8-10	{ 0x0012 }
 	}
 
-	uint pa5glw1a {
-		revs 16-255	{ u16 0x0018 }
-		revs 256-2047	{ u16 0x0014 }
+	uint16 pa5glw1a {
+		srom 4-7	{ 0x0018 }
+		srom 8-10	{ 0x0014 }
 	}
 
-	uint pa5glw2a {
-		revs 16-255	{ u16 0x001A }
-		revs 256-2047	{ u16 0x0016 }
+	uint16 pa5glw2a {
+		srom 4-7	{ 0x001A }
+		srom 8-10	{ 0x0016 }
 	}
 
-	uint pa5glw3a {
-		revs 16-255	{ u16 0x001C }
+	uint16 pa5glw3a {
+		srom 4-7	{ 0x001C }
 	}
 
-	uint pa5gw0a {
-		revs 16-255	{ u16 0x000E }
-		revs 256-2047	{ u16 0x000C }
+	uint16 pa5gw0a {
+		srom 4-7	{ 0x000E }
+		srom 8-10	{ 0x000C }
 	}
 
-	uint pa5gw1a {
-		revs 16-255	{ u16 0x0010 }
-		revs 256-2047	{ u16 0x000E }
+	uint16 pa5gw1a {
+		srom 4-7	{ 0x0010 }
+		srom 8-10	{ 0x000E }
 	}
 
-	uint pa5gw2a {
-		revs 16-255	{ u16 0x0012 }
-		revs 256-2047	{ u16 0x0010 }
+	uint16 pa5gw2a {
+		srom 4-7	{ 0x0012 }
+		srom 8-10	{ 0x0010 }
 	}
 
-	uint pa5gw3a {
-		revs 16-255	{ u16 0x0014 }
+	uint16 pa5gw3a {
+		srom 4-7	{ 0x0014 }
 	}
 
-	uint rxgains2gelnagaina {
-		revs >= 2048	{ u8 0x000B (&0x7) }
+	uint8 rxgains2gelnagaina {
+		srom >= 11	{ 0x000B (&0x7) }
 	}
 
-	uint rxgains2gtrelnabypa {
-		revs >= 2048	{ u8 0x000B (&0x80, >>7) }
+	uint8 rxgains2gtrelnabypa {
+		srom >= 11	{ 0x000B (&0x80, >>7) }
 	}
 
-	uint rxgains2gtrisoa {
-		revs >= 2048	{ u8 0x000B (&0x78, >>3) }
+	uint8 rxgains2gtrisoa {
+		srom >= 11	{ 0x000B (&0x78, >>3) }
 	}
 
-	uint rxgains5gelnagaina {
-		revs >= 2048	{ u8 0x000A (&0x7) }
+	uint8 rxgains5gelnagaina {
+		srom >= 11	{ 0x000A (&0x7) }
 	}
 
-	uint rxgains5ghelnagaina {
-		revs >= 2048	{ u8 0x0008 (&0x7) }
+	uint8 rxgains5ghelnagaina {
+		srom >= 11	{ 0x0008 (&0x7) }
 	}
 
-	uint rxgains5ghtrelnabypa {
-		revs >= 2048	{ u8 0x0008 (&0x80, >>7) }
+	uint8 rxgains5ghtrelnabypa {
+		srom >= 11	{ 0x0008 (&0x80, >>7) }
 	}
 
-	uint rxgains5ghtrisoa {
-		revs >= 2048	{ u8 0x0008 (&0x78, >>3) }
+	uint8 rxgains5ghtrisoa {
+		srom >= 11	{ 0x0008 (&0x78, >>3) }
 	}
 
-	uint rxgains5gmelnagaina {
-		revs >= 2048	{ u8 0x0009 (&0x7) }
+	uint8 rxgains5gmelnagaina {
+		srom >= 11	{ 0x0009 (&0x7) }
 	}
 
-	uint rxgains5gmtrelnabypa {
-		revs >= 2048	{ u8 0x0009 (&0x80, >>7) }
+	uint8 rxgains5gmtrelnabypa {
+		srom >= 11	{ 0x0009 (&0x80, >>7) }
 	}
 
-	uint rxgains5gmtrisoa {
-		revs >= 2048	{ u8 0x0009 (&0x78, >>3) }
+	uint8 rxgains5gmtrisoa {
+		srom >= 11	{ 0x0009 (&0x78, >>3) }
 	}
 
-	uint rxgains5gtrelnabypa {
-		revs >= 2048	{ u8 0x000A (&0x80, >>7) }
+	uint8 rxgains5gtrelnabypa {
+		srom >= 11	{ 0x000A (&0x80, >>7) }
 	}
 
-	uint rxgains5gtrisoa {
-		revs >= 2048	{ u8 0x000A (&0x78, >>3) }
+	uint8 rxgains5gtrisoa {
+		srom >= 11	{ 0x000A (&0x78, >>3) }
 	}
 
 }
