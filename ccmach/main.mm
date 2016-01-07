@@ -95,7 +95,7 @@ enum {
     BHND_NVRAM_VF_IGNALL1	= (1<<2)	/**< hide variable if its value has all bits set. */
 };
 
-#define	BHND_SPROMREV_MAX	UINT16_MAX	/**< maximum supported SPROM revision */
+#define	BHND_SPROMREV_MAX	31	/**< maximum supported SPROM revision */
 
 /** SPROM revision compatibility declaration */
 struct bhnd_sprom_compat {
@@ -832,10 +832,9 @@ private:
                 
                 vals.push_back(val);
             }
-            
-            int ctz = __builtin_ctz(revmask);
-            uint16_t first_ver = (1UL << ctz);
-            uint16_t last_ver = revmask | (((~revmask) << (sizeof(revmask)*8 - ctz)) >> (sizeof(revmask)*8 - ctz));
+
+            uint16_t first_ver = __builtin_ctz(revmask);
+            uint16_t last_ver = 31 - __builtin_clz(revmask);
             
             v->sprom_descs.push_back({{first_ver, last_ver}, vals});
         }
