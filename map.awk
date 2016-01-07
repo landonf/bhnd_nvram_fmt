@@ -45,7 +45,6 @@ BEGIN {
 	INT_REGEX	= "[1-9][0-9]*"
 	HEX_REGEX	= "0x[A-Fa-f0-9]+"
 	TYPES_REGEX	= "(u?int(8|16|32)|char)(\\[" INT_REGEX "\\])?"
-	WIDTHS_REGEX	= "(u8|u16|u32)(\\[[1-9][0-9]*\\])?"
 	IDENT_REGEX	= "[A-Za-z_][A-Za-z0-9_]*"
 
 	# Internal variable names
@@ -662,7 +661,7 @@ function parse_offset_segment (revk, offk)
 }
 
 # revision offset definition
-$1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("srom") {
+($1 ~ "^"TYPES_REGEX"$" || $1 "^"HEX_REGEX"$") && in_block("srom") {
 	vid = g(BLOCK_NAME)
 
 	# fetch rev id/key defined by our parent block
