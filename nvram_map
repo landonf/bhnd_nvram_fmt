@@ -289,7 +289,7 @@ uint8 ledbh3 {
 }
 
 uint8[2] leddc {
-	fmt	led_dutycycle
+	fmt	led_dc
 	all1	ignore
 	srom 3	{ 0x007D }
 	srom 4	{ 0x005B }

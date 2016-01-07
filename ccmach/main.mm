@@ -85,7 +85,7 @@ typedef enum {
     BHND_NVRAM_VFMT_MACADDR,	/**< mac address (canonical form, hex octets,
                                  seperated with ':') */
     BHND_NVRAM_VFMT_LEDDC,        /**< LED PWM duty-cycle (2 bytes -- on/off) */
-    BHND_NVRAM_VFMT_CCODE		/**< ASCII string */
+    BHND_NVRAM_VFMT_CCODE		/**< count code format (2-3 ASCII chars, or hex string) */
 } bhnd_nvram_fmt;
 
 /** NVRAM variable flags */
@@ -456,7 +456,7 @@ static const char *fmtstr (bhnd_nvram_fmt fmt) {
         case BHND_NVRAM_VFMT_SDEC: return "sdec";
         case BHND_NVRAM_VFMT_MACADDR: return "macaddr";
         case BHND_NVRAM_VFMT_CCODE: return "ccode";
-        case BHND_NVRAM_VFMT_LEDDC: return "led_dutycycle";
+        case BHND_NVRAM_VFMT_LEDDC: return "led_dc";
     }
 }
 

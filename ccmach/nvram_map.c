@@ -46,19 +46,7 @@ bhnd_nvram_find_sprom_var (const struct bhnd_nvram_var *nv, uint16_t sprom_ver)
 static size_t
 bhnd_nvram_type_width (bhnd_nvram_dt type)
 {
-	switch (type)
-	{
-		case BHND_NVRAM_DT_UINT:
-			return (sizeof(uint32_t));
-		case BHND_NVRAM_DT_SINT:
-			return (sizeof(int32_t));
-		case BHND_NVRAM_DT_MAC48:
-			return (sizeof(uint8_t) * 48); // TODO
-		case BHND_NVRAM_DT_LEDDC:
-			return (1); // TODO
-		case BHND_NVRAM_DT_CCODE:
-			return sizeof(char[4]); // TODO
-	}
+    return 0; // TODO
 }
 
 #ifdef NVRAM_MAIN

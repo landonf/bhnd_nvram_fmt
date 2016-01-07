@@ -15,9 +15,7 @@
 typedef enum {
 	BHND_NVRAM_DT_UINT,	/**< unsigned integer */
 	BHND_NVRAM_DT_SINT,	/**< signed integer */
-	BHND_NVRAM_DT_MAC48,	/**< MAC-48 address */
-	BHND_NVRAM_DT_LEDDC,	/**< LED PWM duty-cycle */
-	BHND_NVRAM_DT_CCODE,	/**< country code format (2-3 ASCII chars) */
+	BHND_NVRAM_DT_CHAR,	/**< ASCII char */
 } bhnd_nvram_dt;
 
 /** NVRAM data type string representations */
@@ -26,7 +24,8 @@ typedef enum {
 	BHND_NVRAM_VFMT_SDEC,		/**< signed decimal format */
 	BHND_NVRAM_VFMT_MACADDR,	/**< mac address (canonical form, hex octets,
 					     seperated with ':') */
-	BHND_NVRAM_VFMT_CCODE		/**< ASCII string */
+	BHND_NVRAM_VFMT_LEDDC,		/**< LED PWM duty-cycle (2 bytes -- on/off) */
+	BHND_NVRAM_VFMT_CCODE		/**< count code format (2-3 ASCII chars, or hex string) */
 } bhnd_nvram_fmt;
 
 /** NVRAM variable flags */

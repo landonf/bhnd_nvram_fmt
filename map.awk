@@ -22,15 +22,14 @@ BEGIN {
 	# Format Constants
 	SFMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
 	SFMT["sdec"]	= "BHND_NVRAM_VFMT_SDEC"
-	SFMT["ascii"]	= "BHND_NVRAM_VFMT_CCODE"
+	SFMT["ccode"]	= "BHND_NVRAM_VFMT_CCODE"
 	SFMT["macaddr"]	= "BHND_NVRAM_VFMT_MACADDR"
+	SFMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"
 
 	# Data Type Constants
 	DTYPE["uint"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["sint"]	= "BHND_NVRAM_DT_SINT"
-	DTYPE["mac48"]	= "BHND_NVRAM_DT_MAC48"
-	DTYPE["led"]	= "BHND_NVRAM_DT_LEDDC"
-	DTYPE["cc"]	= "BHND_NVRAM_DT_CCODE"
+	DTYPE["int"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["char"]	= "BHND_NVRAM_DT_CHAR"
 
 	# Default masking for standard widths
 	WMASK["u8"]	= "0x000000FF"
@@ -45,7 +44,7 @@ BEGIN {
 	# Common Regexs
 	INT_REGEX	= "[1-9][0-9]*"
 	HEX_REGEX	= "0x[A-Fa-f0-9]+"
-	TYPES_REGEX	= "(uint|sint|led|cc|mac48)(\\[\\])?"
+	TYPES_REGEX	= "(uint(8|16|32)|int(8|16|32)|char)(\\[\\])?"
 	WIDTHS_REGEX	= "(u8|u16|u32)(\\[[1-9][0-9]*\\])?"
 	IDENT_REGEX	= "[A-Za-z][A-Za-z0-9]*"
 
@@ -499,9 +498,9 @@ function allow_def (type)
 		    in_block("var"))
 	} else if (type == "struct") {
 		return (in_block("NONE"))
-	} else if (type == "revs") {
+	} else if (type == "srom") {
 		return (in_block("var"))
-	} else if (type == "struct_revs") {
+	} else if (type == "struct_srom") {
 		return (in_block("struct"))
 	}
 
@@ -532,7 +531,7 @@ $1 == "struct" && allow_def("struct") {
 }
 
 # struct rev descriptor
-$1 == "revs" && allow_def("struct_revs") {
+$1 == "srom" && allow_def("struct_srom") {
 	sid = g(BLOCK_NAME)
 
 	# parse revision descriptor
@@ -563,12 +562,12 @@ $1 == "revs" && allow_def("struct_revs") {
 		structs[offk,SEG_ADDR] = addrs[i]
 	}
 
-	debug("struct_revs " structs[revk,REV_START] "... [" addrs_str "]")
+	debug("struct_srom " structs[revk,REV_START] "... [" addrs_str "]")
 	next
 }
 
-# variable revs block
-$1 == "revs" && allow_def("revs") {
+# variable srom revs block
+$1 == "srom" && allow_def("srom") {
 	# parse revision descriptor
 	parse_revdesc(rev_desc)
 
@@ -588,7 +587,7 @@ $1 == "revs" && allow_def("revs") {
 	vars[revk,REV_END] = rev_desc[REV_END]
 	vars[revk,REV_NUM_OFFS] = 0
 
-	debug("revs " _revstr " {")
+	debug("srom " _revstr " {")
 	open_block($1, null)
 }
 
@@ -664,7 +663,7 @@ function parse_offset_segment (revk, offk)
 }
 
 # revision offset definition
-$1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("revs") {
+$1 ~ "^"WIDTHS_REGEX "(\\[" INT_REGEX "\\])?" && in_block("srom") {
 	vid = g(BLOCK_NAME)
 
 	# fetch rev id/key defined by our parent block
