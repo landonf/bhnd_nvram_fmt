@@ -55,7 +55,8 @@ bhnd_nvram_type_width (bhnd_nvram_dt type)
 	}
 }
 
-int mmain (int argc, char * const argv[]) {
+#ifdef NVRAM_MAIN
+int main (int argc, char * const argv[]) {
 	uint16_t sprom_ver = 2048;
 	const char *vname = argv[1];
 
@@ -76,7 +77,8 @@ int mmain (int argc, char * const argv[]) {
 
 	printf("found %s with type %u (%zu bytes)\n", vname, nv->type, bhnd_nvram_type_width(nv->type));
 	if (nv->flags & BHND_NVRAM_VF_ARRAY) {
-		printf("array with max length of %zu (%zu bytes)\n", nv->array_len, bhnd_nvram_type_width(nv->type) * nv->array_len);
+		printf("array\n");
 	}
     return 0;
 }
+#endif

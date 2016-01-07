@@ -123,29 +123,12 @@ function gen_var_flags (v)
 	return _flags
 }
 
-function gen_var_max_array_len (v)
-{
-	if (!vars[v,VAR_ARRAY])
-		return 0
-
-	_max_elems = 0
-	for (_rev = 0; _rev < vars[v,NUM_REVS]; _rev++) {
-		_revk = subkey(v, REV, _rev"")
-		_num_offs = vars[_revk,REV_NUM_OFFS]
-		if (_num_offs > _max_elems)
-			_max_elems = _num_offs
-	}
-
-	return _max_elems
-}
-
 function gen_var_head (v, suffix)
 {
 	printi("{\"" v suffix "\", ")
 	printf("%s, ", DTYPE[vars[v,VAR_TYPE]])
 	printf("%s, ", SFMT[vars[v,VAR_FMT]])
 	printf("%s, ", gen_var_flags(v))
-	printf("%s, ", gen_var_max_array_len(v))
 	printf("(struct bhnd_sprom_var[]) {\n")
 	output_depth++
 }
@@ -158,33 +141,33 @@ function gen_var_rev_body (revk, base_addr)
 		base_addr = ""
 
 	printi()
-	printf("{{%u, %u}, (struct bhnd_sprom_value[]) {\n",
+	printf("{{%u, %u}, (struct bhnd_sprom_offset[]) {\n",
 	    vars[revk,REV_START],
 	    vars[revk,REV_END])
 	output_depth++
 
 	num_offs = vars[revk,REV_NUM_OFFS]
+	num_offs_written = 0
 	for (offset = 0; offset < num_offs; offset++) {
 		offk = subkey(revk, OFF, offset"")
 		num_segs = vars[offk,OFF_NUM_SEGS]
 
-		printi( "{(struct bhnd_sprom_seg []) {\n")
-		output_depth++
 		for (seg = 0; seg < num_segs; seg++) {
 			segk = subkey(offk, OFF_SEG, seg"")
+
 			printi()
-			printf("{%s,\t%s,\t%s,\t%s,\t%s},\n",
+			printf("{%s, %s, %s, %s, %s, %s},\n",
 			    base_addr vars[segk,SEG_ADDR],
 			    vars[segk,SEG_WIDTH],
 			    vars[segk,SEG_COUNT],
 			    vars[segk,SEG_MASK],
-			    vars[segk,SEG_SHIFT])
+			    vars[segk,SEG_SHIFT],
+			    (num_segs-1 > seg) ? "true" : "false")
+			num_offs_written++
 		}
-		output_depth--
-		printi("}, " num_segs "},\n")
 	}
 	output_depth--
-	printi("}, " num_offs "},\n")
+	printi("}, " num_offs_written "},\n")
 }
 
 function gen_var_body (v, base_addr)

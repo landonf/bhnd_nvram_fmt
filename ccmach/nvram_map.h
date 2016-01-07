@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /** NVRAM primitive data types */
 typedef enum {
@@ -44,26 +45,22 @@ struct bhnd_sprom_compat {
 	uint16_t	last;	/**< last compatible SPROM revision, or BHND_SPROMREV_MAX */
 };
 
-/** SPROM value segment descriptor */
-struct bhnd_sprom_seg {
+/** SPROM value descriptor */
+struct bhnd_sprom_offset {
 	uint16_t	offset;	/**< byte offset within SPROM */
 	size_t		width;	/**< 1, 2, or 4 bytes */
 	size_t		count;	/**< the number of consecutive readable elements */
 	uint32_t	mask;	/**< mask to be applied to the value(s) */
 	size_t		shift;	/**< shift to be applied to the value */
-};
-
-/** SPROM value descriptor */
-struct bhnd_sprom_value {
-	const struct bhnd_sprom_seg	*segs;		/**< segment(s) containing this value */
-	size_t				 num_segs;	/**< number of segments */
+	bool		cont;	/**< value should be bitwise OR'd with the next offset
+				  *  descriptor */
 };
 
 /** SPROM-specific variable definition */
 struct bhnd_sprom_var {
 	struct bhnd_sprom_compat	 compat;	/**< sprom compatibility declaration */
-	const struct bhnd_sprom_value	*values;	/**< value descriptor(s) */
-	size_t				 num_values;	/**< number of values (e.g. if this is an array) */
+	const struct bhnd_sprom_offset	*offsets;	/**< offset descriptors */
+	size_t				 num_offsets;	/**< number of offset descriptors */
 };
 
 /** NVRAM variable definition */
@@ -72,7 +69,6 @@ struct bhnd_nvram_var {
 	bhnd_nvram_dt			 type;		/**< base data type */
 	bhnd_nvram_sfmt			 sfmt;		/**< string format */
 	uint32_t			 flags;		/**< BHND_NVRAM_VF_* flags */
-	size_t				 array_len;	/**< array element count (if BHND_NVRAM_VF_ARRAY) */
 
 	const struct bhnd_sprom_var	*sprom_descs;	/**< SPROM-specific variable descriptors */
 	size_t				 num_sp_descs;	/**< number of sprom descriptors */
