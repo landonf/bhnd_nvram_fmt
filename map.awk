@@ -14,7 +14,7 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 1
+	DEBUG = 0
 
 	# Maximum revision
 	REV_MAX = 65535
@@ -27,29 +27,29 @@ BEGIN {
 	FMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"
 
 	# Data Type Constants
-	DTYPE["uint8"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["uint16"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["uint32"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["int8"]	= "BHND_NVRAM_DT_SINT"
-	DTYPE["int16"]	= "BHND_NVRAM_DT_SINT"
-	DTYPE["int32"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["u8"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["u16"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["u32"]	= "BHND_NVRAM_DT_UINT"
+	DTYPE["i8"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["i16"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["i32"]	= "BHND_NVRAM_DT_SINT"
 	DTYPE["char"]	= "BHND_NVRAM_DT_CHAR"
 
 	# Default masking for standard types
-	TMASK["uint8"]	= "0x000000FF"
-	TMASK["uint16"]	= "0x0000FFFF"
-	TMASK["uint32"]	= "0xFFFFFFFF"
-	TMASK["int8"]	= TMASK["uint8"]
-	TMASK["int16"]	= TMASK["uint16"]
-	TMASK["int32"]	= TMASK["uint32"]
+	TMASK["u8"]	= "0x000000FF"
+	TMASK["u16"]	= "0x0000FFFF"
+	TMASK["u32"]	= "0xFFFFFFFF"
+	TMASK["i8"]	= TMASK["u8"]
+	TMASK["i16"]	= TMASK["u16"]
+	TMASK["i32"]	= TMASK["u32"]
 
 	# Byte sizes for standard types
-	TSIZE["uint8"]	= "1"
-	TSIZE["uint16"]	= "2"
-	TSIZE["uint32"]	= "4"
-	TSIZE["int8"]	= TSIZE["uint8"]
-	TSIZE["int16"]	= TSIZE["uint8"]
-	TSIZE["int32"]	= TSIZE["uint8"]
+	TSIZE["u8"]	= "1"
+	TSIZE["u16"]	= "2"
+	TSIZE["u32"]	= "4"
+	TSIZE["i8"]	= TSIZE["u8"]
+	TSIZE["i16"]	= TSIZE["u8"]
+	TSIZE["i32"]	= TSIZE["u8"]
 	TSIZE["char"]	= "1"
 
 	# Common Regexs
@@ -57,7 +57,7 @@ BEGIN {
 	HEX_REGEX	= "^0x[A-Fa-f0-9]+,?$"
 
 	ARRAY_REGEX	= "\\[(0|[1-9][0-9]*)\\]"
-	TYPES_REGEX	= "^(u?int(8|16|32)|char)("ARRAY_REGEX")?,?$"
+	TYPES_REGEX	= "^(((u|i)(8|16|32))|char)("ARRAY_REGEX")?,?$"
 
 	IDENT_REGEX	= "^[A-Za-z_][A-Za-z0-9_]*,?$"
 	SROM_OFF_REGEX	= "("TYPES_REGEX"|"HEX_REGEX")"
@@ -96,7 +96,6 @@ BEGIN {
 	# Segment array keys
 	SEG_ADDR	= "seg_addr"
 	SEG_WIDTH	= "seg_width"
-	SEG_COUNT	= "seg_count"
 	SEG_MASK	= "seg_mask"
 	SEG_SHIFT	= "seg_shift"
 
@@ -133,7 +132,7 @@ function gen_var_flags (v)
 	if (vars[v,VAR_IGNALL1])
 		_flags[_num_flags++] = "BHND_NVRAM_VF_IGNALL1"
 
-	return join(_flags, ", ", _num_flags)
+	return (join(_flags, ", ", _num_flags))
 }
 
 # open a bhnd_nvram_var definition for `v`, with optional name `suffix`.
@@ -148,7 +147,7 @@ function gen_var_head (v, suffix)
 }
 
 # generate a bhnd_sprom_var definition for the given variable revision key
-function gen_var_rev_body (revk, base_addr)
+function gen_var_rev_body (v, revk, base_addr)
 {
 	if (base_addr != null)
 		base_addr = base_addr"+"
@@ -163,6 +162,7 @@ function gen_var_rev_body (revk, base_addr)
 
 	num_offs = vars[revk,REV_NUM_OFFS]
 	num_offs_written = 0
+	elem_count = 0
 	for (offset = 0; offset < num_offs; offset++) {
 		offk = subkey(revk, OFF, offset"")
 		num_segs = vars[offk,OFF_NUM_SEGS]
@@ -171,16 +171,28 @@ function gen_var_rev_body (revk, base_addr)
 			segk = subkey(offk, OFF_SEG, seg"")
 
 			printi()
-			printf("{%s, %s, %s, %s, %s, %s},\n",
+			printf("{%s, %s, %s, %s},\n",
 			    base_addr vars[segk,SEG_ADDR],
 			    vars[segk,SEG_WIDTH],
-			    vars[segk,SEG_COUNT],
-			    vars[segk,SEG_MASK],
-			    vars[segk,SEG_SHIFT],
-			    (num_segs-1 > seg) ? "true" : "false")
+    			    vars[segk,SEG_SHIFT],
+			    vars[segk,SEG_MASK])
 			num_offs_written++
 		}
 	}
+
+	# Check for overflow of the variable's declared type
+	if (vars[v,VAR_ARRAY])
+		max_elem_count = type_array_len(vars[v,VAR_TYPE])
+	else
+		max_elem_count = 1
+
+	if (TODO && vars[revk,REV_NUM_ELEMS] > max_elem_count) {
+		_err_line = vars[revk,DEF_LINE]
+		errorx(vars[v,VAR_NAME] " srom definition of " vars[revk,REV_NUM_ELEMS] \
+		    " elements on line " _err_line " overflows type " \
+		    vars[v,VAR_TYPE])
+	}
+
 	output_depth--
 	printi("}, " num_offs_written "},\n")
 }
@@ -190,7 +202,7 @@ function gen_var_body (v)
 {
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
 		revk = subkey(v, REV, rev"")
-		gen_var_rev_body(revk)
+		gen_var_rev_body(v, revk)
 	}
 }
 
@@ -254,7 +266,7 @@ function gen_struct_var (v)
 					continue
 
 				st_rev_count++
-				gen_var_rev_body(vrevk, base_addr)
+				gen_var_rev_body(v, vrevk, base_addr)
 			}
 		}
 
@@ -305,13 +317,13 @@ function usage ()
 function join (array, sep, count)
 {
 	if (count == 0)
-		return ""
+		return ("")
 
 	_result = array[0]
 	for (_ji = 1; _ji < count; _ji++)
 		_result = _result sep array[_ji]
 
-	return _result
+	return (_result)
 }
 
 #
@@ -372,9 +384,9 @@ function debug (msg)
 function subkey (parent, selector, child)
 {
 	if (child != null)
-		return parent SUBSEP selector SUBSEP child
+		return (parent SUBSEP selector SUBSEP child)
 	else
-		return parent SUBSEP selector
+		return (parent SUBSEP selector)
 }
 
 #
@@ -385,7 +397,7 @@ function next_line ()
 	do {
 		_result = getline
 	} while (_result > 0 && $0 ~ /^[ \t]*#.*/) # skip comment lines
-	return _result
+	return (_result)
 }
 
 #
@@ -395,12 +407,12 @@ function getline_matching (regex)
 {
 	_result = next_line()
 	if (_result <= 0)
-		return _result
+		return (_result)
 
 	if ($0 ~ regex)
-		return 1
+		return (1)
 
-	return -1
+	return (-1)
 }
 
 #
@@ -476,7 +488,7 @@ function open_block (type, name)
 		push(BLOCK_TYPE, type)
 
 		sub("^[^{]+{", "", $0)
-		return 1
+		return
 	}
 
 	error("found '"$1 "' instead of expected '{' for '" name "'")
@@ -513,7 +525,7 @@ function _find_sym (name, scope)
 			return (depth-i)
 	}
 
-	return -1
+	return (-1)
 }
 
 #
@@ -573,10 +585,10 @@ function in_nested_block (type)
 	for (i = 0; i < depth; i++) {
 		if ((depth-i,BLOCK_TYPE) in symbols) {
 			if (symbols[depth-i,BLOCK_TYPE] == type)
-				return 1
+				return (1)
 		}
 	}
-	return 0
+	return (0)
 }
 
 # Evaluates to true if definitions of the given type are permitted within
@@ -670,6 +682,7 @@ $1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
 	push("rev_key", revk)
 
 	# init basic revision state
+	vars[revk,DEF_LINE] = NR
 	vars[revk,REV_START] = rev_desc[REV_START]
 	vars[revk,REV_END] = rev_desc[REV_END]
 	vars[revk,REV_NUM_OFFS] = 0
@@ -679,16 +692,25 @@ $1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
 }
 
 #
+# Extract and return the array length from the given type string.
+# Returns -1 if the type is not an array.
+#
+function type_array_len (type)
+{
+	# extract byte count[] and width
+	if (match(type, ARRAY_REGEX"$") > 0) {
+		return (substr(type, RSTART+1, RLENGTH-2))
+	} else {
+		return (-1)
+	}
+}
+
+#
 # Parse an offset declaration from the current line.
 #
 function parse_offset_segment (revk, offk)
 {
 	vid = g(BLOCK_NAME)
-
-	# assign segment id
-	seg = vars[offk,OFF_NUM_SEGS] ""
-	segk = subkey(offk, OFF_SEG, seg)
-	vars[offk,OFF_NUM_SEGS]++
 
 	# handle missing explicit type
 	type = $1
@@ -703,7 +725,7 @@ function parse_offset_segment (revk, offk)
 
 	# extract byte count[] and width
 	if (match(type, ARRAY_REGEX"$") > 0) {
-		count = substr(type, RSTART+1, RLENGTH-2)
+		count = int(substr(type, RSTART+1, RLENGTH-2))
 		type = substr(type, 1, RSTART-1)
 	} else {
 		count = 1
@@ -742,12 +764,21 @@ function parse_offset_segment (revk, offk)
 		}
 	}
 
-	vars[segk,SEG_ADDR]	= offset
-	vars[segk,SEG_WIDTH]	= width
-	vars[segk,SEG_COUNT]	= count
-	vars[segk,SEG_MASK]	= mask
-	vars[segk,SEG_SHIFT]	= shift
-	debug("{"offset", " width ", " mask ", " shift"}" _comma)
+	for (_oi = 0; _oi < count; _oi++) {
+		# assign segment id
+		seg = vars[offk,OFF_NUM_SEGS] ""
+		segk = subkey(offk, OFF_SEG, seg)
+		vars[offk,OFF_NUM_SEGS]++
+
+		vars[segk,SEG_ADDR]	= offset + (width * _oi)
+		vars[segk,SEG_WIDTH]	= width
+		vars[segk,SEG_MASK]	= mask
+		vars[segk,SEG_SHIFT]	= shift
+
+		debug("{"vars[segk,SEG_ADDR]", "width", "mask", "shift"}" \
+		   _comma)
+	}
+
 }
 
 # revision offset definition
@@ -766,6 +797,7 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 		vars[revk,REV_NUM_OFFS]++
 
 		# initialize segment count
+		vars[offk,DEF_LINE] = NR
 		vars[offk,OFF_NUM_SEGS] = 0
 
 		debug("[")
@@ -802,9 +834,8 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 
 	# Check for and remove any array[] specifier
 	base_type = type
-	if (sub(ARRAY_REGEX"$", "", base_type) > 0) {
+	if (sub(ARRAY_REGEX"$", "", base_type) > 0)
 		array = 1
-	}
 
 	# verify type
 	if (!base_type in DTYPE)
@@ -816,6 +847,7 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 		    "line " vars[name,DEF_LINE])
 
 	var_names[name] = 0
+	vars[name,VAR_NAME] = name
 	vars[name,DEF_LINE] = NR
 	vars[name,VAR_TYPE] = type
 	vars[name,NUM_REVS] = 0
