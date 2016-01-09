@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
 		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
+		05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC11C40761D005E5D51 /* cis_tuples.mm */; };
 		05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */ = {isa = PBXBuildFile; fileRef = 05FDE57E1C3721DA0035C177 /* nvram_map.c */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,8 @@
 		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		0599679E1C38DD9B00CB31ED /* nvram_map */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = nvram_map; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		0599679F1C38DFA300CB31ED /* map.awk */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = map.awk; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
+		05C56EC11C40761D005E5D51 /* cis_tuples.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_tuples.mm; sourceTree = "<group>"; };
+		05C56EC21C40761D005E5D51 /* cis_tuples.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_tuples.hpp; sourceTree = "<group>"; };
 		05FDE5041C36E4410035C177 /* aidmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aidmp.h; sourceTree = "<group>"; };
 		05FDE5051C36E4410035C177 /* amemc_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = amemc_core.h; sourceTree = "<group>"; };
 		05FDE5061C36E4410035C177 /* armca9_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armca9_core.h; sourceTree = "<group>"; };
@@ -189,6 +192,8 @@
 				059550361C35EAA80032A4AE /* main.mm */,
 				05FDE57D1C36FF7B0035C177 /* nvram_map.h */,
 				05FDE57E1C3721DA0035C177 /* nvram_map.c */,
+				05C56EC11C40761D005E5D51 /* cis_tuples.mm */,
+				05C56EC21C40761D005E5D51 /* cis_tuples.hpp */,
 			);
 			path = ccmach;
 			sourceTree = "<group>";
@@ -407,6 +412,7 @@
 			files = (
 				059550371C35EAA80032A4AE /* main.mm in Sources */,
 				05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */,
+				05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

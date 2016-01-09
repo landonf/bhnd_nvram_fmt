@@ -21,6 +21,8 @@
 #import <ObjectDoc/ObjectDoc.h>
 #import <ObjectDoc/PLClang.h>
 
+#include "cis_tuples.hpp"
+
 extern "C" {
 #include "bcm/bcmsrom_tbl.h"
 }
@@ -601,7 +603,7 @@ private:
                     printf("%u-%u", t->compat.first, t->compat.last);
                 
                 size_t vlines = 0;
-                for (const auto &val : t->values) {
+                for (__unused const auto &val : t->values) {
                     vlines++;
                 }
                 
@@ -993,7 +995,8 @@ int
 main (int argc, char * const argv[])
 {
     @autoreleasepool {
-        Extractor(argc, argv);
+        // Extractor(argc, argv);
+        enumerate_cis_tuples();
         return (0);
     }
 }

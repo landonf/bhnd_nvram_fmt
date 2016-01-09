@@ -51,6 +51,9 @@ bhnd_nvram_type_width (bhnd_nvram_dt type)
 
 #ifdef NVRAM_MAIN
 int main (int argc, char * const argv[]) {
+#else
+int nvram_main (int argc, char * const argv[]) {
+#endif
 	uint16_t sprom_ver = 2048;
 	const char *vname = argv[1];
 
@@ -75,4 +78,3 @@ int main (int argc, char * const argv[]) {
 	}
     return 0;
 }
-#endif
