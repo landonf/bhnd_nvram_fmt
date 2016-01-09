@@ -368,6 +368,8 @@ compute_literal_u32(PLClangTranslationUnit *tu, NSArray *tokens)
     for (__strong PLClangToken *t in tokens) {
         if (t.kind == PLClangTokenKindIdentifier)
             t = resolve_pre(tu, t);
+        else if (t.kind == PLClangTokenKindComment)
+            continue;
         
         switch (t.kind) {
             case PLClangTokenKindLiteral: {
@@ -395,7 +397,7 @@ compute_literal_u32(PLClangTranslationUnit *tu, NSArray *tokens)
                 op = t.spelling.UTF8String[0];
                 break;
             default:
-                errx(EXIT_FAILURE, "Unsupported token type!");
+                errx(EXIT_FAILURE, "Unsupported token type: %u", (unsigned int) t.kind);
         }
     }
 
@@ -1001,6 +1003,13 @@ public:
         
         _depth--;
         dprintf("}\n");
+        
+        for (NSString *v in [api allKeys]) {
+            if ([v hasPrefix: @"HNBU_"]) {
+                uint32_t tag = compute_literal_u32(tu, get_tokens(api[v]));
+                printf("%s=0x%x\n", v.UTF8String, tag);
+            }
+        }
     }
 };
 
