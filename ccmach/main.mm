@@ -1006,8 +1006,50 @@ public:
         
         for (NSString *v in [api allKeys]) {
             if ([v hasPrefix: @"HNBU_"]) {
-                uint32_t tag = compute_literal_u32(tu, get_tokens(api[v]));
-                printf("%s=0x%x\n", v.UTF8String, tag);
+                //uint32_t tag = compute_literal_u32(tu, get_tokens(api[v]));
+                //printf("%s=0x%x\n", v.UTF8String, tag);
+            } else if ([v hasPrefix: @"vstr_"] && ![v isEqual: @"vstr_end"]) {
+                PLClangCursor *s = api[v];
+                printf("%s:\n", s.spelling.UTF8String);
+                [s visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+                    switch (cursor.kind) {
+                        case PLClangCursorKindStringLiteral: {
+                            NSString *fmt = (NSString *) get_literal(tu, get_tokens(cursor).firstObject);
+                            printf("\tlit=%s\n", fmt.UTF8String);
+                            break;
+                        }
+                        case PLClangCursorKindInitializerListExpression: {
+                            for (PLClangToken *t in get_tokens(cursor)) {
+                
+                                switch (t.kind) {
+                                    case PLClangTokenKindLiteral: {
+                                        NSString *var_fmt;
+                                        NSString *val_fmt;
+                                        NSString *lit = (NSString *)get_literal(tu, t);
+                                        NSArray *lits = [lit componentsSeparatedByString: @"="];
+                                        var_fmt = lits[0];
+                                        val_fmt = lits[1];
+                                        
+                                        if (var_fmt != nil)
+                                            printf("\t'%s' '%s'\n", var_fmt.UTF8String, val_fmt.UTF8String);
+                                        else
+                                            errx(EXIT_FAILURE, "failed to parse multi-variable HNBU instance %s", t.spelling.UTF8String);
+                                        
+                                        break;
+                                    } default:
+                                        break;
+                                }
+                            }
+                            printf("\n");
+                            break;
+                        } case PLClangCursorKindIntegerLiteral:
+                            break;
+                        default:
+                            errx(EXIT_FAILURE, "unsupported kind %u", (unsigned int) cursor.kind);
+                    }
+                    return PLClangCursorVisitContinue;
+                }];
+//                printf("=%s\n", [get_tokens(s) componentsJoinedByString: @" "].UTF8String);
             }
         }
     }
