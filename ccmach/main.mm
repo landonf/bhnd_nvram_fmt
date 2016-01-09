@@ -980,7 +980,7 @@ private:
         
         return ret;
     }
-    
+
 public:
     Extractor(int argc, char * const argv[]) {
         NSError *error;
@@ -1159,7 +1159,6 @@ public:
                                             struct vstr e = vstr.elems[idx];
                                             
                                             tuple->vars.push_back(e);
-                                            //printf("%s[%s]: %s=%s\n", base.spelling.UTF8String, subscript.spelling.UTF8String, e.var.c_str(), e.val.c_str());
                                             return PLClangCursorVisitContinue;
                                         }
                                     }
@@ -1184,63 +1183,58 @@ public:
             }
         }];
         
-        for (const auto &cs : cis_tuples) {
+        for (auto &cs : cis_tuples) {
+            size_t idx = 0;
+            vector<vstr> addtl;
+            for (auto &vs : cs->vars) {
+                if (cs->tag.name() == "HNBU_LEDS" && vs.var == "ledbh%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), (int) idx].UTF8String;
+                } else if (cs->tag.name() == "HNBU_PO_MCS2G" && vs.var == "mcs2gpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs2gpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_PO_MCS5GM" && vs.var == "mcs5gpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs5gpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_PO_MCS5GLH" && vs.var == "mcs5glpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs5glpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_PO_MCS5GLH" && vs.var == "mcs5ghpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs5ghpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_USBSSPHY_MDIO" && vs.var == "usbssmdio%d") {
+                    // TODO
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                }
+                
+                idx++;
+            }
+            cs->vars.insert(cs->vars.end(), addtl.begin(), addtl.end());
+        }
+        
+        for (auto &cs : cis_tuples) {
             printf("%s:\n", cs->tag.name().c_str());
-            for (const auto &vs : cs->vars) {
+            for (auto &vs : cs->vars) {
+                if (vs.is_var_fmt())
+                    errx(EXIT_FAILURE, "unexpanded format string in %s", vs.var.c_str());
                 printf("\t%s\n", vs.var.c_str());
             }
         }
-        
-#if 0
-        for (NSString *v in [api allKeys]) {
-            if ([v hasPrefix: @"HNBU_"]) {
-                //uint32_t tag = compute_literal_u32(tu, get_tokens(api[v]));
-                //printf("%s=0x%x\n", v.UTF8String, tag);
-            } else if ([v hasPrefix: @"vstr_"] && ![v isEqual: @"vstr_end"]) {
-                PLClangCursor *s = api[v];
-                printf("%s:\n", s.spelling.UTF8String);
-                [s visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
-                    switch (cursor.kind) {
-                        case PLClangCursorKindStringLiteral: {
-                            NSString *fmt = (NSString *) get_literal(tu, get_tokens(cursor).firstObject);
-                            printf("\tlit=%s\n", fmt.UTF8String);
-                            break;
-                        }
-                        case PLClangCursorKindInitializerListExpression: {
-                            for (PLClangToken *t in get_tokens(cursor)) {
-                
-                                switch (t.kind) {
-                                    case PLClangTokenKindLiteral: {
-                                        NSString *var_fmt;
-                                        NSString *val_fmt;
-                                        NSString *lit = (NSString *)get_literal(tu, t);
-                                        NSArray *lits = [lit componentsSeparatedByString: @"="];
-                                        var_fmt = lits[0];
-                                        val_fmt = lits[1];
-                                        
-                                        if (var_fmt != nil)
-                                            printf("\t'%s' '%s'\n", var_fmt.UTF8String, val_fmt.UTF8String);
-                                        else
-                                            errx(EXIT_FAILURE, "failed to parse multi-variable HNBU instance %s", t.spelling.UTF8String);
-                                        
-                                        break;
-                                    } default:
-                                        break;
-                                }
-                            }
-                            printf("\n");
-                            break;
-                        } case PLClangCursorKindIntegerLiteral:
-                            break;
-                        default:
-                            errx(EXIT_FAILURE, "unsupported kind %u", (unsigned int) cursor.kind);
-                    }
-                    return PLClangCursorVisitContinue;
-                }];
-//                printf("=%s\n", [get_tokens(s) componentsJoinedByString: @" "].UTF8String);
-            }
-        }
-#endif
     }
 };
 
