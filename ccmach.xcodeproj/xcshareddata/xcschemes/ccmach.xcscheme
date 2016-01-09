@@ -68,7 +68,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "$(PROJECT_DIR)/ccmach/bcm/bcmsrom_tbl.h"
+            argument = "$(PROJECT_DIR)/ccmach/bcm/bcmsrom.c"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
