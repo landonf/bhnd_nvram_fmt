@@ -26,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		050444B71C4185760040CBAC /* bcmsrom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bcmsrom.c; sourceTree = "<group>"; };
 		0595502A1C35E97D0032A4AE /* ccmach */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ccmach; sourceTree = BUILT_PRODUCTS_DIR; };
 		059550341C35EA100032A4AE /* ObjectDoc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectDoc.framework; sourceTree = "<group>"; };
 		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -201,6 +202,7 @@
 		05FDE5031C36E4410035C177 /* bcm */ = {
 			isa = PBXGroup;
 			children = (
+				050444B71C4185760040CBAC /* bcmsrom.c */,
 				05FDE5041C36E4410035C177 /* aidmp.h */,
 				05FDE5051C36E4410035C177 /* amemc_core.h */,
 				05FDE5061C36E4410035C177 /* armca9_core.h */,

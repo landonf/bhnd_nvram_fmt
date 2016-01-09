@@ -21,7 +21,7 @@
 #ifndef	_bcmsrom_h_
 #define	_bcmsrom_h_
 
-#include <bcmsrom_fmt.h>
+#include "bcmsrom_fmt.h"
 
 /* Prototypes */
 extern int srom_var_init(si_t *sih, uint bus, void *curmap, osl_t *osh,

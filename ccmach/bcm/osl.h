@@ -21,7 +21,7 @@
 #ifndef _osl_h_
 #define _osl_h_
 
-#include <osl_decl.h>
+#include "osl_decl.h"
 
 #ifdef MACOSX
 #define OSL_PKTTAG_SZ	56
@@ -100,8 +100,8 @@ MAKE_PREFETCH_RANGE_FN(PREF_STORE_RETAINED)
 #include <cfe_osl.h>
 #elif defined(_MINOSL_)
 #include <min_osl.h>
-#elif defined(MACOSX)
-#include <macosx_osl.h>
+#elif defined(__APPLE__)
+//#include <macosx_osl.h>
 #elif defined(__NetBSD__)
 #include <bsd_osl.h>
 #elif defined(__FreeBSD__)

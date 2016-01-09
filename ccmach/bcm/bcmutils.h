@@ -1091,14 +1091,14 @@ typedef struct bcm_tlv {
 } bcm_tlv_t;
 
 /* packing is required if struct is passed across the bus */
-#include <packed_section_start.h>
+#include "packed_section_start.h"
 /* bcm tlv w/ 16 bit id/len */
 typedef BWL_PRE_PACKED_STRUCT struct bcm_xtlv {
 	uint16	id;
 	uint16	len;
 	uint8	data[1];
 } BWL_POST_PACKED_STRUCT bcm_xtlv_t;
-#include <packed_section_end.h>
+#include "packed_section_end.h"
 
 
 /* descriptor of xtlv data src or dst  */

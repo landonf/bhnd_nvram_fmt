@@ -104,6 +104,15 @@ enum {
 struct bhnd_sprom_compat {
     uint16_t	first;	/**< first compatible SPROM revision */
     uint16_t	last;	/**< last compatible SPROM revision, or BHND_SPROMREV_MAX */
+    
+    string revdesc () const {
+        if (last == BHND_SPROMREV_MAX)
+            return [NSString stringWithFormat: @">= %u", first].UTF8String;
+        else if (first == last)
+            return [NSString stringWithFormat: @"%u", first].UTF8String;
+        else
+            return [NSString stringWithFormat: @"%u-%u", first, last].UTF8String;
+    }
 };
 
 static const char *width_tostring (size_t width) {
@@ -188,9 +197,19 @@ struct bhnd_sprom_var {
     }
 };
 
+struct st_pathcfg {
+    bhnd_sprom_compat compat;
+    string addr_const_prefix;
+    string count_const;
+};
+
+struct bhnd_sprom_struct {
+    
+};
+
 /** NVRAM variable definition */
 struct bhnd_nvram_var {
-    std::string		name;		/**< variable name */
+    std::string		name;		/**< variable base name */
     bhnd_nvram_dt		 type;		/**< base data type */
     bhnd_nvram_fmt		 fmt;		/**< string format */
     uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
@@ -594,13 +613,7 @@ private:
             });
             
             for (const auto &t : v->sprom_descs) {
-                dprintf("srom ");
-                if (t->compat.last == BHND_SPROMREV_MAX)
-                    printf(">= %u", t->compat.first);
-                else if (t->compat.first == t->compat.last)
-                    printf("%u", t->compat.first);
-                else
-                    printf("%u-%u", t->compat.first, t->compat.last);
+                dprintf("srom %s", t->compat.revdesc().c_str());
                 
                 size_t vlines = 0;
                 for (__unused const auto &val : t->values) {
@@ -995,8 +1008,8 @@ int
 main (int argc, char * const argv[])
 {
     @autoreleasepool {
-        // Extractor(argc, argv);
-        enumerate_cis_tuples();
+        Extractor(argc, argv);
+        // enumerate_cis_tuples();
         return (0);
     }
 }

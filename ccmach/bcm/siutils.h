@@ -175,7 +175,7 @@ typedef void (*gci_gpio_handler_t)(uint32 stat, void *arg);
 #define	ARMCR4_BSZ_MULT		8192
 #endif /* BCMDONGLEHOST */
 
-#include <osl_decl.h>
+#include "osl_decl.h"
 /* === exported functions === */
 extern si_t *si_attach(uint pcidev, osl_t *osh, void *regs, uint bustype,
                        void *sdh, char **vars, uint *varsz);
