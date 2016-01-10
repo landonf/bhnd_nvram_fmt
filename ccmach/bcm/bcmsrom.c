@@ -2848,12 +2848,16 @@ static const char BCMATTACHDATA(vstr_cctl)[] = "cctl=0x%x";
 static const char BCMATTACHDATA(vstr_cckpo)[] = "cckpo=0x%x";
 static const char BCMATTACHDATA(vstr_ofdmpo)[] = "ofdmpo=0x%x";
 static const char BCMATTACHDATA(vstr_rdlid)[] = "rdlid=0x%x";
+#ifdef BCM_BOOTLOADER
 static const char BCMATTACHDATA(vstr_rdlrndis)[] = "rdlrndis=%d";
 static const char BCMATTACHDATA(vstr_rdlrwu)[] = "rdlrwu=%d";
+#endif
 static const char BCMATTACHDATA(vstr_usbfs)[] = "usbfs=%d";
 static const char BCMATTACHDATA(vstr_wpsgpio)[] = "wpsgpio=%d";
 static const char BCMATTACHDATA(vstr_wpsled)[] = "wpsled=%d";
+#ifdef BCM_BOOTLOADER
 static const char BCMATTACHDATA(vstr_rdlsn)[] = "rdlsn=%d";
+#endif
 static const char BCMATTACHDATA(vstr_rssismf2g)[] = "rssismf2g=%d";
 static const char BCMATTACHDATA(vstr_rssismc2g)[] = "rssismc2g=%d";
 static const char BCMATTACHDATA(vstr_rssisav2g)[] = "rssisav2g=%d";

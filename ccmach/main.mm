@@ -877,6 +877,9 @@ private:
     struct vstr {
         string var;
         string val;
+        PLClangCursor *vstr_global;
+        
+        vstr (string _var, string _val, PLClangCursor *glbl) : var(_var), val(_val), vstr_global(glbl) {}
         
         bool is_var_fmt () const { return var.find("%") != string::npos; }
     };
@@ -932,10 +935,10 @@ private:
         return varstr;
     }
 
-    vstr_decl extract_vstr (PLClangCursor *cursor, NSArray *fmtargs) {
+    vstr_decl extract_vstr (PLClangCursor *def, NSArray *fmtargs) {
         __block vstr_decl ret;
 
-        [cursor visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+        [def visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
             switch (cursor.kind) {
                 case PLClangCursorKindStringLiteral: {
                     NSString *var_fmt;
@@ -945,8 +948,7 @@ private:
                     var_fmt = apply_fmt_lits(lits[0], fmtargs);
                     val_fmt = lits[1];
                     
-                    vstr e = {var_fmt.UTF8String, val_fmt.UTF8String};
-                    ret.elems.push_back(e);
+                    ret.elems.emplace_back(var_fmt.UTF8String, val_fmt.UTF8String, def);
                     break;
                 }
                 case PLClangCursorKindInitializerListExpression: {
@@ -961,9 +963,7 @@ private:
                                 var_fmt = apply_fmt_lits(lits[0], fmtargs);
                                 val_fmt = lits[1];
                                 
-                                vstr e = {var_fmt.UTF8String, val_fmt.UTF8String};
-                                ret.elems.push_back(e);
-                                
+                                ret.elems.emplace_back(var_fmt.UTF8String, val_fmt.UTF8String, def);
                                 break;
                             } default:
                                 break;
@@ -979,6 +979,147 @@ private:
         }];
         
         return ret;
+    }
+    
+    vector<shared_ptr<cis_tuple>> extract_cis_tuples () {
+        PLClangCursor *srom_parsecis = api[@"srom_parsecis(osl_t *, uint8 **, uint, char **, uint *)"];
+        if (srom_parsecis == nil)
+            errx(EXIT_FAILURE, "srom_parsecis() not found");
+        
+        __block NSString *hnbu_sect = nil;
+        __block vector<shared_ptr<cis_tuple>> cis_tuples;
+        __block shared_ptr<cis_tuple> tuple;
+        
+        [srom_parsecis visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+            if (cursor.kind == PLClangCursorKindSwitchStatement) {
+                [cursor visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+                    if (cursor.kind == PLClangCursorKindCaseStatement) {
+                        PLClangToken *caseval = get_tokens(cursor)[1];
+                        if ([caseval.spelling hasPrefix: @"HNBU_"] || [caseval.spelling hasPrefix: @"CISTPL_"]) {
+                            hnbu_sect = caseval.spelling;
+                            
+                            tuple = make_shared<cis_tuple>();
+                            tuple->tag = {caseval};
+                            cis_tuples.push_back(tuple);
+                        }
+                    } else if (cursor.kind == PLClangCursorKindCallExpression) {
+                        NSString *fn = cursor.spelling;
+                        if ([fn isEqual: @"varbuf_append"]) {
+                            NSArray *args = cursor.arguments;
+                            NSArray *vap = [args subarrayWithRange: NSMakeRange(2, args.count - 2)];
+                            PLClangCursor *vs_arg = args[1];
+                            
+                            if (vs_arg.kind == PLClangCursorKindVariableReference || vs_arg.kind == PLClangCursorKindDeclarationReferenceExpression) {
+                                if ([vs_arg.spelling hasPrefix: @"vstr_"]) {
+                                    auto vstr = extract_vstr(vs_arg.definition, vap);
+                                    if (vstr.elems.size() != 1)
+                                        errx(EXIT_FAILURE, "parsed too-large vstr: %s", vs_arg.definition.spelling.UTF8String);
+                                    
+                                    tuple->vars.push_back(vstr.elems[0]);
+                                }
+                            } else {
+                                [vs_arg visitChildrenUsingBlock: ^PLClangCursorVisitResult(PLClangCursor *cursor) {
+                                    if (cursor.kind == PLClangCursorKindArraySubscriptExpression) {
+                                        auto tokens = get_tokens(cursor);
+                                        PLClangToken *base = tokens[0];
+                                        PLClangToken *subscript = tokens[2];
+                                        if ([base.spelling hasPrefix: @"vstr_"]) {
+                                            uint32_t idx = (uint32_t) [(NSNumber *) get_literal(tu, subscript) unsignedIntegerValue];
+                                            auto vstr = extract_vstr(base.cursor.definition, vap);
+                                            struct vstr e = vstr.elems[idx];
+                                            
+                                            tuple->vars.push_back(e);
+                                            return PLClangCursorVisitContinue;
+                                        }
+                                    }
+                                    
+                                    if (cursor.kind == PLClangCursorKindVariableReference || cursor.kind == PLClangCursorKindDeclarationReferenceExpression) {
+                                        if ([cursor.spelling hasPrefix: @"vstr_"]) {
+                                            auto vstr = extract_vstr(cursor.definition, vap);
+                                            tuple->vars.insert(tuple->vars.end(), vstr.elems.begin(), vstr.elems.end());
+                                        }
+                                    }
+                                    return PLClangCursorVisitRecurse;
+                                }];
+                            }
+                        }
+                    }
+                    
+                    return PLClangCursorVisitRecurse;
+                }];
+                return PLClangCursorVisitContinue;
+            } else {
+                return PLClangCursorVisitRecurse;
+            }
+        }];
+        
+        for (auto &cs : cis_tuples) {
+            size_t idx = 0;
+            vector<vstr> addtl;
+            
+            for (auto &vs : cs->vars) {
+                if (cs->tag.name() == "HNBU_LEDS" && vs.var == "ledbh%d") {
+                    // XXX: this only works if there are no other variables in HNBU_LEDS
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), (int) idx].UTF8String;
+                } else if (cs->tag.name() == "HNBU_PO_MCS2G" && vs.var == "mcs2gpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs2gpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_PO_MCS5GM" && vs.var == "mcs5gpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs5gpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_PO_MCS5GLH" && vs.var == "mcs5glpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs5glpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_PO_MCS5GLH" && vs.var == "mcs5ghpo%d") {
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                    for (int i = 1; i < 8; i++) {
+                        vstr vap = vs;
+                        vap.var = [NSString stringWithFormat: @"mcs5ghpo%d", i].UTF8String;
+                        addtl.push_back(vap);
+                    }
+                } else if (cs->tag.name() == "HNBU_USBSSPHY_MDIO" && vs.var == "usbssmdio%d") {
+                    // TODO
+                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                }
+
+                idx++;
+            }
+            
+            if (cs->tag.name() == "HNBU_BOARDNUM") {
+                // XXX: implicit; the boardnum may also be specified elsewhere
+                PLClangCursor *c = api[@"vstr_boardnum"];
+                if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_boardnum`");
+                addtl.emplace_back("boardnum", "%d", c);
+            } else if (cs->tag.name() == "HNBU_MACADDR") {
+                // XXX: may also be specified elsewhere
+                PLClangCursor *c = api[@"vstr_macaddr"];
+                if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_macaddr`");
+                addtl.emplace_back("macaddr", "%d", c);
+            }
+            
+            cs->vars.insert(cs->vars.end(), addtl.begin(), addtl.end());
+        }
+        
+        for (auto &cs : cis_tuples) {
+            for (auto &vs : cs->vars) {
+                if (vs.is_var_fmt())
+                    errx(EXIT_FAILURE, "unexpanded format string in %s", vs.var.c_str());
+            }
+        }
+        
+        return cis_tuples;
     }
 
 public:
@@ -1053,10 +1194,14 @@ public:
         api = symbols;
 
         /* Output all PCI sromvars */
+        unordered_set<string> srom_vars;
         auto nvars = extract_nvars(@"pci_sromvars");
         auto vars = convert_nvars(nvars);
         output_vars(vars);
-
+        for (const auto &v : vars) {
+            srom_vars.insert(v->name);
+        }
+    
         /* Output the per-path vars */
         auto path_nvars = extract_nvars(@"perpath_pci_sromvars");
         auto path_vars = convert_nvars(path_nvars);
@@ -1064,11 +1209,11 @@ public:
         struct pathcfg {
             NSString *path_pfx;
             NSString *path_num;
-            const char *revdesc;
+            bhnd_sprom_compat compat;
         } pathcfgs[] = {
-            { @"SROM4_PATH",    @"MAX_PATH_SROM",       "srom 4-7" },
-            { @"SROM8_PATH",    @"MAX_PATH_SROM",       "srom 8-10" },
-            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    "srom >= 11" },
+            { @"SROM4_PATH",    @"MAX_PATH_SROM",       {4, 7}},
+            { @"SROM8_PATH",    @"MAX_PATH_SROM",       {8, 10}},
+            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    {11, BHND_SPROMREV_MAX}},
             { nil, nil }
         };
 
@@ -1092,7 +1237,7 @@ public:
                 errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
             uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
     
-            dprintf("%s\t[", cfg->revdesc);
+            dprintf("srom %s\t[", cfg->compat.revdesc().c_str());
             for (uint32_t i = 0; i < max; i++) {
                 NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
                 PLClangCursor *c = api[path];
@@ -1102,6 +1247,14 @@ public:
                 printf("0x%04zX", offset*sizeof(uint16_t));
                 if (i+1 != max)
                     printf(", ");
+                
+                for (const auto &v : path_vars) {
+                    for (const auto &sp : v->sprom_descs) {
+                        if (sp->compat.first >= cfg->compat.first && sp->compat.first <= cfg->compat.last) {
+                            srom_vars.insert([NSString stringWithFormat: @"%s%u", v->name.c_str(), i].UTF8String);
+                        }
+                    }
+                }
             }
             printf("]\n");
         }
@@ -1112,129 +1265,59 @@ public:
         _depth--;
         dprintf("}\n");
 
-        PLClangCursor *srom_parsecis = api[@"srom_parsecis(osl_t *, uint8 **, uint, char **, uint *)"];
-        if (srom_parsecis == nil)
-            errx(EXIT_FAILURE, "srom_parsecis() not found");
-        
-        __block NSString *hnbu_sect = nil;
-        __block vector<shared_ptr<cis_tuple>> cis_tuples;
-        __block shared_ptr<cis_tuple> tuple;
+        /* Report SROM/CIS differences */
+        auto cis_tuples = extract_cis_tuples();
+        NSMutableSet *unclaimedCISVSTR = [NSMutableSet set];
+        NSSet *allVSTR;
+        for (NSString *vs in [api allKeys])
+            if ([vs hasPrefix: @"vstr_"])
+                [unclaimedCISVSTR addObject: vs];
+        allVSTR = [unclaimedCISVSTR copy];
+        [unclaimedCISVSTR removeObject: @"vstr_end"]; // terminator
 
-        [srom_parsecis visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
-            if (cursor.kind == PLClangCursorKindSwitchStatement) {
-                [cursor visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
-                    if (cursor.kind == PLClangCursorKindCaseStatement) {
-                        PLClangToken *caseval = get_tokens(cursor)[1];
-                        if ([caseval.spelling hasPrefix: @"HNBU_"] || [caseval.spelling hasPrefix: @"CISTPL_"]) {
-                            hnbu_sect = caseval.spelling;
-                            
-                            tuple = make_shared<cis_tuple>();
-                            tuple->tag = {caseval};
-                            cis_tuples.push_back(tuple);
-                        }
-                    } else if (cursor.kind == PLClangCursorKindCallExpression) {
-                        NSString *fn = cursor.spelling;
-                        if ([fn isEqual: @"varbuf_append"]) {
-                            NSArray *args = cursor.arguments;
-                            NSArray *vap = [args subarrayWithRange: NSMakeRange(2, args.count - 2)];
-                            PLClangCursor *vs_arg = args[1];
-
-                            if (vs_arg.kind == PLClangCursorKindVariableReference || vs_arg.kind == PLClangCursorKindDeclarationReferenceExpression) {
-                                if ([vs_arg.spelling hasPrefix: @"vstr_"]) {
-                                    auto vstr = extract_vstr(vs_arg.definition, vap);
-                                    if (vstr.elems.size() != 1)
-                                        errx(EXIT_FAILURE, "parsed too-large vstr: %s", vs_arg.definition.spelling.UTF8String);
-                                    
-                                    tuple->vars.push_back(vstr.elems[0]);
-                                }
-                            } else {
-                                [vs_arg visitChildrenUsingBlock: ^PLClangCursorVisitResult(PLClangCursor *cursor) {
-                                    if (cursor.kind == PLClangCursorKindArraySubscriptExpression) {
-                                        auto tokens = get_tokens(cursor);
-                                        PLClangToken *base = tokens[0];
-                                        PLClangToken *subscript = tokens[2];
-                                        if ([base.spelling hasPrefix: @"vstr_"]) {
-                                            uint32_t idx = (uint32_t) [(NSNumber *) get_literal(tu, subscript) unsignedIntegerValue];
-                                            auto vstr = extract_vstr(base.cursor.definition, vap);
-                                            struct vstr e = vstr.elems[idx];
-                                            
-                                            tuple->vars.push_back(e);
-                                            return PLClangCursorVisitContinue;
-                                        }
-                                    }
-                                    
-                                    if (cursor.kind == PLClangCursorKindVariableReference || cursor.kind == PLClangCursorKindDeclarationReferenceExpression) {
-                                        if ([cursor.spelling hasPrefix: @"vstr_"]) {
-                                            auto vstr = extract_vstr(cursor.definition, vap);
-                                            tuple->vars.insert(tuple->vars.end(), vstr.elems.begin(), vstr.elems.end());
-                                        }
-                                    }
-                                    return PLClangCursorVisitRecurse;
-                                }];
-                            }
-                        }
-                    }
-                    
-                    return PLClangCursorVisitRecurse;
-                }];
-                return PLClangCursorVisitContinue;
-            } else {
-                return PLClangCursorVisitRecurse;
-            }
-        }];
-        
+        unordered_set<string> cis_vars;
         for (auto &cs : cis_tuples) {
-            size_t idx = 0;
-            vector<vstr> addtl;
             for (auto &vs : cs->vars) {
-                if (cs->tag.name() == "HNBU_LEDS" && vs.var == "ledbh%d") {
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), (int) idx].UTF8String;
-                } else if (cs->tag.name() == "HNBU_PO_MCS2G" && vs.var == "mcs2gpo%d") {
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
-                    for (int i = 1; i < 8; i++) {
-                        vstr vap = vs;
-                        vap.var = [NSString stringWithFormat: @"mcs2gpo%d", i].UTF8String;
-                        addtl.push_back(vap);
-                    }
-                } else if (cs->tag.name() == "HNBU_PO_MCS5GM" && vs.var == "mcs5gpo%d") {
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
-                    for (int i = 1; i < 8; i++) {
-                        vstr vap = vs;
-                        vap.var = [NSString stringWithFormat: @"mcs5gpo%d", i].UTF8String;
-                        addtl.push_back(vap);
-                    }
-                } else if (cs->tag.name() == "HNBU_PO_MCS5GLH" && vs.var == "mcs5glpo%d") {
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
-                    for (int i = 1; i < 8; i++) {
-                        vstr vap = vs;
-                        vap.var = [NSString stringWithFormat: @"mcs5glpo%d", i].UTF8String;
-                        addtl.push_back(vap);
-                    }
-                } else if (cs->tag.name() == "HNBU_PO_MCS5GLH" && vs.var == "mcs5ghpo%d") {
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
-                    for (int i = 1; i < 8; i++) {
-                        vstr vap = vs;
-                        vap.var = [NSString stringWithFormat: @"mcs5ghpo%d", i].UTF8String;
-                        addtl.push_back(vap);
-                    }
-                } else if (cs->tag.name() == "HNBU_USBSSPHY_MDIO" && vs.var == "usbssmdio%d") {
-                    // TODO
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
+                if ([allVSTR containsObject: vs.vstr_global.spelling]) {
+                    [unclaimedCISVSTR removeObject: vs.vstr_global.spelling];
+                } else {
+                    errx(EXIT_FAILURE, "vstr global '%s' not found", vs.vstr_global.spelling.UTF8String);
                 }
-                
-                idx++;
+                cis_vars.insert(vs.var);
             }
-            cs->vars.insert(cs->vars.end(), addtl.begin(), addtl.end());
         }
         
-        for (auto &cs : cis_tuples) {
-            printf("%s:\n", cs->tag.name().c_str());
-            for (auto &vs : cs->vars) {
-                if (vs.is_var_fmt())
-                    errx(EXIT_FAILURE, "unexpanded format string in %s", vs.var.c_str());
-                printf("\t%s\n", vs.var.c_str());
-            }
-        }
+
+    
+        vector<string> srom_undef;
+        vector<string> cis_undef;
+        for (const auto &v : cis_vars)
+            if (srom_vars.count(v) == 0)
+                srom_undef.push_back(v);
+        
+        for (const auto &v : srom_vars)
+            if (cis_vars.count(v) == 0)
+                cis_undef.push_back(v);
+        
+        sort(srom_undef.begin(), srom_undef.end(), [](const string &lhs, string &rhs) {
+            return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
+        });
+        
+        sort(cis_undef.begin(), cis_undef.end(), [](const string &lhs, string &rhs) {
+            return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
+        });
+
+        fprintf(stderr, "SROM vars not defined in CIS:\n");
+        for (const auto &v : cis_undef)
+            fprintf(stderr, "\t%s\n", v.c_str());
+
+        fprintf(stderr, "CIS vars not defined in SPROM:\n");
+        for (const auto &v : srom_undef)
+            fprintf(stderr, "\t%s\n", v.c_str());
+
+        fprintf(stderr, "CIS vstr_* globals unclaimed by CIS code:\n");
+        for (NSString *vstr in unclaimedCISVSTR)
+            fprintf(stderr, "\t%s\n", vstr.UTF8String);
     }
 };
 
