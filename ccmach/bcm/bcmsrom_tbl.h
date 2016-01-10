@@ -778,21 +778,40 @@ typedef struct {
 	const char *vars;
 } pavars_t;
 
+/* band range returned by band_range iovar */
+#define WL_CHAN_FREQ_RANGE_2G      0
+#define WL_CHAN_FREQ_RANGE_5GL     1
+#define WL_CHAN_FREQ_RANGE_5GM     2
+#define WL_CHAN_FREQ_RANGE_5GH     3
+
+#define WL_CHAN_FREQ_RANGE_5GLL_5BAND    4
+#define WL_CHAN_FREQ_RANGE_5GLH_5BAND    5
+#define WL_CHAN_FREQ_RANGE_5GML_5BAND    6
+#define WL_CHAN_FREQ_RANGE_5GMH_5BAND    7
+#define WL_CHAN_FREQ_RANGE_5GH_5BAND     8
+
+#define WL_CHAN_FREQ_RANGE_5G_BAND0     1
+#define WL_CHAN_FREQ_RANGE_5G_BAND1     2
+#define WL_CHAN_FREQ_RANGE_5G_BAND2     3
+#define WL_CHAN_FREQ_RANGE_5G_BAND3     4
+
+#define WL_CHAN_FREQ_RANGE_5G_4BAND	5
+
 static const pavars_t pavars[] = {
 	/* HTPHY */
 	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_2G,  0, "pa2gw0a0 pa2gw1a0 pa2gw2a0"},
 	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_2G,  1, "pa2gw0a1 pa2gw1a1 pa2gw2a1"},
 	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_2G,  2, "pa2gw0a2 pa2gw1a2 pa2gw2a2"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND0, 0, "pa5glw0a0 pa5glw1a0 pa5glw2a0"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND0, 1, "pa5glw0a1 pa5glw1a1 pa5glw2a1"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND0, 2, "pa5glw0a2 pa5glw1a2 pa5glw2a2"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND1, 0, "pa5gw0a0 pa5gw1a0 pa5gw2a0"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND1, 1, "pa5gw0a1 pa5gw1a1 pa5gw2a1"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND1, 2, "pa5gw0a2 pa5gw1a2 pa5gw2a2"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND2, 0, "pa5ghw0a0 pa5ghw1a0 pa5ghw2a0"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND2, 1, "pa5ghw0a1 pa5ghw1a1 pa5ghw2a1"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND2, 2, "pa5ghw0a2 pa5ghw1a2 pa5ghw2a2"},
-	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND3, 0, "pa5gw0a3 pa5gw1a3 pa5gw2a3"},
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND0, 0, "pa5glw0a0 pa5glw1a0 pa5glw2a0"}, // WL_CHAN_FREQ_RANGE_5GL
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND0, 1, "pa5glw0a1 pa5glw1a1 pa5glw2a1"}, // WL_CHAN_FREQ_RANGE_5GL
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND0, 2, "pa5glw0a2 pa5glw1a2 pa5glw2a2"}, // WL_CHAN_FREQ_RANGE_5GL
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND1, 0, "pa5gw0a0 pa5gw1a0 pa5gw2a0"},    // WL_CHAN_FREQ_RANGE_5GM
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND1, 1, "pa5gw0a1 pa5gw1a1 pa5gw2a1"},    // WL_CHAN_FREQ_RANGE_5GM
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND1, 2, "pa5gw0a2 pa5gw1a2 pa5gw2a2"},    // WL_CHAN_FREQ_RANGE_5GM
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND2, 0, "pa5ghw0a0 pa5ghw1a0 pa5ghw2a0"}, // WL_CHAN_FREQ_RANGE_5GH
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND2, 1, "pa5ghw0a1 pa5ghw1a1 pa5ghw2a1"}, // WL_CHAN_FREQ_RANGE_5GH
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND2, 2, "pa5ghw0a2 pa5ghw1a2 pa5ghw2a2"}, // WL_CHAN_FREQ_RANGE_5GH
+	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND3, 0, "pa5gw0a3 pa5gw1a3 pa5gw2a3"},    
 	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND3, 1,  "pa5glw0a3 pa5glw1a3 pa5glw2a3"},
 	{PHY_TYPE_HT, WL_CHAN_FREQ_RANGE_5G_BAND3, 2, "pa5ghw0a3 pa5ghw1a3 pa5ghw2a3"},
 	/* NPHY */

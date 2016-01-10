@@ -34,7 +34,12 @@ static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
 /** A symbolic constant definition */
 struct symbolic_constant {
+    PLClangTranslationUnit *tu;
     PLClangToken           *token;
+
+    uint32_t u32_value () {
+        return compute_literal_u32(tu, [tu tokensForSourceRange: token.cursor.extent]);
+    }
     std::string name() const { return token.spelling.UTF8String; }
 };
 
@@ -63,7 +68,46 @@ struct nvar {
     }
 };
 
+class PHY {
+public:
+    int ptype;
+    string name () const {
+        switch (ptype) {
+            case PHY_TYPE_HT: return "HT";
+            case PHY_TYPE_N: return "N";
+            case PHY_TYPE_LP: return "LP";
+            case PHY_TYPE_AC: return "AC";
+            case PHY_TYPE_NULL: return "NULL";
+            default:
+                errx(EXIT_FAILURE, "unknown PHY type %d", ptype);
+        }
+    };
+};
 
+class Band {
+public:
+    int btype;
+    string band_name () {
+        switch (btype) {
+            case WL_CHAN_FREQ_RANGE_2G:         return "2G";
+            case WL_CHAN_FREQ_RANGE_5G_BAND0:   return "5G U-NII-1 Low";
+            case WL_CHAN_FREQ_RANGE_5G_BAND1:   return "5G U-NII-2 Mid";
+            case WL_CHAN_FREQ_RANGE_5G_BAND2:   return "5G U-NII-3 High";
+            case WL_CHAN_FREQ_RANGE_5G_BAND3:   return "5G U-NII-2e Worldwide"; // XXX ??? is this right
+            case WL_CHAN_FREQ_RANGE_5G_4BAND:   return "5G (all bands)";
+            default:                            errx(EXIT_FAILURE, "unknown band range %d", btype);
+        }
+    }
+};
+
+class PHYBand {
+public:
+    PHY phy;
+    Band band;
+    string description () {
+        return (phy.name() + " " + band.band_name());
+    }
+};
 
 /*
  * A copy of our output target's types, modified to support generating
@@ -196,16 +240,6 @@ struct bhnd_sprom_var {
     }
 };
 
-struct st_pathcfg {
-    bhnd_sprom_compat compat;
-    string addr_const_prefix;
-    string count_const;
-};
-
-struct bhnd_sprom_struct {
-    
-};
-
 /** NVRAM variable definition */
 struct bhnd_nvram_var {
     std::string		name;		/**< variable base name */
@@ -299,9 +333,6 @@ struct bhnd_nvram_var {
         return ([@(name.c_str()) compare:@(other.name.c_str()) options:NSNumericSearch] == NSOrderedAscending);
     }
 };
-
-
-static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
 
 static PLClangToken *
 resolve_pre(PLClangTranslationUnit *tu, PLClangToken *t) {
@@ -875,13 +906,57 @@ private:
 
     /* vstr_ constant */
     struct vstr {
+        symbolic_constant tag;
         string var;
         string val;
         PLClangCursor *vstr_global;
         
-        vstr (string _var, string _val, PLClangCursor *glbl) : var(_var), val(_val), vstr_global(glbl) {}
+        vstr (symbolic_constant _tag, string _var, string _val, PLClangCursor *glbl) : tag(_tag), var(_var), val(_val), vstr_global(glbl) {}
         
         bool is_var_fmt () const { return var.find("%") != string::npos; }
+        
+        const cis_tuple_t *hnbu_entry () {
+            uint32_t tagval = tag.u32_value();
+            for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
+                auto tgtvar = var;
+
+                if (t->tag != tagval)
+                    continue;
+                
+                auto vars = [@(t->params) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+                for (NSString *v in vars) {
+                    const char *cstr = v.UTF8String;
+                    const char *p;
+                    
+                    for (p = cstr; isdigit(*p) || *p == '*'; p++);
+                    auto offset = p - cstr;
+                    NSString *tv = [v substringFromIndex: offset];
+                    if (![tv isEqual: @(var.c_str())])
+                        continue;
+
+                    return (t);
+                }
+                
+                return (NULL);
+            }
+            
+            return (NULL);
+        }
+        
+        bool has_hnbu_entry () {
+            return (hnbu_entry() != NULL);
+        }
+
+        bhnd_sprom_compat compat () {
+            const cis_tuple_t *t = hnbu_entry();
+            if (t == NULL) {
+                errx(EXIT_FAILURE, "%s variable not found in cis_hnbuvars table\n", var.c_str());
+            }
+
+            uint16_t first_ver = __builtin_ctz(t->revmask);
+            uint16_t last_ver = 31 - __builtin_clz(t->revmask);
+            return {first_ver, last_ver};
+        }
     };
     
     struct vstr_decl {
@@ -935,7 +1010,7 @@ private:
         return varstr;
     }
 
-    vstr_decl extract_vstr (PLClangCursor *def, NSArray *fmtargs) {
+    vstr_decl extract_vstr (const symbolic_constant &tag, PLClangCursor *def, NSArray *fmtargs) {
         __block vstr_decl ret;
 
         [def visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
@@ -948,7 +1023,7 @@ private:
                     var_fmt = apply_fmt_lits(lits[0], fmtargs);
                     val_fmt = lits[1];
                     
-                    ret.elems.emplace_back(var_fmt.UTF8String, val_fmt.UTF8String, def);
+                    ret.elems.emplace_back(tag, var_fmt.UTF8String, val_fmt.UTF8String, def);
                     break;
                 }
                 case PLClangCursorKindInitializerListExpression: {
@@ -963,7 +1038,7 @@ private:
                                 var_fmt = apply_fmt_lits(lits[0], fmtargs);
                                 val_fmt = lits[1];
                                 
-                                ret.elems.emplace_back(var_fmt.UTF8String, val_fmt.UTF8String, def);
+                                ret.elems.emplace_back(tag, var_fmt.UTF8String, val_fmt.UTF8String, def);
                                 break;
                             } default:
                                 break;
@@ -999,7 +1074,7 @@ private:
                             hnbu_sect = caseval.spelling;
                             
                             tuple = make_shared<cis_tuple>();
-                            tuple->tag = {caseval};
+                            tuple->tag = {tu, caseval};
                             cis_tuples.push_back(tuple);
                         }
                     } else if (cursor.kind == PLClangCursorKindCallExpression) {
@@ -1011,7 +1086,7 @@ private:
                             
                             if (vs_arg.kind == PLClangCursorKindVariableReference || vs_arg.kind == PLClangCursorKindDeclarationReferenceExpression) {
                                 if ([vs_arg.spelling hasPrefix: @"vstr_"]) {
-                                    auto vstr = extract_vstr(vs_arg.definition, vap);
+                                    auto vstr = extract_vstr(tuple->tag, vs_arg.definition, vap);
                                     if (vstr.elems.size() != 1)
                                         errx(EXIT_FAILURE, "parsed too-large vstr: %s", vs_arg.definition.spelling.UTF8String);
                                     
@@ -1025,7 +1100,7 @@ private:
                                         PLClangToken *subscript = tokens[2];
                                         if ([base.spelling hasPrefix: @"vstr_"]) {
                                             uint32_t idx = (uint32_t) [(NSNumber *) get_literal(tu, subscript) unsignedIntegerValue];
-                                            auto vstr = extract_vstr(base.cursor.definition, vap);
+                                            auto vstr = extract_vstr(tuple->tag, base.cursor.definition, vap);
                                             struct vstr e = vstr.elems[idx];
                                             
                                             tuple->vars.push_back(e);
@@ -1035,7 +1110,7 @@ private:
                                     
                                     if (cursor.kind == PLClangCursorKindVariableReference || cursor.kind == PLClangCursorKindDeclarationReferenceExpression) {
                                         if ([cursor.spelling hasPrefix: @"vstr_"]) {
-                                            auto vstr = extract_vstr(cursor.definition, vap);
+                                            auto vstr = extract_vstr(tuple->tag, cursor.definition, vap);
                                             tuple->vars.insert(tuple->vars.end(), vstr.elems.begin(), vstr.elems.end());
                                         }
                                     }
@@ -1101,12 +1176,12 @@ private:
                 // XXX: implicit; the boardnum may also be specified elsewhere
                 PLClangCursor *c = api[@"vstr_boardnum"];
                 if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_boardnum`");
-                addtl.emplace_back("boardnum", "%d", c);
+                addtl.emplace_back(cs->tag, "boardnum", "%d", c);
             } else if (cs->tag.name() == "HNBU_MACADDR") {
                 // XXX: may also be specified elsewhere
                 PLClangCursor *c = api[@"vstr_macaddr"];
                 if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_macaddr`");
-                addtl.emplace_back("macaddr", "%d", c);
+                addtl.emplace_back(cs->tag, "macaddr", "%d", c);
             }
             
             cs->vars.insert(cs->vars.end(), addtl.begin(), addtl.end());
@@ -1284,6 +1359,32 @@ public:
                     errx(EXIT_FAILURE, "vstr global '%s' not found", vs.vstr_global.spelling.UTF8String);
                 }
                 cis_vars.insert(vs.var);
+                
+                /* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
+                 * as the subdevid */
+                if (vs.tag.name() == "HNBU_CHIPID" && vs.var == "boardtype")
+                    continue;
+
+                printf("%s:%s ", vs.tag.name().c_str(), vs.var.c_str());
+
+                if (vs.has_hnbu_entry()) {
+                    auto c = vs.compat();
+                    printf("(%hu-%hu)\n", c.first, c.last);
+                } else {
+                    uint32_t revs = 0;
+                    for (const sromvar_t *srv = pci_sromvars; srv->name != NULL; srv++)
+                        if (strcmp(srv->name, vs.var.c_str()) == 0)
+                            revs |= srv->revmask;
+                    
+                    if (revs == 0) {
+                        printf("(unknown revs)\n");
+                    } else {
+                        uint16_t first_ver = __builtin_ctz(revs);
+                        uint16_t last_ver = 31 - __builtin_clz(revs);
+                        printf("(srom %hu-%hu)\n", first_ver, last_ver);
+
+                    }
+                }
             }
         }
         
