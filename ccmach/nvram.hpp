@@ -62,7 +62,7 @@ enum {
 /** SPROM revision compatibility declaration */
 class compat_range {
 public:
-	static const uint8_t MAX_SPROMREV = 31;	/**< maximum supported SPROM revision */
+	static const uint8_t MAX_SPROMREV;
 
 	PL_RECORD_FIELDS(compat_range,
 		(uint8_t, first),	/**< first compatible SPROM revision */

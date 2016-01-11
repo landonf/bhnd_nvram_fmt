@@ -10,6 +10,8 @@
 
 using namespace nvram;
 
+const uint8_t nvram::compat_range::MAX_SPROMREV = 31;	/**< maximum supported SPROM revision */
+
 prop_type nvram::prop_type_widen (prop_type operand) {
     switch (operand) {
         case BHND_T_UINT8:

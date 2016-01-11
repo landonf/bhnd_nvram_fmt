@@ -76,7 +76,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-#define ASSERT(...)
+static inline void ASSERT(bool assertion) {};
 
 extern char *getvar(char *vars, const char *name);
 

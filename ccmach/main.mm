@@ -516,8 +516,9 @@ private:
         string var;
         string val;
         PLClangCursor *vstr_global;
+        uint32_t asserted_revmask = 0;
         
-        vstr (symbolic_constant _tag, string _var, string _val, PLClangCursor *glbl) : tag(_tag), var(_var), val(_val), vstr_global(glbl) {}
+        vstr (symbolic_constant _tag, string _var, string _val, PLClangCursor *glbl, uint32_t _asserted_revmask) : tag(_tag), var(_var), val(_val), vstr_global(glbl), asserted_revmask(_asserted_revmask) {}
         
         bool is_var_fmt () const { return var.find("%") != string::npos; }
         
@@ -614,7 +615,7 @@ private:
         return varstr;
     }
 
-    vstr_decl extract_vstr (const symbolic_constant &tag, PLClangCursor *def, NSArray *fmtargs) {
+    vstr_decl extract_vstr (const symbolic_constant &tag, PLClangCursor *def, NSArray *fmtargs, uint32_t asserted_revmask) {
         __block vstr_decl ret;
 
         [def visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
@@ -627,7 +628,7 @@ private:
                     var_fmt = apply_fmt_lits(lits[0], fmtargs);
                     val_fmt = lits[1];
                     
-                    ret.elems.emplace_back(tag, var_fmt.UTF8String, val_fmt.UTF8String, def);
+                    ret.elems.emplace_back(tag, var_fmt.UTF8String, val_fmt.UTF8String, def, asserted_revmask);
                     break;
                 }
                 case PLClangCursorKindInitializerListExpression: {
@@ -642,7 +643,7 @@ private:
                                 var_fmt = apply_fmt_lits(lits[0], fmtargs);
                                 val_fmt = lits[1];
                                 
-                                ret.elems.emplace_back(tag, var_fmt.UTF8String, val_fmt.UTF8String, def);
+                                ret.elems.emplace_back(tag, var_fmt.UTF8String, val_fmt.UTF8String, def, asserted_revmask);
                                 break;
                             } default:
                                 break;
@@ -668,6 +669,7 @@ private:
         __block NSString *hnbu_sect = nil;
         __block vector<shared_ptr<cis_tuple>> cis_tuples;
         __block shared_ptr<cis_tuple> tuple;
+        __block uint32_t asserted_revmask = 0;
         
         [srom_parsecis visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
             if (cursor.kind == PLClangCursorKindSwitchStatement) {
@@ -680,6 +682,7 @@ private:
                             tuple = make_shared<cis_tuple>();
                             tuple->tag = {tu, caseval};
                             cis_tuples.push_back(tuple);
+                            asserted_revmask = 0;
                         }
                     } else if (cursor.kind == PLClangCursorKindCallExpression) {
                         NSString *fn = cursor.spelling;
@@ -690,7 +693,7 @@ private:
                             
                             if (vs_arg.kind == PLClangCursorKindVariableReference || vs_arg.kind == PLClangCursorKindDeclarationReferenceExpression) {
                                 if ([vs_arg.spelling hasPrefix: @"vstr_"]) {
-                                    auto vstr = extract_vstr(tuple->tag, vs_arg.definition, vap);
+                                    auto vstr = extract_vstr(tuple->tag, vs_arg.definition, vap, asserted_revmask);
                                     if (vstr.elems.size() != 1)
                                         errx(EXIT_FAILURE, "parsed too-large vstr: %s", vs_arg.definition.spelling.UTF8String);
                                     
@@ -705,7 +708,7 @@ private:
                                         if ([base.spelling hasPrefix: @"vstr_"]) {
                                             uint32_t start, finish;
                                             string vstr_name = string(base.spelling.UTF8String);
-                                            auto vstr = extract_vstr(tuple->tag, base.cursor.definition, vap);
+                                            auto vstr = extract_vstr(tuple->tag, base.cursor.definition, vap, asserted_revmask);
 
                                             if (get_literal(tu, subscript) == nil) {
                                                 if ((tuple->tag.name() == "HNBU_PAPARMS" && (vstr_name == "vstr_pa0b" || vstr_name == "vstr_pa0b_lo")) ||
@@ -743,16 +746,59 @@ private:
                                     
                                     if (cursor.kind == PLClangCursorKindVariableReference || cursor.kind == PLClangCursorKindDeclarationReferenceExpression) {
                                         if ([cursor.spelling hasPrefix: @"vstr_"]) {
-                                            auto vstr = extract_vstr(tuple->tag, cursor.definition, vap);
+                                            auto vstr = extract_vstr(tuple->tag, cursor.definition, vap, asserted_revmask);
                                             tuple->vars.insert(tuple->vars.end(), vstr.elems.begin(), vstr.elems.end());
                                         }
                                     }
                                     return PLClangCursorVisitRecurse;
                                 }];
                             }
+                        } else if ([fn isEqual: @"ASSERT"]) {
+                            NSArray *args = get_tokens(cursor);
+                            args = [args subarrayWithRange: NSMakeRange(2, args.count - 4)];
+                            if ([[args[0] spelling] isEqual: @"sromrev"] || [[args[1] spelling] isEqual: @"sromrev"]) {
+                                NSArray *sep = [[[[[args componentsJoinedByString: @""] stringByReplacingOccurrencesOfString: @"sromrev" withString: @""] stringByReplacingOccurrencesOfString: @"(" withString: @""] stringByReplacingOccurrencesOfString: @")" withString:@""] componentsSeparatedByString:@"||"];
+                                
+                                NSCharacterSet *trim = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+                                vector<nvram::compat_range> ranges;
+                                for (NSString *rspec in sep) {
+                                    NSString *numstr = [rspec stringByTrimmingCharactersInSet: trim];
+                                    int num;
+                                    if (![[NSScanner scannerWithString: numstr] scanInt: &num])
+                                        errx(EXIT_FAILURE, "can't parse %s", numstr.UTF8String);
+                                    
+                                    if ([rspec hasPrefix: @">="]) {
+                                        ranges.emplace_back(num, nvram::compat_range::MAX_SPROMREV);
+                                    } else if ([rspec hasPrefix: @"<="]) {
+                                        ranges.emplace_back(0, num);
+                                    } else if ([rspec hasPrefix: @">"]) {
+                                        ranges.emplace_back(num+1, nvram::compat_range::MAX_SPROMREV);
+                                    } else if ([rspec hasPrefix: @"<"]) {
+                                        ranges.emplace_back(0, num-1);
+                                    } else if ([rspec hasPrefix: @"=="]) {
+                                        ranges.emplace_back(num, num);
+                                    } else {
+                                        errx(EXIT_FAILURE, "can't parse %s", rspec.UTF8String);
+                                    }
+                                }
+
+                                uint32_t revmask = 0;
+                                for (const auto &r : ranges)
+                                    revmask |= r.to_revmask();
+
+                                // XXX: this is not entirely correct, in that we don't really handle
+                                // independent code paths
+                                if ((revmask & asserted_revmask) == 0) {
+                                    asserted_revmask = revmask;
+                                } else {
+                                    asserted_revmask |= revmask;
+                                }
+    
+                            } else {
+                                // NSLog(@"UNHANDLED-MACRO: %@", args);
+                            }
                         }
                     }
-                    
                     return PLClangCursorVisitRecurse;
                 }];
                 return PLClangCursorVisitContinue;
@@ -773,7 +819,7 @@ private:
                 vstr orig = cs->vars[0];
                 cs->vars.clear();
                 for (int i = 0; i < 16; i++)
-                    cs->vars.emplace_back(orig.tag, string("ledbh") + to_string(i), orig.val, orig.vstr_global);
+                    cs->vars.emplace_back(orig.tag, string("ledbh") + to_string(i), orig.val, orig.vstr_global, orig.asserted_revmask);
             }
             
             for (auto &vs : cs->vars) {
@@ -817,12 +863,12 @@ private:
                 // XXX: implicit; the boardnum may also be specified elsewhere
                 PLClangCursor *c = api[@"vstr_boardnum"];
                 if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_boardnum`");
-                addtl.emplace_back(cs->tag, "boardnum", "%d", c);
+                addtl.emplace_back(cs->tag, "boardnum", "%d", c, 0);
             } else if (cs->tag.name() == "HNBU_MACADDR") {
                 // XXX: may also be specified elsewhere
                 PLClangCursor *c = api[@"vstr_macaddr"];
                 if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_macaddr`");
-                addtl.emplace_back(cs->tag, "macaddr", "%d", c);
+                addtl.emplace_back(cs->tag, "macaddr", "%d", c, 0);
             }
             
             cs->vars.insert(cs->vars.end(), addtl.begin(), addtl.end());
@@ -1018,32 +1064,61 @@ public:
             printf("%s:\n", cs->tag.name().c_str());
 
             for (auto &vs : cs->vars) {
+                uint32_t srom_revmask = 0;
+                
                 /* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
                  * as the subdevid */
                 if (vs.tag.name() == "HNBU_CHIPID" && vs.var == "boardtype")
                     continue;
                 
                 printf("\t%s ", vs.var.c_str());
-                
-                if (vs.has_hnbu_entry()) {
-                    auto c = vs.compat();
-                    printf("%s\n", c.description().c_str());
-                } else if (srom_vars.count(vs.var) > 0) {
+
+                if (srom_vars.count(vs.var) > 0) {
                     const auto &svr = srom_vars.at(vs.var);
-                    uint32_t revs = 0;
-                    for (const auto &sp : *svr->sprom_offsets()) {
-                        revs |= sp.compat().to_revmask();
+
+                    for (const auto &sp : *svr->sprom_offsets())
+                        srom_revmask |= sp.compat().to_revmask();
+                    
+                    if (srom_revmask == 0) {
+                        printf("(unknown revs)");
+                    } else {
+                        auto c = nvram::compat_range::from_revmask(srom_revmask);
+                        printf("(srom %s)", c.description().c_str());
+                    }
+                }
+                
+                if (!vs.has_hnbu_entry() && !vs.asserted_revmask && !srom_revmask) {
+                    printf("(unknown revs)");
+                } else {
+                    NSMutableArray *elems = [NSMutableArray array];
+                    if (vs.has_hnbu_entry()) {
+                        [elems addObject: [NSString stringWithFormat: @"hnbu %s", nvram::compat_range::from_revmask(vs.hnbu_entry()->revmask).description().c_str()]];
+                    }
+
+                    if (srom_revmask) {
+                        [elems addObject: [NSString stringWithFormat: @"srom %s", nvram::compat_range::from_revmask(srom_revmask).description().c_str()]];
+                    }
+
+                    if (vs.asserted_revmask) {
+                        [elems addObject: [NSString stringWithFormat: @"asrt %s", nvram::compat_range::from_revmask(vs.asserted_revmask).description().c_str()]];
                     }
                     
-                    if (revs == 0) {
-                        printf("(unknown revs)\n");
-                    } else {
-                        auto c = nvram::compat_range::from_revmask(revs);
-                        printf("(srom %s)\n", c.description().c_str());
-                    }
-                } else {
-                    printf("(unknown revs)\n");
+                    printf("(%s)\n", [elems componentsJoinedByString: @", "].UTF8String);
                 }
+
+#if 0
+                if (vs.has_hnbu_entry() && vs.asserted_revmask && vs.hnbu_entry()->revmask != vs.asserted_revmask)
+                    printf(" hnbu / asserted_revmask mismatch (%s)", nvram::compat_range::from_revmask(vs.asserted_revmask).description().c_str());
+
+                if (vs.has_hnbu_entry() && srom_revmask && vs.hnbu_entry()->revmask != srom_revmask)
+                    printf(" hnbu / srom_revmask mismatch (%s)", nvram::compat_range::from_revmask(srom_revmask).description().c_str());
+                
+                if (vs.asserted_revmask && srom_revmask && vs.asserted_revmask != srom_revmask)
+                    printf(" asserted_revmask (%s) / srom_revmask (%s) mismatch", nvram::compat_range::from_revmask(vs.asserted_revmask
+                                                                                                                    ).description().c_str(), nvram::compat_range::from_revmask(srom_revmask).description().c_str());
+#endif
+        
+                printf("\n");
             }
         }
 
