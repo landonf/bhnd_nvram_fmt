@@ -6,6 +6,8 @@
 //  Copyright (c) 2015 Landon Fuller. All rights reserved.
 //
 
+#include "nvram.hpp"
+
 #include <stdio.h>
 
 #include <err.h>
@@ -21,11 +23,6 @@
 #import <ObjectDoc/ObjectDoc.h>
 #import <ObjectDoc/PLClang.h>
 
-#include "cis_tuples.hpp"
-
-extern "C" {
-#include "bcm/bcmsrom_tbl.h"
-}
 
 using namespace std;
 
@@ -66,271 +63,79 @@ struct nvar {
         else
             width = 1;
     }
-};
-
-class PHY {
-public:
-    int ptype;
-    string name () const {
-        switch (ptype) {
-            case PHY_TYPE_HT: return "HT";
-            case PHY_TYPE_N: return "N";
-            case PHY_TYPE_LP: return "LP";
-            case PHY_TYPE_AC: return "AC";
-            case PHY_TYPE_NULL: return "NULL";
-            default:
-                errx(EXIT_FAILURE, "unknown PHY type %d", ptype);
-        }
-    };
-};
-
-class Band {
-public:
-    int btype;
-    string band_name () {
-        switch (btype) {
-            case WL_CHAN_FREQ_RANGE_2G:         return "2G";
-            case WL_CHAN_FREQ_RANGE_5G_BAND0:   return "5G U-NII-1 Low";
-            case WL_CHAN_FREQ_RANGE_5G_BAND1:   return "5G U-NII-2 Mid";
-            case WL_CHAN_FREQ_RANGE_5G_BAND2:   return "5G U-NII-3 High";
-            case WL_CHAN_FREQ_RANGE_5G_BAND3:   return "5G U-NII-2e Worldwide"; // XXX ??? is this right
-            case WL_CHAN_FREQ_RANGE_5G_4BAND:   return "5G (all bands)";
-            default:                            errx(EXIT_FAILURE, "unknown band range %d", btype);
-        }
-    }
-};
-
-class PHYBand {
-public:
-    PHY phy;
-    Band band;
-    string description () {
-        return (phy.name() + " " + band.band_name());
-    }
-};
-
-/*
- * A copy of our output target's types, modified to support generating
- * output code, allow use of std::vector instead of C arrays, etc.
- */
-
-/** NVRAM primitive data types */
-typedef enum {
-    BHND_NVRAM_DT_UINT,	/**< unsigned integer */
-    BHND_NVRAM_DT_SINT,	/**< signed integer */
-    BHND_NVRAM_DT_MAC48,	/**< MAC-48 address */
-    BHND_NVRAM_DT_LEDDC,	/**< LED PWM duty-cycle */
-    BHND_NVRAM_DT_CCODE,	/**< country code format (2-3 ASCII chars) */
-} bhnd_nvram_dt;
-
-/** NVRAM data type string representations */
-typedef enum {
-    BHND_NVRAM_VFMT_HEX,		/**< hex string format */
-    BHND_NVRAM_VFMT_SDEC,		/**< signed decimal format */
-    BHND_NVRAM_VFMT_MACADDR,	/**< mac address (canonical form, hex octets,
-                                 seperated with ':') */
-    BHND_NVRAM_VFMT_LEDDC,        /**< LED PWM duty-cycle (2 bytes -- on/off) */
-    BHND_NVRAM_VFMT_CCODE		/**< count code format (2-3 ASCII chars, or hex string) */
-} bhnd_nvram_fmt;
-
-/** NVRAM variable flags */
-enum {
-    BHND_NVRAM_VF_DFLT	= 0,
-    BHND_NVRAM_VF_ARRAY	= (1<<0),	/**< variable is an array */
-    BHND_NVRAM_VF_MFGINT	= (1<<1),	/**< mfg-internal variable; should not be externally visible */
-    BHND_NVRAM_VF_IGNALL1	= (1<<2)	/**< hide variable if its value has all bits set. */
-};
-
-#define	BHND_SPROMREV_MAX	31	/**< maximum supported SPROM revision */
-
-/** SPROM revision compatibility declaration */
-struct bhnd_sprom_compat {
-    uint16_t	first;	/**< first compatible SPROM revision */
-    uint16_t	last;	/**< last compatible SPROM revision, or BHND_SPROMREV_MAX */
-    
-    string revdesc () const {
-        if (last == BHND_SPROMREV_MAX)
-            return [NSString stringWithFormat: @">= %u", first].UTF8String;
-        else if (first == last)
-            return [NSString stringWithFormat: @"%u", first].UTF8String;
-        else
-            return [NSString stringWithFormat: @"%u-%u", first, last].UTF8String;
-    }
-};
-
-static const char *width_tostring (size_t width) {
-	switch (width) {
-		case 1:
-			return "uint8";
-		case 2:
-			return "uint16";
-		case 4:
-			return "uint32";
-		default:
-			errx(EXIT_FAILURE, "Unsupported width: %zu", width);
-	}
-}
-
-/** SPROM value segment descriptor */
-struct bhnd_sprom_vseg {
-    size_t      offset;	/**< byte offset within SPROM */
-    size_t		width;	/**< 1, 2, or 4 bytes */
-    uint32_t	mask;	/**< mask to be applied to the value */
-    ssize_t		shift;	/**< shift to be applied to the value on extraction. if negative, left shift. if positive, right shift. */
-    
-    const char *width_str () const {
-	    return (width_tostring(width));
-    }
-    
-    bool has_default_mask () const {
+private:
+    nvram::prop_type uint_type () {
         switch (width) {
-            case 1:
-                return (mask == 0xFF);
-            case 2:
-                return (mask == 0xFFFF);
-            case 4:
-                return (mask == 0xFFFFFFFF);
-            default:
-                errx(EXIT_FAILURE, "Unsupported width: %zu", width);
+            case 1: return nvram::BHND_T_UINT8;
+            case 2: return nvram::BHND_T_UINT16;
+            case 4: return nvram::BHND_T_UINT32;
+            default: errx(EX_DATAERR, "unknown width %zu", width);
         }
     }
     
-    bool has_default_shift () const {
-        return (shift == 0);
+    nvram::prop_type int_type () {
+        switch (width) {
+            case 1: return nvram::BHND_T_INT8;
+            case 2: return nvram::BHND_T_INT16;
+            case 4: return nvram::BHND_T_INT32;
+            default: errx(EX_DATAERR, "unknown width %zu", width);
+        }
     }
-
-    bool has_defaults () const {
-        return (has_default_mask() && has_default_shift());
-    }
-};
-
-/** SPROM value descriptor */
-struct bhnd_sprom_value {
-    std::vector<bhnd_sprom_vseg>	segs;		/**< segment(s) containing this value */
-	
-	size_t total_width () const {
-		uint32_t mask = 0;
-		for (const auto &seg : segs) {
-			
-			if (seg.shift < 0)
-				mask |= (seg.mask << (-seg.shift));
-			else
-				mask |= (seg.mask >> seg.shift);
-		}
-		
-		if (mask & 0xFFFF0000)
-			return 4;
-		else if ((mask & 0x0000FF00) && (mask & 0xFF))
-			return 2;
-		else
-			return 1;
-	}
-};
-
-/** SPROM-specific variable definition */
-struct bhnd_sprom_var {
-    const bhnd_sprom_compat	 compat;	/**< sprom compatibility declaration */
-    std::vector<bhnd_sprom_value> values;	/**< value descriptor(s) */
-	
-    size_t elem_width () const {
-        size_t max_width = 0;
-        for (const auto &v : values)
-            max_width = max(max_width, v.total_width());
-        return max_width;
-    }
-};
-
-/** NVRAM variable definition */
-struct bhnd_nvram_var {
-    std::string		name;		/**< variable base name */
-    bhnd_nvram_dt		 type;		/**< base data type */
-    bhnd_nvram_fmt		 fmt;		/**< string format */
-    uint32_t		 flags;		/**< BHND_NVRAM_VF_* flags */
+public:
     
-    std::vector<shared_ptr<bhnd_sprom_var>>	sprom_descs;	/**< SPROM-specific variable descriptors */
-    
-    void normalize () {
-        size_t alen;
-        switch (type) {
-            case BHND_NVRAM_DT_LEDDC:
-            case BHND_NVRAM_DT_CCODE:
-                alen = 2;
-                break;
-            case BHND_NVRAM_DT_MAC48:
-                alen = 48;
-                break;
-            default:
-                return;
+    nvram::prop_type get_type () {
+        if (flags & SRFL_CCODE) {
+            return nvram::BHND_T_CHAR;
+        } else if (flags & SRFL_ETHADDR) {
+            return nvram::BHND_T_UINT8;
+        } else if (flags & SRFL_LEDDC) {
+            return nvram::BHND_T_UINT8;
+        } else if (flags & SRFL_PRSIGN) {
+            return int_type();
+        } else if (flags & SRFL_PRHEX) {
+            return uint_type();
+        } else {
+            /* Default behavior */
+            return uint_type();
         }
-
-        flags |= BHND_NVRAM_VF_ARRAY;
-        
-        for (auto &s : sprom_descs) {
-            bhnd_sprom_vseg seg = s->values[0].segs[0];
-            s->values = {};
-            
-            for (size_t i = 0; i < alen; i++) {
-                seg.width = 1;
-                seg.offset += 1;
-                seg.mask = 0xFF;
-                s->values.push_back({{seg}});
-            }
-        }
-    }
-
-    size_t elem_count () const {
-        size_t max_elem = 0;
-        for (const auto &s : sprom_descs) {
-            max_elem = max(max_elem, s->values.size());
-        }
-        
-        return max_elem;
-    }
-
-    size_t elem_width () const {
-        size_t max_width = 0;
-        for (const auto &s : sprom_descs)
-            for (const auto &v : s->values)
-                max_width = max(max_width, v.total_width());
-
-        return max_width;
     }
     
-    std::string dtstr () const {
-        std::string base;
-        switch (type) {
-            case BHND_NVRAM_DT_UINT: base = "uint"; break;
-            case BHND_NVRAM_DT_SINT: base =  "int"; break;
-            case BHND_NVRAM_DT_MAC48: base = "uint"; break;
-            case BHND_NVRAM_DT_LEDDC: base = "uint"; break;
-            case BHND_NVRAM_DT_CCODE: base = "char"; break;
+    nvram::str_fmt get_sfmt() {
+        if (flags & SRFL_CCODE) {
+            return nvram::SFMT_CCODE;
+        } else if (flags & SRFL_ETHADDR) {
+            return nvram::SFMT_MACADDR;
+        } else if (flags & SRFL_LEDDC) {
+            return nvram::SFMT_LEDDC;
+        } else if (flags & SRFL_PRSIGN) {
+            return nvram::SFMT_DECIMAL;
+        } else if (flags & SRFL_PRHEX) {
+            return nvram::SFMT_HEX;
+        } else {
+            /* Default behavior */
+            return nvram::SFMT_HEX;
         }
-        
-        switch (elem_width()) {
-            case 1:
-                if (base != "char")
-                    base += "8";
-                break;
-            case 2:
-                base += "16";
-                break;
-            case 4:
-                base += "32";
-                break;
-        }
-        
-        if (elem_count() > 1) {
-            base += "[" + to_string(elem_count()) + "]";
-            
-            if ((!flags & BHND_NVRAM_VF_ARRAY))
-                warnx("%s is not an array, but has multiple elements", name.c_str());
-        }
-
-        return base;
     }
     
-    bool operator < (const bhnd_nvram_var &other) const {
-        return ([@(name.c_str()) compare:@(other.name.c_str()) options:NSNumericSearch] == NSOrderedAscending);
+    size_t nvram_count() {
+        if (flags & SRFL_CCODE) {
+            return 2;
+        } else if (flags & SRFL_ETHADDR) {
+            return 48;
+        } else if (flags & SRFL_LEDDC) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    uint32_t nvram_flags() {
+        uint32_t ret = 0;
+        if (flags & SRFL_NOVAR)
+            ret |= nvram::FLAG_MFGINT;
+        if (flags & SRFL_NOFFS)
+            ret |= nvram::FLAG_NOALL1;
+        return (ret);
     }
 };
 
@@ -504,6 +309,7 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     return true;
 }
 
+#if 0
 static const char *fmtstr (bhnd_nvram_fmt fmt) {
     switch (fmt) {
         case BHND_NVRAM_VFMT_HEX: return "hex";
@@ -513,6 +319,7 @@ static const char *fmtstr (bhnd_nvram_fmt fmt) {
         case BHND_NVRAM_VFMT_LEDDC: return "led_dc";
     }
 }
+#endif
 
 class Extractor {
 private:
@@ -608,302 +415,114 @@ private:
         return [tu tokensForSourceRange: cursor.extent];
     }
     
-    int _depth = 0;
-    int dprintf(const char *fmt, ...) {
-        va_list vap;
-   
-        for (int i = 0; i < _depth; i++)
-            printf("\t");
+    vector<shared_ptr<nvram::var>> convert_nvars (shared_ptr<vector<nvar>> &nvars) {
+        unordered_map<string, shared_ptr<nvram::var>> var_table;
+        vector<shared_ptr<nvram::var>> ret;
 
-        va_start(vap, fmt);
-        int r = vprintf(fmt, vap);
-        va_end(vap);
-        return r;
-    }
-    
-    void output_vars (vector<shared_ptr<bhnd_nvram_var>> &vars) {
-        sort(vars.begin(), vars.end(), [](const shared_ptr<bhnd_nvram_var> &lhs, const shared_ptr<bhnd_nvram_var> &rhs) {
-            return *lhs < *rhs;
-        });
-
-        for (const auto &v : vars) {
-            if (v->flags & BHND_NVRAM_VF_MFGINT)
-                printf("private ");
-            
-            dprintf("%s", v->dtstr().c_str());
-            
-            printf(" %s {\n", v->name.c_str());
-            _depth++;
-            
-            if (v->fmt != BHND_NVRAM_VFMT_HEX)
-                dprintf("fmt\t%s\n", fmtstr(v->fmt));
-            
-            if (v->flags & BHND_NVRAM_VF_IGNALL1)
-                dprintf("all1\tignore\n");
-            
-            sort(v->sprom_descs.begin(), v->sprom_descs.end(), [](const shared_ptr<bhnd_sprom_var> &lhs, const shared_ptr<bhnd_sprom_var> &rhs) {
-                return lhs->compat.first < rhs->compat.last;
-            });
-            
-            for (const auto &t : v->sprom_descs) {
-                dprintf("srom %s", t->compat.revdesc().c_str());
-                
-                size_t vlines = 0;
-                for (__unused const auto &val : t->values) {
-                    vlines++;
-                }
-                
-                
-                /* attempt unification of array vals */
-                size_t unified_array = 0;
-                size_t elem_size = 0;
-                size_t next_addr = 0;
-                uint32_t elem_mask = 0;
-                size_t elem_shft = 0;
-                
-                for (const auto &val : t->values) {
-                    if (val.segs.size() != 1) {
-                        unified_array = 0;
-                        break;
-                    }
-                    
-                    if (unified_array == 0) {
-                        elem_size = val.segs[0].width;
-                        next_addr = val.segs[0].offset;
-                        elem_mask = val.segs[0].mask;
-                        elem_shft = val.segs[0].shift;
-                    } else if (elem_size != val.segs[0].width || val.segs[0].offset != next_addr || val.segs[0].mask != elem_mask || val.segs[0].shift != elem_shft) {
-                        unified_array = 0;
-                        break;
-                    }
-                    
-                    next_addr += val.segs[0].width;
-                    unified_array++;
-                }
-                
-                if (unified_array == 1)
-                    unified_array = 0;
-                
-                if (unified_array)
-                    vlines = 1;
-
-                if (vlines <= 1) {
-                    printf("\t{ ");
-                } else {
-                    printf(" {\n");
-                    _depth++;
-                }
-
-
-                size_t vali = 0;
-                for (const auto &val : t->values) {
-                    for (size_t i = 0; i < val.segs.size(); i++) {
-                        const auto &seg = val.segs[i];
-                        
-                        if (vlines > 1)
-                            dprintf("");
-
-                        if (unified_array) {
-                            /* no implicit types */
-                            /* if (seg.width != v->elem_width() || v->elem_count() != unified_array) */
-                                printf("%s[%zu] ", seg.width_str(), unified_array);
-                        } else /* if (seg.width != v->elem_width()) */ /*impl types */ {
-                            printf("%s ", seg.width_str());
-                        }
-                        printf("0x%04zX", seg.offset);
-
-                        if (!seg.has_defaults()) {
-                            printf(" (");
-                            if (!seg.has_default_mask()) {
-                                printf("&0x%X", seg.mask);
-                                if (!seg.has_default_shift())
-                                    printf(", ");
-                            }
-                            if (!seg.has_default_shift()) {
-                                if (seg.shift < 0)
-                                    printf("<<%zu", -seg.shift);
-                                else
-                                    printf(">>%zu", seg.shift);
-                            }
-                            printf(")");
-                        }
-                        
-                        if (unified_array)
-                            break;
-                        
-                        if (i+1 != val.segs.size())
-                            printf(" | ");
-                        else if (vlines > 1 && vali+1 != t->values.size())
-                            printf(",\n");
-                    }
-                    vali++;
-                    
-                    if (unified_array)
-                        break;
-                }
-
-                if (vlines <= 1)
-                    printf(" }\n");
-                else {
-                    printf("\n");
-                    _depth--;
-                    dprintf("}\n");
-                }
-            }
-            _depth--;
-            dprintf("}\n\n");
-        }
-    }
-
-    vector<shared_ptr<bhnd_nvram_var>> convert_nvars (shared_ptr<vector<nvar>> &nvars) {
-        unordered_map<string, shared_ptr<bhnd_nvram_var>> var_table;
-        vector<shared_ptr<bhnd_nvram_var>> vars;
-        unordered_set<string> consts;
-        
         for (size_t i = 0; i < nvars->size(); i++) {
             nvar *n = &(*nvars)[i];
             
             std::string name = n->name.UTF8String;
-            uint32_t revmask = n->revmask;
-            uint32_t flags = n->flags;
             
             if (name.length() == 0)
                 errx(EXIT_FAILURE, "variable has zero-length name");
-            
-            /* Generate the basic bhnd_nvram_var record */
-            auto v = std::make_shared<bhnd_nvram_var>();
-            v->name = name;
-            
-            /* Determine fmt and type */
-            if (flags & SRFL_CCODE) {
-                v->type = BHND_NVRAM_DT_CCODE;
-                v->fmt = BHND_NVRAM_VFMT_CCODE;
-            } else if (flags & SRFL_ETHADDR) {
-                v->type = BHND_NVRAM_DT_MAC48;
-                v->fmt = BHND_NVRAM_VFMT_MACADDR;
-            } else if (flags & SRFL_LEDDC) {
-                v->type = BHND_NVRAM_DT_LEDDC;
-                v->fmt = BHND_NVRAM_VFMT_LEDDC;
-            } else if (flags & SRFL_PRSIGN) {
-                v->type = BHND_NVRAM_DT_SINT;
-                v->fmt = BHND_NVRAM_VFMT_SDEC;
-            } else if (flags & SRFL_PRHEX) {
-                v->type = BHND_NVRAM_DT_UINT;
-                v->fmt = BHND_NVRAM_VFMT_HEX;
-            } else {
-                /* Default behavior */
-                v->type = BHND_NVRAM_DT_UINT;
-                v->fmt = BHND_NVRAM_VFMT_HEX;
-            }
-            
-            /* Apply flags */
-            v->flags = 0;
-            if (flags & SRFL_NOFFS)
-                v->flags |= BHND_NVRAM_VF_IGNALL1;
-            
-            if (flags & SRFL_ARRAY)
-                v->flags |= BHND_NVRAM_VF_ARRAY;
-            
-            if (flags & SRFL_NOVAR)
-                v->flags |= BHND_NVRAM_VF_MFGINT;
+
+            auto v = make_shared<nvram::var>(name, n->get_type(), n->get_sfmt(), 0 /* array count */, n->nvram_flags(), make_shared<vector<nvram::sprom_offset>>());
             
             /* Compare against previous variable with this name, or
              * register the new variable */
             if (var_table.count(name) == 0) {
-                vars.push_back(v);
                 var_table.insert({name, v});
             } else {
                 auto orig = var_table.at(name);
                 
-                if (orig->type != v->type)
-                    errx(EXIT_FAILURE, "%s: type mismatch (%u vs %u)", name.c_str(), orig->type, v->type);
-                
-                if (orig->fmt != v->fmt)
-                    errx(EXIT_FAILURE, "fmt mismatch");
-                
-                if (orig->flags != v->flags) {
-                    /* VF_ARRAY mismatch is OK, but nothing else is */
-                    if ((orig->flags & ~BHND_NVRAM_VF_ARRAY) != (v->flags & ~BHND_NVRAM_VF_ARRAY))
-                        errx(EXIT_FAILURE, "%s: flag mismatch (0x%X vs. 0x%X)", name.c_str(), orig->flags, v->flags);
-                    
-                    /* Promote to an array */
-                    orig->flags |= BHND_NVRAM_VF_ARRAY;
+                if (!nvram::prop_type_compat(orig->type(), v->type())) {
+                    errx(EX_DATAERR, "%s: type mismatch (%u vs %u)", name.c_str(), orig->type(), v->type());
                 }
+
+                if (orig->sfmt() != v->sfmt())
+                    errx(EX_DATAERR, "fmt mismatch");
                 
-                v = orig;
+                if (orig->flags() != v->flags())
+                    errx(EX_DATAERR, "%s: flag mismatch (0x%X vs. 0x%X)", name.c_str(), orig->flags(), v->flags());
+
+                /* array size may only increase */
+                if (v->count() < orig->count())
+                    *v = v->count(orig->count());
+                
+                /* type width may only increase */
+                if (v->type() < orig->type())
+                    *v = v->type(orig->type());
+
+                *v = v->sprom_offsets(orig->sprom_offsets());
+                var_table.insert({name, v});
             }
             
             /* Handle array/sparse continuation records */
-            std::vector<bhnd_sprom_value> vals;
-            bhnd_sprom_value base_val;
-            bhnd_sprom_vseg base_seg = {
+            auto vals = make_shared<vector<nvram::value>>();
+            nvram::value base_val(make_shared<vector<nvram::value_seg>>());
+            nvram::value_seg base_seg = {
                 n->off,
-                n->width,
+                n->get_type(),
+                n->nvram_count(),
                 n->valmask,
                 static_cast<ssize_t>(__builtin_ctz(n->valmask))
             };
             
-            base_val.segs.push_back(base_seg);
+            base_val.segments()->push_back(base_seg);
             size_t more_width = n->width;
             while (n->flags & SRFL_MORE) {
                 i++;
                 n = &(*nvars)[i];
-                
-                base_val.segs.push_back({
-                    n->off,
-                    n->width,
-                    n->valmask,
-                    static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
-                });
+                base_val.segments()->emplace_back(n->off, n->get_type(), 1, n->valmask, static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8)));
                 
                 more_width += n->width;
             }
-            vals.push_back(base_val);
+            vals->push_back(base_val);
             
             while (n->flags & SRFL_ARRAY) {
-                bhnd_sprom_value val;
+                nvram::value val(make_shared<vector<nvram::value_seg>>());
                 
                 i++;
                 n = &(*nvars)[i];
                 
-                val.segs.push_back({
+                val.segments()->emplace_back(
                     n->off,
-                    n->width,
+                    n->get_type(),
+                    1,
                     n->valmask,
                     static_cast<ssize_t>(__builtin_ctz(n->valmask))
-                });
+                );
                 
                 more_width = n->width;
                 while (n->flags & SRFL_MORE) {
                     i++;
                     n = &(*nvars)[i];
                     
-                    val.segs.push_back({
+                    val.segments()->emplace_back(
                         n->off,
-                        n->width,
+                        n->get_type(),
+                        1,
                         n->valmask,
                         static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
-                    });
+                    );
                     
                     more_width += n->width;
                 }
                 
-                vals.push_back(val);
+                vals->push_back(val);
             }
-
-            uint16_t first_ver = __builtin_ctz(revmask);
-            uint16_t last_ver = 31 - __builtin_clz(revmask);
             
-            bhnd_sprom_var spvar = {{first_ver, last_ver}, vals};
-            v->sprom_descs.push_back(make_shared<bhnd_sprom_var>(spvar));
+            nvram::sprom_offset sp_off(nvram::compat_range::from_revmask(n->revmask), vals);
+            v->sprom_offsets()->push_back(sp_off);
         }
-        
-        for (auto &v : vars)
-            v->normalize();
-        
-        return vars;
+
+        for (const auto &v : var_table)
+            ret.push_back(v.second);
+        return ret;
     }
 
+#if 0
     /* vstr_ constant */
     struct vstr {
         symbolic_constant tag;
@@ -1196,7 +815,8 @@ private:
         
         return cis_tuples;
     }
-
+#endif
+    
 public:
     Extractor(int argc, char * const argv[]) {
         NSError *error;
@@ -1272,11 +892,7 @@ public:
         unordered_set<string> srom_vars;
         auto nvars = extract_nvars(@"pci_sromvars");
         auto vars = convert_nvars(nvars);
-        output_vars(vars);
-        for (const auto &v : vars) {
-            srom_vars.insert(v->name);
-        }
-    
+
         /* Output the per-path vars */
         auto path_nvars = extract_nvars(@"perpath_pci_sromvars");
         auto path_vars = convert_nvars(path_nvars);
@@ -1284,62 +900,85 @@ public:
         struct pathcfg {
             NSString *path_pfx;
             NSString *path_num;
-            bhnd_sprom_compat compat;
+            nvram::compat_range compat;
         } pathcfgs[] = {
             { @"SROM4_PATH",    @"MAX_PATH_SROM",       {4, 7}},
             { @"SROM8_PATH",    @"MAX_PATH_SROM",       {8, 10}},
-            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    {11, BHND_SPROMREV_MAX}},
-            { nil, nil }
+            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    {11, nvram::compat_range::MAX_SPROMREV}},
+            { nil, nil, {0, 0}}
         };
-
-        printf("#\n"
-                "# Any variables defined within a `struct` block will be interpreted relative to\n"
-                "# the provided array of SPROM base addresses; this is used to define\n"
-                "# a common layout defined at the given base addresses.\n"
-                "#\n"
-                "# To produce SPROM variable names matching those used in the Broadcom HND\n"
-                "# ASCII 'key=value\\0' NVRAM, the index number of the variable's\n"
-                "# struct instance will be appended (e.g., given a variable of noiselvl5ga, the\n"
-                "# generated variable instances will be named noiselvl5ga0, noiselvl5ga1,\n"
-                "# noiselvl5ga2, noiselvl5ga3 ...)\n"
-                "#\n");
-        printf("struct pathvars[] {\n");
-        _depth++;
         
-        for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
-            PLClangCursor *maxCursor = api[cfg->path_num];
-            if (maxCursor == nil)
-                errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
-            uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
+        unordered_map<string, shared_ptr<nvram::var>> path_var_tbl;
+        for (const auto &v : path_vars) {
+            for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
+                PLClangCursor *maxCursor = api[cfg->path_num];
+                if (maxCursor == nil)
+                    errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
     
-            dprintf("srom %s\t[", cfg->compat.revdesc().c_str());
-            for (uint32_t i = 0; i < max; i++) {
-                NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
-                PLClangCursor *c = api[path];
-                if (c == nil)
-                    errx(EXIT_FAILURE, "missing %s", path.UTF8String);
-                uint32_t offset = compute_literal_u32(tu, get_tokens(c));
-                printf("0x%04zX", offset*sizeof(uint16_t));
-                if (i+1 != max)
-                    printf(", ");
+                uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
                 
-                for (const auto &v : path_vars) {
-                    for (const auto &sp : v->sprom_descs) {
-                        if (sp->compat.first >= cfg->compat.first && sp->compat.first <= cfg->compat.last) {
-                            srom_vars.insert([NSString stringWithFormat: @"%s%u", v->name.c_str(), i].UTF8String);
+                shared_ptr<nvram::var> newv;
+                for (uint32_t i = 0; i < max; i++) {
+                    NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
+                    PLClangCursor *c = api[path];
+                    if (c == nil)
+                        errx(EXIT_FAILURE, "missing %s", path.UTF8String);
+                    uint32_t struct_base = compute_literal_u32(tu, get_tokens(c)) * sizeof(uint16_t);
+
+                    for (const auto &sp : *v->sprom_offsets()) {
+                        if (sp.compat().first() >= cfg->compat.first() && sp.compat().first() <= cfg->compat.last()) {
+                            auto values = make_shared<vector<nvram::value>>();
+                            for (const auto &val : *sp.values()) {
+                                auto segs = make_shared<vector<nvram::value_seg>>();
+                                for (const auto &seg : *val.segments()) {
+                                    segs->push_back(seg.offset(seg.offset() + struct_base));
+                                }
+                                values->emplace_back(segs);
+                            }
+                            
+                            string name = v->name() + to_string(i);
+                            if (path_var_tbl.count(name) == 0) {
+                                newv = make_shared<nvram::var>(v->name(name).sprom_offsets(make_shared<vector<nvram::sprom_offset>>()));
+                                path_var_tbl.insert({name, newv});
+                            } else {
+                                newv = path_var_tbl.at(name);
+                            }
+                            newv->sprom_offsets()->emplace_back(sp.compat(), values);
                         }
                     }
+                    
+                    if (newv)
+                        vars.push_back(newv);
                 }
             }
-            printf("]\n");
         }
-        
-        printf("\n");
-        output_vars(path_vars);
-        
-        _depth--;
-        dprintf("}\n");
 
+        sort(vars.begin(), vars.end(), [](const shared_ptr<nvram::var> &lhs, shared_ptr<nvram::var> &rhs) {
+            return ([@(lhs->name().c_str()) compare: @(rhs->name().c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
+        });
+
+        for (const auto &v : vars) {
+            printf("%s:\n", v->name().c_str());
+            for (const auto &sp : *v->sprom_offsets()) {
+                printf("\t%s\t%s\t{ ", sp.compat().description().c_str(), to_string(v->type()).c_str());
+                for (size_t vi = 0; vi < sp.values()->size(); vi++) {
+                    const auto &val = sp.values()->at(vi);
+                    auto segs = val.segments();
+                    for (size_t seg = 0; seg < segs->size(); seg++) {
+                        auto s = segs->at(seg);
+                        printf("%s", s.description().c_str());
+                        if (seg+1 < segs->size())
+                            printf(" | ");
+                    }
+                    
+                    if (vi+1 < sp.values()->size())
+                        printf(", ");
+                }
+                printf(" }\n");
+            }
+        }
+
+#if 0
         /* Report SROM/CIS differences */
         auto cis_tuples = extract_cis_tuples();
         NSMutableSet *unclaimedCISVSTR = [NSMutableSet set];
@@ -1419,6 +1058,7 @@ public:
         fprintf(stderr, "CIS vstr_* globals unclaimed by CIS code:\n");
         for (NSString *vstr in unclaimedCISVSTR)
             fprintf(stderr, "\t%s\n", vstr.UTF8String);
+#endif
     }
 };
 
@@ -1427,7 +1067,6 @@ main (int argc, char * const argv[])
 {
     @autoreleasepool {
         Extractor(argc, argv);
-        // enumerate_cis_tuples();
         return (0);
     }
 }

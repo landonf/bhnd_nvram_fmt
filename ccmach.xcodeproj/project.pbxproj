@@ -10,8 +10,55 @@
 		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
 		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
 		05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC11C40761D005E5D51 /* cis_tuples.mm */; };
+		05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC41C42F48F005E5D51 /* nvram.mm */; };
+		05C56F441C430100005E5D51 /* PLStdCPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05C56F351C42FFC5005E5D51 /* PLStdCPP.framework */; };
 		05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */ = {isa = PBXBuildFile; fileRef = 05FDE57E1C3721DA0035C177 /* nvram_map.c */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		05C56F341C42FFC5005E5D51 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 373BC30B1AB3555B00138ACF;
+			remoteInfo = PLStdCPP.framework;
+		};
+		05C56F361C42FFC5005E5D51 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 373BC3161AB3555B00138ACF;
+			remoteInfo = "PLStdCPP.framework Tests";
+		};
+		05C56F381C42FFC5005E5D51 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 373BC32C1AB3575A00138ACF;
+			remoteInfo = libPLStdCPP.a;
+		};
+		05C56F3A1C42FFC5005E5D51 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 373BC3361AB3575B00138ACF;
+			remoteInfo = "libPLStdCPP.a Tests";
+		};
+		05C56F401C42FFE3005E5D51 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 373BC32B1AB3575A00138ACF;
+			remoteInfo = libPLStdCPP.a;
+		};
+		05C56F421C43007B005E5D51 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 373BC30A1AB3555B00138ACF;
+			remoteInfo = PLStdCPP.framework;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		059550281C35E97D0032A4AE /* CopyFiles */ = {
@@ -34,6 +81,59 @@
 		0599679F1C38DFA300CB31ED /* map.awk */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = map.awk; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		05C56EC11C40761D005E5D51 /* cis_tuples.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_tuples.mm; sourceTree = "<group>"; };
 		05C56EC21C40761D005E5D51 /* cis_tuples.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_tuples.hpp; sourceTree = "<group>"; };
+		05C56EC41C42F48F005E5D51 /* nvram.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nvram.mm; sourceTree = "<group>"; };
+		05C56EC51C42F48F005E5D51 /* nvram.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.cpp.h; path = nvram.hpp; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
+		05C56EEC1C42FFC5005E5D51 /* applicative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = applicative.h; sourceTree = "<group>"; };
+		05C56EED1C42FFC5005E5D51 /* basic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = basic.h; sourceTree = "<group>"; };
+		05C56EEE1C42FFC5005E5D51 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		05C56EEF1C42FFC5005E5D51 /* foldable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = foldable.h; sourceTree = "<group>"; };
+		05C56EF01C42FFC5005E5D51 /* functor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = functor.h; sourceTree = "<group>"; };
+		05C56EF11C42FFC5005E5D51 /* iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iterator.h; sourceTree = "<group>"; };
+		05C56EF21C42FFC5005E5D51 /* monad.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = monad.h; sourceTree = "<group>"; };
+		05C56EF31C42FFC5005E5D51 /* monoid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = monoid.h; sourceTree = "<group>"; };
+		05C56EF41C42FFC5005E5D51 /* orderable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = orderable.h; sourceTree = "<group>"; };
+		05C56EF51C42FFC5005E5D51 /* zippable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zippable.h; sourceTree = "<group>"; };
+		05C56EF61C42FFC5005E5D51 /* either.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = either.h; sourceTree = "<group>"; };
+		05C56EF71C42FFC5005E5D51 /* either_trans.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = either_trans.h; sourceTree = "<group>"; };
+		05C56EF81C42FFC5005E5D51 /* forward_list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = forward_list.h; sourceTree = "<group>"; };
+		05C56EF91C42FFC5005E5D51 /* function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = function.h; sourceTree = "<group>"; };
+		05C56EFA1C42FFC5005E5D51 /* functional.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = functional.h; sourceTree = "<group>"; };
+		05C56EFB1C42FFC5005E5D51 /* future.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = future.h; sourceTree = "<group>"; };
+		05C56EFD1C42FFC5005E5D51 /* currying.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = currying.h; sourceTree = "<group>"; };
+		05C56EFE1C42FFC5005E5D51 /* function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = function.h; sourceTree = "<group>"; };
+		05C56EFF1C42FFC5005E5D51 /* maybe_iterator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = maybe_iterator.h; sourceTree = "<group>"; };
+		05C56F001C42FFC5005E5D51 /* tuple_apply.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tuple_apply.h; sourceTree = "<group>"; };
+		05C56F011C42FFC5005E5D51 /* lazy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lazy.h; sourceTree = "<group>"; };
+		05C56F021C42FFC5005E5D51 /* lazy_trans.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lazy_trans.h; sourceTree = "<group>"; };
+		05C56F031C42FFC5005E5D51 /* list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = list.h; sourceTree = "<group>"; };
+		05C56F041C42FFC5005E5D51 /* map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = map.h; sourceTree = "<group>"; };
+		05C56F051C42FFC5005E5D51 /* maybe.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = maybe.h; sourceTree = "<group>"; };
+		05C56F061C42FFC5005E5D51 /* maybe_trans.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = maybe_trans.h; sourceTree = "<group>"; };
+		05C56F071C42FFC5005E5D51 /* memory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = memory.h; sourceTree = "<group>"; };
+		05C56F081C42FFC5005E5D51 /* ord.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ord.h; sourceTree = "<group>"; };
+		05C56F091C42FFC5005E5D51 /* prelude.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = prelude.h; sourceTree = "<group>"; };
+		05C56F0A1C42FFC5005E5D51 /* set.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = set.h; sourceTree = "<group>"; };
+		05C56F0B1C42FFC5005E5D51 /* string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = string.h; sourceTree = "<group>"; };
+		05C56F0C1C42FFC5005E5D51 /* sum_type.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sum_type.h; sourceTree = "<group>"; };
+		05C56F0D1C42FFC5005E5D51 /* tuple.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tuple.h; sourceTree = "<group>"; };
+		05C56F0E1C42FFC5005E5D51 /* type_functions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = type_functions.h; sourceTree = "<group>"; };
+		05C56F0F1C42FFC5005E5D51 /* type_traits.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = type_traits.h; sourceTree = "<group>"; };
+		05C56F101C42FFC5005E5D51 /* unordered_map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = unordered_map.h; sourceTree = "<group>"; };
+		05C56F111C42FFC5005E5D51 /* vector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector.h; sourceTree = "<group>"; };
+		05C56F121C42FFC5005E5D51 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		05C56F131C42FFC5005E5D51 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
+		05C56F151C42FFC5005E5D51 /* XSmallTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = XSmallTest.h; sourceTree = "<group>"; };
+		05C56F161C42FFC5005E5D51 /* libPLStdCPPTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "libPLStdCPPTests-Info.plist"; sourceTree = "<group>"; };
+		05C56F171C42FFC5005E5D51 /* PLStdCPP-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PLStdCPP-Info.plist"; sourceTree = "<group>"; };
+		05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = PLStdCPP.xcodeproj; sourceTree = "<group>"; };
+		05C56F1B1C42FFC5005E5D51 /* PLStdCPPTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "PLStdCPPTests-Info.plist"; sourceTree = "<group>"; };
+		05C56F1D1C42FFC5005E5D51 /* hlist.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = hlist.hpp; sourceTree = "<group>"; };
+		05C56F1E1C42FFC5005E5D51 /* hlist_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = hlist_tests.mm; sourceTree = "<group>"; };
+		05C56F1F1C42FFC5005E5D51 /* PLSmallTestExt.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = PLSmallTestExt.hpp; sourceTree = "<group>"; };
+		05C56F201C42FFC5005E5D51 /* product_type.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = product_type.hpp; sourceTree = "<group>"; };
+		05C56F211C42FFC5005E5D51 /* record_type.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = record_type.hpp; sourceTree = "<group>"; };
+		05C56F221C42FFC5005E5D51 /* record_type_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = record_type_tests.mm; sourceTree = "<group>"; };
+		05C56F231C42FFC5005E5D51 /* unit_type.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = unit_type.hpp; sourceTree = "<group>"; };
 		05FDE5041C36E4410035C177 /* aidmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aidmp.h; sourceTree = "<group>"; };
 		05FDE5051C36E4410035C177 /* amemc_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = amemc_core.h; sourceTree = "<group>"; };
 		05FDE5061C36E4410035C177 /* armca9_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armca9_core.h; sourceTree = "<group>"; };
@@ -160,6 +260,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05C56F441C430100005E5D51 /* PLStdCPP.framework in Frameworks */,
 				059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -174,6 +275,7 @@
 				0599679E1C38DD9B00CB31ED /* nvram_map */,
 				059550341C35EA100032A4AE /* ObjectDoc.framework */,
 				0595502C1C35E97D0032A4AE /* ccmach */,
+				05C56EE71C42FFC5005E5D51 /* plstdcpp */,
 				0595502B1C35E97D0032A4AE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -195,8 +297,135 @@
 				05FDE57E1C3721DA0035C177 /* nvram_map.c */,
 				05C56EC11C40761D005E5D51 /* cis_tuples.mm */,
 				05C56EC21C40761D005E5D51 /* cis_tuples.hpp */,
+				05C56EC41C42F48F005E5D51 /* nvram.mm */,
+				05C56EC51C42F48F005E5D51 /* nvram.hpp */,
 			);
 			path = ccmach;
+			sourceTree = "<group>";
+		};
+		05C56EE71C42FFC5005E5D51 /* plstdcpp */ = {
+			isa = PBXGroup;
+			children = (
+				05C56EE81C42FFC5005E5D51 /* Dependencies */,
+				05C56F161C42FFC5005E5D51 /* libPLStdCPPTests-Info.plist */,
+				05C56F171C42FFC5005E5D51 /* PLStdCPP-Info.plist */,
+				05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */,
+				05C56F1B1C42FFC5005E5D51 /* PLStdCPPTests-Info.plist */,
+				05C56F1C1C42FFC5005E5D51 /* src */,
+			);
+			path = plstdcpp;
+			sourceTree = "<group>";
+		};
+		05C56EE81C42FFC5005E5D51 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				05C56EE91C42FFC5005E5D51 /* ftl */,
+				05C56F131C42FFC5005E5D51 /* README.txt */,
+				05C56F141C42FFC5005E5D51 /* XSmallTest */,
+			);
+			path = Dependencies;
+			sourceTree = "<group>";
+		};
+		05C56EE91C42FFC5005E5D51 /* ftl */ = {
+			isa = PBXGroup;
+			children = (
+				05C56EEA1C42FFC5005E5D51 /* ftl */,
+				05C56F121C42FFC5005E5D51 /* LICENSE */,
+			);
+			path = ftl;
+			sourceTree = "<group>";
+		};
+		05C56EEA1C42FFC5005E5D51 /* ftl */ = {
+			isa = PBXGroup;
+			children = (
+				05C56EEB1C42FFC5005E5D51 /* concepts */,
+				05C56EF61C42FFC5005E5D51 /* either.h */,
+				05C56EF71C42FFC5005E5D51 /* either_trans.h */,
+				05C56EF81C42FFC5005E5D51 /* forward_list.h */,
+				05C56EF91C42FFC5005E5D51 /* function.h */,
+				05C56EFA1C42FFC5005E5D51 /* functional.h */,
+				05C56EFB1C42FFC5005E5D51 /* future.h */,
+				05C56EFC1C42FFC5005E5D51 /* implementation */,
+				05C56F011C42FFC5005E5D51 /* lazy.h */,
+				05C56F021C42FFC5005E5D51 /* lazy_trans.h */,
+				05C56F031C42FFC5005E5D51 /* list.h */,
+				05C56F041C42FFC5005E5D51 /* map.h */,
+				05C56F051C42FFC5005E5D51 /* maybe.h */,
+				05C56F061C42FFC5005E5D51 /* maybe_trans.h */,
+				05C56F071C42FFC5005E5D51 /* memory.h */,
+				05C56F081C42FFC5005E5D51 /* ord.h */,
+				05C56F091C42FFC5005E5D51 /* prelude.h */,
+				05C56F0A1C42FFC5005E5D51 /* set.h */,
+				05C56F0B1C42FFC5005E5D51 /* string.h */,
+				05C56F0C1C42FFC5005E5D51 /* sum_type.h */,
+				05C56F0D1C42FFC5005E5D51 /* tuple.h */,
+				05C56F0E1C42FFC5005E5D51 /* type_functions.h */,
+				05C56F0F1C42FFC5005E5D51 /* type_traits.h */,
+				05C56F101C42FFC5005E5D51 /* unordered_map.h */,
+				05C56F111C42FFC5005E5D51 /* vector.h */,
+			);
+			path = ftl;
+			sourceTree = "<group>";
+		};
+		05C56EEB1C42FFC5005E5D51 /* concepts */ = {
+			isa = PBXGroup;
+			children = (
+				05C56EEC1C42FFC5005E5D51 /* applicative.h */,
+				05C56EED1C42FFC5005E5D51 /* basic.h */,
+				05C56EEE1C42FFC5005E5D51 /* common.h */,
+				05C56EEF1C42FFC5005E5D51 /* foldable.h */,
+				05C56EF01C42FFC5005E5D51 /* functor.h */,
+				05C56EF11C42FFC5005E5D51 /* iterator.h */,
+				05C56EF21C42FFC5005E5D51 /* monad.h */,
+				05C56EF31C42FFC5005E5D51 /* monoid.h */,
+				05C56EF41C42FFC5005E5D51 /* orderable.h */,
+				05C56EF51C42FFC5005E5D51 /* zippable.h */,
+			);
+			path = concepts;
+			sourceTree = "<group>";
+		};
+		05C56EFC1C42FFC5005E5D51 /* implementation */ = {
+			isa = PBXGroup;
+			children = (
+				05C56EFD1C42FFC5005E5D51 /* currying.h */,
+				05C56EFE1C42FFC5005E5D51 /* function.h */,
+				05C56EFF1C42FFC5005E5D51 /* maybe_iterator.h */,
+				05C56F001C42FFC5005E5D51 /* tuple_apply.h */,
+			);
+			path = implementation;
+			sourceTree = "<group>";
+		};
+		05C56F141C42FFC5005E5D51 /* XSmallTest */ = {
+			isa = PBXGroup;
+			children = (
+				05C56F151C42FFC5005E5D51 /* XSmallTest.h */,
+			);
+			path = XSmallTest;
+			sourceTree = "<group>";
+		};
+		05C56F191C42FFC5005E5D51 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				05C56F351C42FFC5005E5D51 /* PLStdCPP.framework */,
+				05C56F371C42FFC5005E5D51 /* PLStdCPP.framework Tests.xctest */,
+				05C56F391C42FFC5005E5D51 /* libPLStdCPP.a */,
+				05C56F3B1C42FFC5005E5D51 /* libPLStdCPP.a Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		05C56F1C1C42FFC5005E5D51 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				05C56F1D1C42FFC5005E5D51 /* hlist.hpp */,
+				05C56F1E1C42FFC5005E5D51 /* hlist_tests.mm */,
+				05C56F1F1C42FFC5005E5D51 /* PLSmallTestExt.hpp */,
+				05C56F201C42FFC5005E5D51 /* product_type.hpp */,
+				05C56F211C42FFC5005E5D51 /* record_type.hpp */,
+				05C56F221C42FFC5005E5D51 /* record_type_tests.mm */,
+				05C56F231C42FFC5005E5D51 /* unit_type.hpp */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 		05FDE5031C36E4410035C177 /* bcm */ = {
@@ -370,6 +599,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				05C56F431C43007B005E5D51 /* PBXTargetDependency */,
+				05C56F411C42FFE3005E5D51 /* PBXTargetDependency */,
 			);
 			name = ccmach;
 			productName = ccmach;
@@ -400,12 +631,49 @@
 			mainGroup = 059550211C35E97D0032A4AE;
 			productRefGroup = 0595502B1C35E97D0032A4AE /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 05C56F191C42FFC5005E5D51 /* Products */;
+					ProjectRef = 05C56F181C42FFC5005E5D51 /* PLStdCPP.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				059550291C35E97D0032A4AE /* ccmach */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		05C56F351C42FFC5005E5D51 /* PLStdCPP.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = PLStdCPP.framework;
+			remoteRef = 05C56F341C42FFC5005E5D51 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		05C56F371C42FFC5005E5D51 /* PLStdCPP.framework Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "PLStdCPP.framework Tests.xctest";
+			remoteRef = 05C56F361C42FFC5005E5D51 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		05C56F391C42FFC5005E5D51 /* libPLStdCPP.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libPLStdCPP.a;
+			remoteRef = 05C56F381C42FFC5005E5D51 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		05C56F3B1C42FFC5005E5D51 /* libPLStdCPP.a Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "libPLStdCPP.a Tests.xctest";
+			remoteRef = 05C56F3A1C42FFC5005E5D51 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXSourcesBuildPhase section */
 		059550261C35E97D0032A4AE /* Sources */ = {
@@ -414,18 +682,32 @@
 			files = (
 				059550371C35EAA80032A4AE /* main.mm in Sources */,
 				05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */,
+				05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */,
 				05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		05C56F411C42FFE3005E5D51 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libPLStdCPP.a;
+			targetProxy = 05C56F401C42FFE3005E5D51 /* PBXContainerItemProxy */;
+		};
+		05C56F431C43007B005E5D51 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = PLStdCPP.framework;
+			targetProxy = 05C56F421C43007B005E5D51 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		0595502F1C35E97D0032A4AE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -466,7 +748,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
