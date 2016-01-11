@@ -26,16 +26,222 @@
 
 using namespace std;
 
-static uint32_t     compute_literal_u32(PLClangTranslationUnit *tu, NSArray *tokens);
-static id<NSObject> get_literal(PLClangTranslationUnit *tu, PLClangToken *t);
+class Compiler {
+private:
+    PLClangSourceIndex *_idx;
+    PLClangTranslationUnit *_tu;
+    NSDictionary *_symbols;
+
+public:
+    PLClangCursor *find_symbol (const string &name) {
+        return _symbols[@(name.c_str())];
+    }
+    
+    NSArray *get_tokens (PLClangCursor *cursor) {
+        return [_tu tokensForSourceRange: cursor.extent];
+    }
+    
+    PLClangToken *
+    resolve_macro_def(PLClangToken *t) {
+        PLClangCursor *def;
+        if (t.cursor.referencedCursor != nil)
+            def = t.cursor.referencedCursor;
+        else
+            def = t.cursor;
+        
+        NSArray *tokens = [_tu tokensForSourceRange: def.extent];
+        
+        if (tokens.count < 2)
+            errx(EXIT_FAILURE, "macro def %s unsupported token count %lu", t.spelling.UTF8String, (unsigned long)tokens.count);
+        
+        return tokens[1];
+    }
+    
+    /* Return the cursors composing the given array's initializers */
+    NSArray *
+    get_array_inits (PLClangCursor *tbl) {
+        NSMutableArray *result = [NSMutableArray array];
+        
+        [tbl visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+            if (cursor.kind != PLClangCursorKindInitializerListExpression)
+                return PLClangCursorVisitContinue;
+            
+            [cursor visitChildrenUsingBlock: ^PLClangCursorVisitResult(PLClangCursor *cursor) {
+                if (cursor.kind == PLClangCursorKindInitializerListExpression)
+                    [result addObject: cursor];
+                
+                return PLClangCursorVisitContinue;
+            }];
+            
+            return PLClangCursorVisitContinue;
+        }];
+        
+        return result;
+    }
+
+    id<NSObject>
+    token_literal(PLClangToken *t) {
+        if (t.kind == PLClangTokenKindIdentifier && t.cursor.isPreprocessing)
+            return token_literal(resolve_macro_def(t));
+        
+        if (t.kind != PLClangTokenKindLiteral)
+            return nil;
+        
+        NSString *s = t.spelling;
+        NSScanner *sc = [NSScanner scannerWithString: s];
+        
+        switch (t.cursor.kind) {
+            case PLClangCursorKindMacroDefinition:
+            case PLClangCursorKindIntegerLiteral: {
+                unsigned long long ull;
+                if ([s hasPrefix: @"0x"]) {
+                    [sc scanHexLongLong: &ull];
+                } else if ([s hasPrefix: @"0"] && ![s isEqual: @"0"]) {
+                    // TODO
+                    errx(EXIT_FAILURE, "octal not supported srry");
+                } else {
+                    [sc scanUnsignedLongLong: &ull];
+                }
+                return [NSNumber numberWithUnsignedLongLong: ull];
+            }
+            case PLClangCursorKindStringLiteral:
+            case PLClangCursorKindCharacterLiteral: {
+                NSString *lit = t.spelling;
+                lit = [lit substringFromIndex: 1];
+                lit = [lit substringToIndex: lit.length - 1];
+                return lit;
+            }
+            default:
+                return nil;
+        }
+    }
+
+    string token_literal_string (PLClangToken *token) {
+        id<NSObject> value = token_literal(token);
+        if (value == nil)
+            errx(EX_DATAERR, "can't fetch literal value for %s", token.spelling.UTF8String);
+        
+        if ([value isKindOfClass: [NSString class]]) {
+            return ((NSString *)(value)).UTF8String;
+        } else {
+            errx(EX_DATAERR, "%s is not a string literal", token.spelling.UTF8String);
+        }
+    }
+    
+    uint32 token_literal_u32 (PLClangToken *token) {
+        id<NSObject> value = token_literal(token);
+        if (value == nil)
+            errx(EX_DATAERR, "can't fetch literal value for %s", token.spelling.UTF8String);
+        
+        if ([value isKindOfClass: [NSNumber class]]) {
+            return [((NSNumber *)(value)) unsignedIntValue];
+        } else {
+            errx(EX_DATAERR, "%s is not an integer literal", token.spelling.UTF8String);
+        }
+    }
+    
+    uint32_t
+    tokens_literal_u32 (NSArray *tokens)
+    {
+        uint32_t v = 0;
+        char op = '\0';
+        
+        if (tokens.count == 0)
+            errx(EXIT_FAILURE, "empty token list");
+        
+        for (__strong PLClangToken *t in tokens) {
+            if (t.kind == PLClangTokenKindIdentifier) {
+                t = resolve_macro_def(t);
+
+            } else if (t.kind == PLClangTokenKindComment) {
+                continue;
+            }
+            
+            switch (t.kind) {
+                case PLClangTokenKindLiteral: {
+                    uint32_t nv = token_literal_u32(t);
+                    switch (op) {
+                        case '\0':
+                            v = nv;
+                            break;
+                        case '|':
+                            v |= nv;
+                            break;
+                        case '+':
+                            v += nv;
+                            break;
+                        case '-':
+                            v -= nv;
+                            break;
+                        default:
+                            errx(EXIT_FAILURE, "unsupported op %c", op);
+                    }
+                    break;
+                }
+                case PLClangTokenKindPunctuation:
+                    op = t.spelling.UTF8String[0];
+                    break;
+                default:
+                    errx(EXIT_FAILURE, "Unsupported token type: %u", (unsigned int) t.kind);
+            }
+        }
+        
+        return v;
+    }
+
+    Compiler () {}
+
+    Compiler (NSArray *arguments) {
+        NSError *error;
+    
+        _idx = [PLClangSourceIndex indexWithOptions: PLClangIndexCreationDisplayDiagnostics];
+        _tu = [_idx addTranslationUnitWithCompilerArguments: arguments
+                                                    options: PLClangTranslationUnitCreationDetailedPreprocessingRecord
+                                                      error: &error];
+        if (_tu == nil)
+            errx(EXIT_FAILURE, "%s", error.description.UTF8String);
+        
+        if (_tu.didFail)
+            errx(EXIT_FAILURE, "parse failed");
+        
+        /* Map symbol names to their definitions */
+        auto symbols = [NSMutableDictionary dictionary];
+        [_tu.cursor visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+            if (cursor.location.isInSystemHeader || cursor.location.path == nil)
+                return PLClangCursorVisitContinue;
+            
+            if (cursor.displayName.length == 0)
+                return PLClangCursorVisitContinue;
+            
+            if (cursor.isReference)
+                return PLClangCursorVisitContinue;
+            
+            symbols[cursor.displayName] = cursor;
+            
+            switch (cursor.kind) {
+                case PLClangCursorKindObjCInterfaceDeclaration:
+                case PLClangCursorKindObjCCategoryDeclaration:
+                case PLClangCursorKindObjCProtocolDeclaration:
+                case PLClangCursorKindEnumDeclaration:
+                    return PLClangCursorVisitRecurse;
+                default:
+                    break;
+            }
+            
+            return PLClangCursorVisitContinue;
+        }];
+        _symbols = symbols;
+    }
+};
+
 
 /** A symbolic constant definition */
 struct symbolic_constant {
-    PLClangTranslationUnit *tu;
+    shared_ptr<Compiler>   c;
     PLClangToken           *token;
-
+    
     uint32_t u32_value () {
-        return compute_literal_u32(tu, [tu tokensForSourceRange: token.cursor.extent]);
+        return c->tokens_literal_u32(c->get_tokens(token.cursor));
     }
     std::string name() const { return token.spelling.UTF8String; }
 };
@@ -139,181 +345,9 @@ public:
     }
 };
 
-static PLClangToken *
-resolve_pre(PLClangTranslationUnit *tu, PLClangToken *t) {
-    PLClangCursor *def;
-    if (t.cursor.referencedCursor != nil)
-        def = t.cursor.referencedCursor;
-    else
-        def = t.cursor;
-
-    NSArray *tokens = [tu tokensForSourceRange: def.extent];
-    
-    if (tokens.count < 2)
-        errx(EXIT_FAILURE, "macro def %s unsupported token count %lu", t.spelling.UTF8String, (unsigned long)tokens.count);
-
-    return tokens[1];
-}
-
-static id<NSObject>
-get_literal(PLClangTranslationUnit *tu, PLClangToken *t) {
-    if (t.kind == PLClangTokenKindIdentifier && t.cursor.isPreprocessing)
-        return get_literal(tu, resolve_pre(tu, t));
-        
-    if (t.kind != PLClangTokenKindLiteral)
-        return nil;
-
-    NSString *s = t.spelling;
-    NSScanner *sc = [NSScanner scannerWithString: s];
-
-    switch (t.cursor.kind) {
-        case PLClangCursorKindMacroDefinition:
-        case PLClangCursorKindIntegerLiteral: {
-            unsigned long long ull;
-            if ([s hasPrefix: @"0x"]) {
-                [sc scanHexLongLong: &ull];
-            } else if ([s hasPrefix: @"0"] && ![s isEqual: @"0"]) {
-                // TODO
-                errx(EXIT_FAILURE, "octal not supported srry");
-            } else {
-                [sc scanUnsignedLongLong: &ull];
-            }
-            return [NSNumber numberWithUnsignedLongLong: ull];
-        }
-        case PLClangCursorKindStringLiteral:
-        case PLClangCursorKindCharacterLiteral: {
-            NSString *lit = t.spelling;
-            lit = [lit substringFromIndex: 1];
-            lit = [lit substringToIndex: lit.length - 1];
-            return lit;
-        }
-        default:
-            return nil;
-    }
-}
-
-static uint32_t
-compute_literal_u32(PLClangTranslationUnit *tu, NSArray *tokens)
-{
-    uint32_t v = 0;
-    char op = '\0';
-
-    if (tokens.count == 0)
-        errx(EXIT_FAILURE, "empty token list");
-
-    for (__strong PLClangToken *t in tokens) {
-        if (t.kind == PLClangTokenKindIdentifier)
-            t = resolve_pre(tu, t);
-        else if (t.kind == PLClangTokenKindComment)
-            continue;
-        
-        switch (t.kind) {
-            case PLClangTokenKindLiteral: {
-                NSNumber *n = (NSNumber *) get_literal(tu, t);
-                uint32_t nv = (uint32_t) [n unsignedIntegerValue];
-                switch (op) {
-                    case '\0':
-                        v = nv;
-                        break;
-                    case '|':
-                        v |= nv;
-                        break;
-                    case '+':
-                        v += nv;
-                        break;
-                    case '-':
-                        v -= nv;
-                        break;
-                    default:
-                        errx(EXIT_FAILURE, "unsupported op %c", op);
-                }
-                break;
-            }
-            case PLClangTokenKindPunctuation:
-                op = t.spelling.UTF8String[0];
-                break;
-            default:
-                errx(EXIT_FAILURE, "Unsupported token type: %u", (unsigned int) t.kind);
-        }
-    }
-
-    return v;
-}
-
-static bool
-extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
-    NSMutableArray *tokens = [[tu tokensForSourceRange: c.extent] mutableCopy];
-    if (tokens.count == 0)
-        errx(EXIT_FAILURE, "zero length");
-
-    PLClangToken *sep = tokens.lastObject;
-    if (sep.kind == PLClangTokenKindPunctuation && ([sep.spelling isEqual: @","] || [sep.spelling isEqual: @"}"])) {
-        sep = nil;
-        [tokens removeLastObject];
-    }
-
-    if (tokens.count < 2)
-        errx(EXIT_FAILURE, "invalid length");
-
-    PLClangToken *start = tokens.firstObject;
-    PLClangToken *end = tokens.lastObject;
-
-    if (start.kind != PLClangTokenKindPunctuation || end.kind != PLClangTokenKindPunctuation)
-        errx(EXIT_FAILURE, "not an initializer");
-    
-    if (![start.spelling isEqual: @"{"] || ![end.spelling isEqual: @"}"])
-        errx(EXIT_FAILURE, "not an initializer");
-
-    [tokens removeObjectAtIndex: 0];
-    [tokens removeLastObject];
-
-    NSMutableArray *grouped = [NSMutableArray array];
-    NSMutableArray *curgroup = [NSMutableArray array];
-    for (PLClangToken *t in [tokens copy]) {
-        if (t.kind == PLClangTokenKindPunctuation && [t.spelling isEqualToString: @","]) {
-            [grouped addObject: curgroup];
-            curgroup = [NSMutableArray array];
-        } else {
-            [curgroup addObject: t];
-        }
-    }
-    [grouped addObject: curgroup];
-
-    if (grouped.count != 5)
-        errx(EXIT_FAILURE, "invalid length");
-    
-    PLClangToken *nameToken = tokens.firstObject;
-
-    /* Skip terminating entry */
-    if (nameToken.kind == PLClangTokenKindIdentifier && [nameToken.spelling isEqual: @"NULL"])
-        return false;
-
-    NSString *name = (NSString *) get_literal(tu, nameToken);
-    uint32_t revmask = compute_literal_u32(tu, grouped[1]);
-    uint32_t flags = compute_literal_u32(tu, grouped[2]);
-    uint16_t raw_off = compute_literal_u32(tu, grouped[3]);
-    uint32_t valmask = compute_literal_u32(tu, grouped[4]);
-    
-    uint16_t byte_off = raw_off * sizeof(uint16_t);
-
-
-    if (valmask & 0xFF00) {
-        if (!(valmask & 0x00FF)) {
-            valmask >>= 8;
-        }
-    } else if (valmask & 0x00FF) {
-        byte_off++;
-    }
-
-    *nout = nvar(name, revmask, flags, byte_off, valmask);
-    return true;
-}
-
 class Extractor {
 private:
-    PLClangSourceIndex *idx;
-    PLClangTranslationUnit *tu;
-    NSDictionary *api;
+    shared_ptr<Compiler> _c;
 
     /**
      * Coalesce unnecessary continuations in nvars
@@ -360,47 +394,91 @@ private:
         
         return clean_nvars;
     }
-
-    /* Return the cursors composing the given array's initializers */
-    NSArray *get_array_inits (PLClangCursor *tbl) {
-        NSMutableArray *result = [NSMutableArray array];
-
-        [tbl visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
-            if (cursor.kind != PLClangCursorKindInitializerListExpression)
-                return PLClangCursorVisitContinue;
-            
-            [cursor visitChildrenUsingBlock: ^PLClangCursorVisitResult(PLClangCursor *cursor) {
-                if (cursor.kind == PLClangCursorKindInitializerListExpression)
-                    [result addObject: cursor];
-                
-                return PLClangCursorVisitContinue;
-            }];
-            
-            return PLClangCursorVisitContinue;
-        }];
-
-        return result;
+    
+    bool
+    extract_srom_struct(PLClangCursor *c, nvar *nout) {
+        NSMutableArray *tokens = [_c->get_tokens(c) mutableCopy];
+        if (tokens.count == 0)
+            errx(EXIT_FAILURE, "zero length");
+        
+        PLClangToken *sep = tokens.lastObject;
+        if (sep.kind == PLClangTokenKindPunctuation && ([sep.spelling isEqual: @","] || [sep.spelling isEqual: @"}"])) {
+            sep = nil;
+            [tokens removeLastObject];
+        }
+        
+        if (tokens.count < 2)
+            errx(EXIT_FAILURE, "invalid length");
+        
+        PLClangToken *start = tokens.firstObject;
+        PLClangToken *end = tokens.lastObject;
+        
+        if (start.kind != PLClangTokenKindPunctuation || end.kind != PLClangTokenKindPunctuation)
+            errx(EXIT_FAILURE, "not an initializer");
+        
+        if (![start.spelling isEqual: @"{"] || ![end.spelling isEqual: @"}"])
+            errx(EXIT_FAILURE, "not an initializer");
+        
+        [tokens removeObjectAtIndex: 0];
+        [tokens removeLastObject];
+        
+        NSMutableArray *grouped = [NSMutableArray array];
+        NSMutableArray *curgroup = [NSMutableArray array];
+        for (PLClangToken *t in [tokens copy]) {
+            if (t.kind == PLClangTokenKindPunctuation && [t.spelling isEqualToString: @","]) {
+                [grouped addObject: curgroup];
+                curgroup = [NSMutableArray array];
+            } else {
+                [curgroup addObject: t];
+            }
+        }
+        [grouped addObject: curgroup];
+        
+        if (grouped.count != 5)
+            errx(EXIT_FAILURE, "invalid length");
+        
+        PLClangToken *nameToken = tokens.firstObject;
+        
+        /* Skip terminating entry */
+        if (nameToken.kind == PLClangTokenKindIdentifier && [nameToken.spelling isEqual: @"NULL"])
+            return false;
+        
+        NSString *name = (NSString *) _c->token_literal(nameToken);
+        uint32_t revmask = _c->tokens_literal_u32(grouped[1]);
+        uint32_t flags = _c->tokens_literal_u32(grouped[2]);
+        uint16_t raw_off = _c->tokens_literal_u32(grouped[3]);
+        uint32_t valmask = _c->tokens_literal_u32(grouped[4]);
+        
+        uint16_t byte_off = raw_off * sizeof(uint16_t);
+        
+        
+        if (valmask & 0xFF00) {
+            if (!(valmask & 0x00FF)) {
+                valmask >>= 8;
+            }
+        } else if (valmask & 0x00FF) {
+            byte_off++;
+        }
+        
+        *nout = nvar(name, revmask, flags, byte_off, valmask);
+        return true;
     }
 
     shared_ptr<vector<nvar>> extract_nvars (NSString *symbol) {
         auto nvars = std::make_shared<std::vector<nvar>>();
         
         /* Fetch all sromvars */
-        PLClangCursor *tbl = api[symbol];
+        PLClangCursor *tbl = _c->find_symbol(symbol.UTF8String);
         if (tbl == nil)
             errx(EXIT_FAILURE, "missing %s", symbol.UTF8String);
-        for (PLClangCursor *init in get_array_inits(tbl)) {
+        for (PLClangCursor *init in _c->get_array_inits(tbl)) {
             nvar n;
-            if (extract_struct(tu, init, &n))
+            if (extract_srom_struct(init, &n))
                 nvars->push_back(n);
         }
         
         /* Coalesce continuations */
         return coalesce(nvars);
-    }
-
-    NSArray *get_tokens (PLClangCursor *cursor) {
-        return [tu tokensForSourceRange: cursor.extent];
     }
     
     vector<shared_ptr<nvram::var>> convert_nvars (shared_ptr<vector<nvar>> &nvars) {
@@ -586,11 +664,11 @@ private:
             [varstr appendString: [fmt substringWithRange: NSMakeRange(last_loc, result.range.location - last_loc)]];
             last_loc = NSMaxRange(result.range);
 
-            NSArray *tokes = get_tokens(fmtargs[idx]);
+            NSArray *tokes = _c->get_tokens(fmtargs[idx]);
             PLClangToken *arg = tokes[0];
             NSUInteger tcount = tokes.count;
             if (tokes.count <= 2 && arg.kind == PLClangTokenKindIdentifier) {
-                tokes = get_tokens(arg.cursor.definition);
+                tokes = _c->get_tokens(arg.cursor.definition);
                 if (tokes.count >= 3) {
                     NSUInteger pos = tokes.count-1-2;
                     if ([[tokes[pos] spelling] isEqual: @"="]) {
@@ -602,10 +680,10 @@ private:
                 }
             }
             
-            if (tcount > 2 || arg.kind != PLClangTokenKindLiteral || get_literal(tu, arg) == nil) {
+            if (tcount > 2 || arg.kind != PLClangTokenKindLiteral || _c->token_literal(arg) == nil) {
                 [varstr appendString: [fmt substringWithRange: result.range]];
             } else {
-                [varstr appendString: [get_literal(tu, arg) description]];
+                [varstr appendString: [_c->token_literal(arg) description]];
             }
             
             idx++;
@@ -623,7 +701,7 @@ private:
                 case PLClangCursorKindStringLiteral: {
                     NSString *var_fmt;
                     NSString *val_fmt;
-                    NSString *lit = (NSString *)get_literal(tu, get_tokens(cursor)[0]);
+                    NSString *lit = (NSString *)_c->token_literal(_c->get_tokens(cursor)[0]);
                     NSArray *lits = [lit componentsSeparatedByString: @"="];
                     var_fmt = apply_fmt_lits(lits[0], fmtargs);
                     val_fmt = lits[1];
@@ -632,13 +710,13 @@ private:
                     break;
                 }
                 case PLClangCursorKindInitializerListExpression: {
-                    for (PLClangToken *t in get_tokens(cursor)) {
+                    for (PLClangToken *t in _c->get_tokens(cursor)) {
                         
                         switch (t.kind) {
                             case PLClangTokenKindLiteral: {
                                 NSString *var_fmt;
                                 NSString *val_fmt;
-                                NSString *lit = (NSString *)get_literal(tu, t);
+                                NSString *lit = (NSString *)_c->token_literal(t);
                                 NSArray *lits = [lit componentsSeparatedByString: @"="];
                                 var_fmt = apply_fmt_lits(lits[0], fmtargs);
                                 val_fmt = lits[1];
@@ -662,7 +740,7 @@ private:
     }
     
     vector<shared_ptr<cis_tuple>> extract_cis_tuples () {
-        PLClangCursor *srom_parsecis = api[@"srom_parsecis(osl_t *, uint8 **, uint, char **, uint *)"];
+        PLClangCursor *srom_parsecis = _c->find_symbol("srom_parsecis(osl_t *, uint8 **, uint, char **, uint *)");
         if (srom_parsecis == nil)
             errx(EXIT_FAILURE, "srom_parsecis() not found");
         
@@ -675,12 +753,12 @@ private:
             if (cursor.kind == PLClangCursorKindSwitchStatement) {
                 [cursor visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
                     if (cursor.kind == PLClangCursorKindCaseStatement) {
-                        PLClangToken *caseval = get_tokens(cursor)[1];
+                        PLClangToken *caseval = _c->get_tokens(cursor)[1];
                         if ([caseval.spelling hasPrefix: @"HNBU_"] || [caseval.spelling hasPrefix: @"CISTPL_"]) {
                             hnbu_sect = caseval.spelling;
                             
                             tuple = make_shared<cis_tuple>();
-                            tuple->tag = {tu, caseval};
+                            tuple->tag = {_c, caseval};
                             cis_tuples.push_back(tuple);
                             asserted_revmask = 0;
                         }
@@ -702,7 +780,7 @@ private:
                             } else {
                                 [vs_arg visitChildrenUsingBlock: ^PLClangCursorVisitResult(PLClangCursor *cursor) {
                                     if (cursor.kind == PLClangCursorKindArraySubscriptExpression) {
-                                        auto tokens = get_tokens(cursor);
+                                        auto tokens = _c->get_tokens(cursor);
                                         PLClangToken *base = tokens[0];
                                         PLClangToken *subscript = tokens[2];
                                         if ([base.spelling hasPrefix: @"vstr_"]) {
@@ -710,7 +788,7 @@ private:
                                             string vstr_name = string(base.spelling.UTF8String);
                                             auto vstr = extract_vstr(tuple->tag, base.cursor.definition, vap, asserted_revmask);
 
-                                            if (get_literal(tu, subscript) == nil) {
+                                            if (_c->token_literal(subscript) == nil) {
                                                 if ((tuple->tag.name() == "HNBU_PAPARMS" && (vstr_name == "vstr_pa0b" || vstr_name == "vstr_pa0b_lo")) ||
                                                     (tuple->tag.name() == "HNBU_PAPARMS5G" && (vstr_name == "vstr_pa1b" || vstr_name == "vstr_pa1lob" || vstr_name == "vstr_pa1hib"))
                                                 ) {
@@ -731,7 +809,7 @@ private:
                                                     errx(EXIT_FAILURE, "can't parse subscript for %s %s", tuple->tag.name().c_str(), base.spelling.UTF8String);
                                                 }
                                             } else {
-                                                start = (uint32_t) [(NSNumber *) get_literal(tu, subscript) unsignedIntegerValue];
+                                                start = (uint32_t) _c->token_literal_u32(subscript);
                                                 finish = start+1;
                                             }
                                             for (uint32_t i = start; i < finish; i++) {
@@ -754,7 +832,7 @@ private:
                                 }];
                             }
                         } else if ([fn isEqual: @"ASSERT"]) {
-                            NSArray *args = get_tokens(cursor);
+                            NSArray *args = _c->get_tokens(cursor);
                             args = [args subarrayWithRange: NSMakeRange(2, args.count - 4)];
                             if ([[args[0] spelling] isEqual: @"sromrev"] || [[args[1] spelling] isEqual: @"sromrev"]) {
                                 NSArray *sep = [[[[[args componentsJoinedByString: @""] stringByReplacingOccurrencesOfString: @"sromrev" withString: @""] stringByReplacingOccurrencesOfString: @"(" withString: @""] stringByReplacingOccurrencesOfString: @")" withString:@""] componentsSeparatedByString:@"||"];
@@ -861,12 +939,12 @@ private:
             
             if (cs->tag.name() == "HNBU_BOARDNUM") {
                 // XXX: implicit; the boardnum may also be specified elsewhere
-                PLClangCursor *c = api[@"vstr_boardnum"];
+                PLClangCursor *c = _c->find_symbol("vstr_boardnum");
                 if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_boardnum`");
                 addtl.emplace_back(cs->tag, "boardnum", "%d", c, 0);
             } else if (cs->tag.name() == "HNBU_MACADDR") {
                 // XXX: may also be specified elsewhere
-                PLClangCursor *c = api[@"vstr_macaddr"];
+                PLClangCursor *c = _c->find_symbol("vstr_macaddr");
                 if (c == nil) errx(EXIT_FAILURE, "could not find `vstr_macaddr`");
                 addtl.emplace_back(cs->tag, "macaddr", "%d", c, 0);
             }
@@ -886,8 +964,6 @@ private:
     
 public:
     Extractor(int argc, char * const argv[]) {
-        NSError *error;
-        NSString *input;
         int optchar;
         
         static struct option longopts[] = {
@@ -899,9 +975,6 @@ public:
             switch (optchar) {
                 case 'h':
                     // TODO
-                    break;
-                case 'i':
-                    input = @(optarg);
                     break;
                 default:
                     fprintf(stderr, "unhandled option -%c\n", optchar);
@@ -916,44 +989,7 @@ public:
             [args addObject: @(argv[i])];
         }
 
-        idx = [PLClangSourceIndex indexWithOptions: PLClangIndexCreationDisplayDiagnostics];
-        tu = [idx addTranslationUnitWithSourcePath: input
-                                      compilerArguments: args
-                                                options: PLClangTranslationUnitCreationDetailedPreprocessingRecord
-                                                  error:&error];
-        if (tu == nil)
-            errx(EXIT_FAILURE, "%s", error.description.UTF8String);
-        
-        if (tu.didFail)
-            errx(EXIT_FAILURE, "parse failed");
-
-        /* Map symbol names to their definitions */
-        auto symbols = [NSMutableDictionary dictionary];
-        [tu.cursor visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
-            if (cursor.location.isInSystemHeader || cursor.location.path == nil)
-                return PLClangCursorVisitContinue;
-
-            if (cursor.displayName.length == 0)
-                return PLClangCursorVisitContinue;
-
-            if (cursor.isReference)
-                return PLClangCursorVisitContinue;
-            
-            symbols[cursor.displayName] = cursor;
-            
-            switch (cursor.kind) {
-                case PLClangCursorKindObjCInterfaceDeclaration:
-                case PLClangCursorKindObjCCategoryDeclaration:
-                case PLClangCursorKindObjCProtocolDeclaration:
-                case PLClangCursorKindEnumDeclaration:
-                    return PLClangCursorVisitRecurse;
-                default:
-                    break;
-            }
-            
-            return PLClangCursorVisitContinue;
-        }];
-        api = symbols;
+        _c = make_shared<Compiler>(args);
 
         /* Output all PCI sromvars */
         auto nvars = extract_nvars(@"pci_sromvars");
@@ -964,32 +1000,32 @@ public:
         auto path_vars = convert_nvars(path_nvars);
 
         struct pathcfg {
-            NSString *path_pfx;
-            NSString *path_num;
+            const char *path_pfx;
+            const char *path_num;
             nvram::compat_range compat;
         } pathcfgs[] = {
-            { @"SROM4_PATH",    @"MAX_PATH_SROM",       {4, 7}},
-            { @"SROM8_PATH",    @"MAX_PATH_SROM",       {8, 10}},
-            { @"SROM11_PATH",   @"MAX_PATH_SROM_11",    {11, nvram::compat_range::MAX_SPROMREV}},
+            { "SROM4_PATH",    "MAX_PATH_SROM",       {4, 7}},
+            { "SROM8_PATH",    "MAX_PATH_SROM",       {8, 10}},
+            { "SROM11_PATH",   "MAX_PATH_SROM_11",    {11, nvram::compat_range::MAX_SPROMREV}},
             { nil, nil, {0, 0}}
         };
         
         unordered_map<string, shared_ptr<nvram::var>> path_var_tbl;
         for (const auto &v : path_vars) {
             for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
-                PLClangCursor *maxCursor = api[cfg->path_num];
+                PLClangCursor *maxCursor = _c->find_symbol(cfg->path_num);
                 if (maxCursor == nil)
-                    errx(EXIT_FAILURE, "missing %s", cfg->path_num.UTF8String);
+                    errx(EXIT_FAILURE, "missing %s", cfg->path_num);
     
-                uint32_t max = compute_literal_u32(tu, get_tokens(maxCursor));
+                uint32_t max = _c->tokens_literal_u32(_c->get_tokens(maxCursor));
                 
                 shared_ptr<nvram::var> newv;
                 for (uint32_t i = 0; i < max; i++) {
-                    NSString *path = [NSString stringWithFormat: @"%@%u", cfg->path_pfx, i];
-                    PLClangCursor *c = api[path];
+                    NSString *path = [NSString stringWithFormat: @"%s%u", cfg->path_pfx, i];
+                    PLClangCursor *c = _c->find_symbol(path.UTF8String);
                     if (c == nil)
                         errx(EXIT_FAILURE, "missing %s", path.UTF8String);
-                    uint32_t struct_base = compute_literal_u32(tu, get_tokens(c)) * sizeof(uint16_t);
+                    uint32_t struct_base = _c->tokens_literal_u32(_c->get_tokens(c)) * sizeof(uint16_t);
 
                     for (const auto &sp : *v->sprom_offsets()) {
                         if (sp.compat().first() >= cfg->compat.first() && sp.compat().first() <= cfg->compat.last()) {
