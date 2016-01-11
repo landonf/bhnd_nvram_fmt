@@ -309,18 +309,6 @@ extract_struct(PLClangTranslationUnit *tu, PLClangCursor *c, nvar *nout) {
     return true;
 }
 
-#if 0
-static const char *fmtstr (bhnd_nvram_fmt fmt) {
-    switch (fmt) {
-        case BHND_NVRAM_VFMT_HEX: return "hex";
-        case BHND_NVRAM_VFMT_SDEC: return "sdec";
-        case BHND_NVRAM_VFMT_MACADDR: return "macaddr";
-        case BHND_NVRAM_VFMT_CCODE: return "ccode";
-        case BHND_NVRAM_VFMT_LEDDC: return "led_dc";
-    }
-}
-#endif
-
 class Extractor {
 private:
     PLClangSourceIndex *idx;
@@ -522,7 +510,6 @@ private:
         return ret;
     }
 
-#if 0
     /* vstr_ constant */
     struct vstr {
         symbolic_constant tag;
@@ -566,15 +553,13 @@ private:
             return (hnbu_entry() != NULL);
         }
 
-        bhnd_sprom_compat compat () {
+        nvram::compat_range compat () {
             const cis_tuple_t *t = hnbu_entry();
             if (t == NULL) {
                 errx(EXIT_FAILURE, "%s variable not found in cis_hnbuvars table\n", var.c_str());
             }
 
-            uint16_t first_ver = __builtin_ctz(t->revmask);
-            uint16_t last_ver = 31 - __builtin_clz(t->revmask);
-            return {first_ver, last_ver};
+            return nvram::compat_range::from_revmask(t->revmask);
         }
     };
     
@@ -815,7 +800,6 @@ private:
         
         return cis_tuples;
     }
-#endif
     
 public:
     Extractor(int argc, char * const argv[]) {
@@ -889,7 +873,6 @@ public:
         api = symbols;
 
         /* Output all PCI sromvars */
-        unordered_set<string> srom_vars;
         auto nvars = extract_nvars(@"pci_sromvars");
         auto vars = convert_nvars(nvars);
 
@@ -978,7 +961,6 @@ public:
             }
         }
 
-#if 0
         /* Report SROM/CIS differences */
         auto cis_tuples = extract_cis_tuples();
         NSMutableSet *unclaimedCISVSTR = [NSMutableSet set];
@@ -989,7 +971,6 @@ public:
         allVSTR = [unclaimedCISVSTR copy];
         [unclaimedCISVSTR removeObject: @"vstr_end"]; // terminator
 
-        unordered_set<string> cis_vars;
         for (auto &cs : cis_tuples) {
             for (auto &vs : cs->vars) {
                 if ([allVSTR containsObject: vs.vstr_global.spelling]) {
@@ -997,7 +978,6 @@ public:
                 } else {
                     errx(EXIT_FAILURE, "vstr global '%s' not found", vs.vstr_global.spelling.UTF8String);
                 }
-                cis_vars.insert(vs.var);
                 
                 /* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
                  * as the subdevid */
@@ -1008,7 +988,7 @@ public:
 
                 if (vs.has_hnbu_entry()) {
                     auto c = vs.compat();
-                    printf("(%hu-%hu)\n", c.first, c.last);
+                    printf("%s\n", c.description().c_str());
                 } else {
                     uint32_t revs = 0;
                     for (const sromvar_t *srv = pci_sromvars; srv->name != NULL; srv++)
@@ -1028,16 +1008,28 @@ public:
         }
         
 
-    
+
+        unordered_map<string, shared_ptr<nvram::var>> srom_vars;
+        unordered_map<string, shared_ptr<cis_tuple>> cis_vars;
         vector<string> srom_undef;
         vector<string> cis_undef;
+
+        /* Build tables */
+        for (const auto &t : cis_tuples)
+            for (const auto &v : t->vars)
+                cis_vars.insert({v.var, t});
+        
+        for (const auto &v : vars)
+            srom_vars.insert({v->name(), v});
+
+        /* Find undefs */
         for (const auto &v : cis_vars)
-            if (srom_vars.count(v) == 0)
-                srom_undef.push_back(v);
+            if (srom_vars.count(v.first) == 0)
+                srom_undef.push_back(v.first);
         
         for (const auto &v : srom_vars)
-            if (cis_vars.count(v) == 0)
-                cis_undef.push_back(v);
+            if (cis_vars.count(v.first) == 0)
+                cis_undef.push_back(v.first);
         
         sort(srom_undef.begin(), srom_undef.end(), [](const string &lhs, string &rhs) {
             return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
@@ -1054,11 +1046,6 @@ public:
         fprintf(stderr, "CIS vars not defined in SPROM:\n");
         for (const auto &v : srom_undef)
             fprintf(stderr, "\t%s\n", v.c_str());
-
-        fprintf(stderr, "CIS vstr_* globals unclaimed by CIS code:\n");
-        for (NSString *vstr in unclaimedCISVSTR)
-            fprintf(stderr, "\t%s\n", vstr.UTF8String);
-#endif
     }
 };
 
