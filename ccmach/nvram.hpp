@@ -86,7 +86,7 @@ public:
 	
 	uint32_t to_revmask (void) const {
 		uint32_t ret = 0;
-		for (uint8_t i = _first; i < _last; i++) {
+		for (uint8_t i = _first; i <= _last; i++) {
 			ret |= (1 << i);
 		}
 		assert(from_revmask(ret) == *this);

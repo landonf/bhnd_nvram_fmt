@@ -963,51 +963,6 @@ public:
 
         /* Report SROM/CIS differences */
         auto cis_tuples = extract_cis_tuples();
-        NSMutableSet *unclaimedCISVSTR = [NSMutableSet set];
-        NSSet *allVSTR;
-        for (NSString *vs in [api allKeys])
-            if ([vs hasPrefix: @"vstr_"])
-                [unclaimedCISVSTR addObject: vs];
-        allVSTR = [unclaimedCISVSTR copy];
-        [unclaimedCISVSTR removeObject: @"vstr_end"]; // terminator
-
-        for (auto &cs : cis_tuples) {
-            for (auto &vs : cs->vars) {
-                if ([allVSTR containsObject: vs.vstr_global.spelling]) {
-                    [unclaimedCISVSTR removeObject: vs.vstr_global.spelling];
-                } else {
-                    errx(EXIT_FAILURE, "vstr global '%s' not found", vs.vstr_global.spelling.UTF8String);
-                }
-                
-                /* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
-                 * as the subdevid */
-                if (vs.tag.name() == "HNBU_CHIPID" && vs.var == "boardtype")
-                    continue;
-
-                printf("%s:%s ", vs.tag.name().c_str(), vs.var.c_str());
-
-                if (vs.has_hnbu_entry()) {
-                    auto c = vs.compat();
-                    printf("%s\n", c.description().c_str());
-                } else {
-                    uint32_t revs = 0;
-                    for (const sromvar_t *srv = pci_sromvars; srv->name != NULL; srv++)
-                        if (strcmp(srv->name, vs.var.c_str()) == 0)
-                            revs |= srv->revmask;
-                    
-                    if (revs == 0) {
-                        printf("(unknown revs)\n");
-                    } else {
-                        uint16_t first_ver = __builtin_ctz(revs);
-                        uint16_t last_ver = 31 - __builtin_clz(revs);
-                        printf("(srom %hu-%hu)\n", first_ver, last_ver);
-
-                    }
-                }
-            }
-        }
-        
-
 
         unordered_map<string, shared_ptr<nvram::var>> srom_vars;
         unordered_map<string, shared_ptr<cis_tuple>> cis_vars;
@@ -1021,6 +976,39 @@ public:
         
         for (const auto &v : vars)
             srom_vars.insert({v->name(), v});
+        
+        for (auto &cs : cis_tuples) {
+            printf("%s:\n", cs->tag.name().c_str());
+
+            for (auto &vs : cs->vars) {
+                /* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
+                 * as the subdevid */
+                if (vs.tag.name() == "HNBU_CHIPID" && vs.var == "boardtype")
+                    continue;
+                
+                printf("\t%s ", vs.var.c_str());
+                
+                if (vs.has_hnbu_entry()) {
+                    auto c = vs.compat();
+                    printf("%s\n", c.description().c_str());
+                } else if (srom_vars.count(vs.var) > 0) {
+                    const auto &svr = srom_vars.at(vs.var);
+                    uint32_t revs = 0;
+                    for (const auto &sp : *svr->sprom_offsets()) {
+                        revs |= sp.compat().to_revmask();
+                    }
+                    
+                    if (revs == 0) {
+                        printf("(unknown revs)\n");
+                    } else {
+                        auto c = nvram::compat_range::from_revmask(revs);
+                        printf("(srom %s)\n", c.description().c_str());
+                    }
+                } else {
+                    printf("(unknown revs)\n");
+                }
+            }
+        }
 
         /* Find undefs */
         for (const auto &v : cis_vars)
