@@ -11,6 +11,8 @@
 #include <err.h>
 #include <sysexits.h>
 #include <vector>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "record_type.hpp"
 
@@ -230,46 +232,100 @@ public:
 };
 	
 
-class PHY {
+class phy {
 public:
-    int ptype;
+	PL_RECORD_FIELDS(phy, (int, ptype));
+public:
     string name () const {
-        switch (ptype) {
+        switch (_ptype) {
             case PHY_TYPE_HT: return "HT";
             case PHY_TYPE_N: return "N";
             case PHY_TYPE_LP: return "LP";
             case PHY_TYPE_AC: return "AC";
             case PHY_TYPE_NULL: return "NULL";
             default:
-                errx(EX_DATAERR, "unknown PHY type %d", ptype);
+                errx(EX_DATAERR, "unknown PHY type %d", _ptype);
         }
     };
 };
 
-class Band {
+class band {
+	PL_RECORD_FIELDS(band, (int, btype));
 public:
-    int btype;
     string band_name () {
-        switch (btype) {
+        switch (_btype) {
             case WL_CHAN_FREQ_RANGE_2G:         return "2G";
             case WL_CHAN_FREQ_RANGE_5G_BAND0:   return "5G U-NII-1 Low";
             case WL_CHAN_FREQ_RANGE_5G_BAND1:   return "5G U-NII-2 Mid";
             case WL_CHAN_FREQ_RANGE_5G_BAND2:   return "5G U-NII-3 High";
             case WL_CHAN_FREQ_RANGE_5G_BAND3:   return "5G U-NII-2e Worldwide"; // XXX ??? is this right
             case WL_CHAN_FREQ_RANGE_5G_4BAND:   return "5G (all bands)";
-            default:                            errx(EX_DATAERR, "unknown band range %d", btype);
+            default:                            errx(EX_DATAERR, "unknown band range %d", _btype);
         }
     }
 };
 
-class PHYBand {
+class phy_band {
+	PL_RECORD_FIELDS(phy_band,
+		(class phy,	phy),
+		(class band,	band)
+	);
 public:
-    PHY phy;
-    Band band;
     string description () {
-        return (phy.name() + " " + band.band_name());
+        return (_phy.name() + " " + _band.band_name());
     }
 };
+
+class phy_chain {
+	PL_RECORD_FIELDS(phy_chain,
+		(phy_band,	pb),
+		(uint32_t,	chain_num)
+	);
+public:
+	string description () {
+		return (pb().description() + " chain (" + to_string(chain_num()) + ")");
+	}
+};
+
+class nvram_map {
+private:
+	unordered_map<string, shared_ptr<var>> _srom_tbl;
+	unordered_multimap<string, phy_chain> _pavars;
+	unordered_multimap<string, phy_band> _povars;
+
+	void populate_pavars (const pavars_t *pas) {
+		for (const pavars_t *pa = pas; pa->phy_type != PHY_TYPE_NULL; pa++) {
+			auto pc = phy_chain(phy_band(phy(pa->phy_type), band(pa->bandrange)), pa->chain);
+			auto *varstr = [@(pa->vars) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+			for (NSString *str in varstr) {
+				_pavars.insert({str.UTF8String, pc});
+			}
+		}
+	}
+	
+public:
+	nvram_map (const vector<shared_ptr<var>> &srom_vars) {
+		for (const auto &v : srom_vars)
+			_srom_tbl.insert({v->name(), v});
+		
+		populate_pavars(pavars);
+		populate_pavars(pavars_bwver_1);
+		populate_pavars(pavars_bwver_2);
+		
+		for (const povars_t *po = povars; po->phy_type != PHY_TYPE_NULL; po++) {
+			auto pb = phy_band(phy(po->phy_type), band(po->bandrange));
+			auto *varstr = [@(po->vars) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+			for (NSString *str in varstr) {
+				_povars.insert({str.UTF8String, pb});
+			}
+		}
+	}
+	
+	void emit_diagnostics () {
+		
+	}
+};
+
 
 } /* namespace nvram */
 

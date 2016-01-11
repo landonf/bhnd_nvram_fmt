@@ -765,11 +765,19 @@ private:
             size_t idx = 0;
             vector<vstr> addtl;
             
+            if (cs->tag.name() == "HNBU_LEDS") {
+                for (auto &vs : cs->vars) {
+                    if (vs.var != "ledbh%d")
+                        errx(EXIT_FAILURE, "%s in HNBU_LEDS not handled", vs.var.c_str());
+                }
+                vstr orig = cs->vars[0];
+                cs->vars.clear();
+                for (int i = 0; i < 16; i++)
+                    cs->vars.emplace_back(orig.tag, string("ledbh") + to_string(i), orig.val, orig.vstr_global);
+            }
+            
             for (auto &vs : cs->vars) {
-                if (cs->tag.name() == "HNBU_LEDS" && vs.var == "ledbh%d") {
-                    // XXX: this only works if there are no other variables in HNBU_LEDS
-                    vs.var = [NSString stringWithFormat: @(vs.var.c_str()), (int) idx].UTF8String;
-                } else if (cs->tag.name() == "HNBU_PO_MCS2G" && vs.var == "mcs2gpo%d") {
+                if (cs->tag.name() == "HNBU_PO_MCS2G" && vs.var == "mcs2gpo%d") {
                     vs.var = [NSString stringWithFormat: @(vs.var.c_str()), 0].UTF8String;
                     for (int i = 1; i < 8; i++) {
                         vstr vap = vs;
@@ -1063,6 +1071,10 @@ public:
         fprintf(stderr, "CIS vars not defined in SPROM:\n");
         for (const auto &v : srom_undef)
             fprintf(stderr, "\t%s\n", v.c_str());
+        
+        
+        nvram::nvram_map m(vars);
+        m.emit_diagnostics();
     }
 };
 
