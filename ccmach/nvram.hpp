@@ -59,6 +59,12 @@ enum {
 	FLAG_NOALL1	= (1<<2)	/**< ignore variable if its value has all bits set. */
 };
 
+/** A symbolic constant definition */
+PL_RECORD_STRUCT(symbolic_constant,
+	(string, name),
+	(uint32, value)
+);
+
 /** SPROM revision compatibility declaration */
 class compat_range {
 public:
@@ -214,6 +220,58 @@ PL_RECORD_STRUCT(sprom_struct,
 	(compat_range,			compat),
 	(shared_ptr<vector<uint16_t>>,	offsets)
 );
+
+/*  */
+struct cis_vstr {
+	PL_RECORD_FIELDS(cis_vstr,
+		(symbolic_constant,	cis_tag),
+		(string,		name),
+		(string,		fmt_str),
+		(string,		vstr_variable),
+		(uint32_t,		asserted_revmask)
+	);
+
+public:
+        bool is_name_incomplete () const { return name().find("%") != string::npos; }
+
+        const cis_tuple_t *hnbu_entry () const {
+            for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
+                if (t->tag != _cis_tag.value())
+                    continue;
+                
+                auto vars = [@(t->params) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+                for (NSString *v in vars) {
+                    const char *cstr = v.UTF8String;
+                    const char *p;
+                    
+                    for (p = cstr; isdigit(*p) || *p == '*'; p++);
+                    auto offset = p - cstr;
+                    NSString *tv = [v substringFromIndex: offset];
+                    if (![tv isEqual: @(_name.c_str())])
+                        continue;
+
+                    return (t);
+                }
+                
+                return (NULL);
+            }
+            
+            return (NULL);
+        }
+        
+        bool has_hnbu_entry () const {
+            return (hnbu_entry() != NULL);
+        }
+
+        nvram::compat_range compat () const {
+            const cis_tuple_t *t = hnbu_entry();
+            if (t == NULL) {
+                errx(EXIT_FAILURE, "%s variable not found in cis_hnbuvars table\n", _name.c_str());
+            }
+
+            return nvram::compat_range::from_revmask(t->revmask);
+        }
+    };
 
 /** NVRAM variable */
 class var {
