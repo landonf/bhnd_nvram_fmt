@@ -1109,21 +1109,15 @@ public:
                 
                 printf("\t%s ", vs.var.c_str());
 
+                vector<nvram::compat_range> srom_compats;
                 if (srom_vars.count(vs.var) > 0) {
                     const auto &svr = srom_vars.at(vs.var);
 
                     for (const auto &sp : *svr->sprom_offsets())
-                        srom_revmask |= sp.compat().to_revmask();
-                    
-                    if (srom_revmask == 0) {
-                        printf("(unknown revs)");
-                    } else {
-                        auto c = nvram::compat_range::from_revmask(srom_revmask);
-                        printf("(srom %s)", c.description().c_str());
-                    }
+                        srom_compats.push_back(sp.compat());
                 }
                 
-                if (!vs.has_hnbu_entry() && !vs.asserted_revmask && !srom_revmask) {
+                if (!vs.has_hnbu_entry() && !vs.asserted_revmask && srom_compats.size() == 0) {
                     printf("(unknown revs)");
                 } else {
                     NSMutableArray *elems = [NSMutableArray array];
@@ -1131,15 +1125,16 @@ public:
                         [elems addObject: [NSString stringWithFormat: @"hnbu %s", nvram::compat_range::from_revmask(vs.hnbu_entry()->revmask).description().c_str()]];
                     }
 
-                    if (srom_revmask) {
-                        [elems addObject: [NSString stringWithFormat: @"srom %s", nvram::compat_range::from_revmask(srom_revmask).description().c_str()]];
+                    if (srom_compats.size() != 0) {
+                        for (const auto &c : srom_compats)
+                            [elems addObject: [NSString stringWithFormat: @"srom %s", c.description().c_str()]];
                     }
 
                     if (vs.asserted_revmask) {
                         [elems addObject: [NSString stringWithFormat: @"asrt %s", nvram::compat_range::from_revmask(vs.asserted_revmask).description().c_str()]];
                     }
                     
-                    printf("(%s)\n", [elems componentsJoinedByString: @", "].UTF8String);
+                    printf("(%s)", [elems componentsJoinedByString: @", "].UTF8String);
                 }
 
 #if 0
