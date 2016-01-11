@@ -703,11 +703,40 @@ private:
                                         PLClangToken *base = tokens[0];
                                         PLClangToken *subscript = tokens[2];
                                         if ([base.spelling hasPrefix: @"vstr_"]) {
-                                            uint32_t idx = (uint32_t) [(NSNumber *) get_literal(tu, subscript) unsignedIntegerValue];
+                                            uint32_t start, finish;
+                                            string vstr_name = string(base.spelling.UTF8String);
                                             auto vstr = extract_vstr(tuple->tag, base.cursor.definition, vap);
-                                            struct vstr e = vstr.elems[idx];
+
+                                            if (get_literal(tu, subscript) == nil) {
+                                                if ((tuple->tag.name() == "HNBU_PAPARMS" && (vstr_name == "vstr_pa0b" || vstr_name == "vstr_pa0b_lo")) ||
+                                                    (tuple->tag.name() == "HNBU_PAPARMS5G" && (vstr_name == "vstr_pa1b" || vstr_name == "vstr_pa1lob" || vstr_name == "vstr_pa1hib"))
+                                                ) {
+                                                    start = 0;
+                                                    finish = 3;
+                                                } else if (tuple->tag.name() == "HNBU_LEGOFDMBW205GPO" && vstr_name == "vstr_legofdmbw205gpo") {
+                                                    start = 0;
+                                                    finish = 6;
+                                                } else if (tuple->tag.name() == "HNBU_MCS2GPO" && vstr_name == "vstr_mcs2gpo") {
+                                                    start = 0; finish = 3;
+                                                } else if (tuple->tag.name() == "HNBU_MCS5GLPO" && vstr_name == "vstr_mcs5glpo") {
+                                                    start = 0; finish = 3;
+                                                } else if (tuple->tag.name() == "HNBU_MCS5GMPO" && vstr_name == "vstr_mcs5gmpo") {
+                                                    start = 0; finish = 3;
+                                                } else if (tuple->tag.name() == "HNBU_MCS5GHPO" && vstr_name == "vstr_mcs5ghpo") {
+                                                    start = 0; finish = 3;
+                                                } else {
+                                                    errx(EXIT_FAILURE, "can't parse subscript for %s %s", tuple->tag.name().c_str(), base.spelling.UTF8String);
+                                                }
+                                            } else {
+                                                start = (uint32_t) [(NSNumber *) get_literal(tu, subscript) unsignedIntegerValue];
+                                                finish = start+1;
+                                            }
+                                            for (uint32_t i = start; i < finish; i++) {
+                                                struct vstr e = vstr.elems[i];
+                                                tuple->vars.push_back(e);
+                                            }
                                             
-                                            tuple->vars.push_back(e);
+                                            
                                             return PLClangCursorVisitContinue;
                                         }
                                     }
