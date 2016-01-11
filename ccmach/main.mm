@@ -832,9 +832,7 @@ private:
         for (auto &cs : cis_tuples) {
             size_t idx = 0;
             vector<nvram::cis_vstr> addtl;
-            
-                printf("WAT: %s %zu\n", cs->tag.name().c_str(), cs->vars.size());
-            
+                        
             if (cs->tag.name() == "HNBU_LEDS") {
                 for (auto &vs : cs->vars) {
                     if (vs.name() != "ledbh%d")
@@ -1023,92 +1021,15 @@ public:
             }
         }
 
-        /* Report SROM/CIS differences */
+        /* Extract CIS decode info */
         auto cis_tuples = extract_cis_tuples();
-
-        unordered_map<string, shared_ptr<nvram::var>> srom_vars;
-        unordered_map<string, shared_ptr<cis_tuple>> cis_vars;
-        vector<string> srom_undef;
-        vector<string> cis_undef;
-
-        /* Build tables */
+        vector<shared_ptr<nvram::cis_vstr>> cis_vstrs;
         for (const auto &t : cis_tuples)
             for (const auto &v : t->vars)
-                cis_vars.insert({v.name(), t});
+                cis_vstrs.emplace_back(make_shared<nvram::cis_vstr>(v));
         
-        for (const auto &v : vars)
-            srom_vars.insert({v->name(), v});
-        
-        for (auto &cs : cis_tuples) {
-            printf("%s:\n", cs->tag.name().c_str());
-
-            for (auto &vs : cs->vars) {
-                /* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
-                 * as the subdevid */
-                if (vs.cis_tag().name() == "HNBU_CHIPID" && vs.name() == "boardtype")
-                    continue;
-                
-                printf("\t%s ", vs.name().c_str());
-
-                vector<nvram::compat_range> srom_compats;
-                if (srom_vars.count(vs.name()) > 0) {
-                    const auto &svr = srom_vars.at(vs.name());
-
-                    for (const auto &sp : *svr->sprom_offsets())
-                        srom_compats.push_back(sp.compat());
-                }
-                
-                if (!vs.has_hnbu_entry() && !vs.asserted_revmask() && srom_compats.size() == 0) {
-                    printf("(unknown revs)");
-                } else {
-                    NSMutableArray *elems = [NSMutableArray array];
-                    if (vs.has_hnbu_entry()) {
-                        [elems addObject: [NSString stringWithFormat: @"hnbu %s", nvram::compat_range::from_revmask(vs.hnbu_entry()->revmask).description().c_str()]];
-                    }
-
-                    if (srom_compats.size() != 0) {
-                        for (const auto &c : srom_compats)
-                            [elems addObject: [NSString stringWithFormat: @"srom %s", c.description().c_str()]];
-                    }
-
-                    if (vs.asserted_revmask()) {
-                        [elems addObject: [NSString stringWithFormat: @"asrt %s", nvram::compat_range::from_revmask(vs.asserted_revmask()).description().c_str()]];
-                    }
-                    
-                    printf("(%s)", [elems componentsJoinedByString: @", "].UTF8String);
-                }
-
-                printf("\n");
-            }
-        }
-
-        /* Find undefs */
-        for (const auto &v : cis_vars)
-            if (srom_vars.count(v.first) == 0)
-                srom_undef.push_back(v.first);
-        
-        for (const auto &v : srom_vars)
-            if (cis_vars.count(v.first) == 0)
-                cis_undef.push_back(v.first);
-        
-        sort(srom_undef.begin(), srom_undef.end(), [](const string &lhs, string &rhs) {
-            return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
-        });
-        
-        sort(cis_undef.begin(), cis_undef.end(), [](const string &lhs, string &rhs) {
-            return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
-        });
-
-        fprintf(stderr, "SROM vars not defined in CIS:\n");
-        for (const auto &v : cis_undef)
-            fprintf(stderr, "\t%s\n", v.c_str());
-
-        fprintf(stderr, "CIS vars not defined in SPROM:\n");
-        for (const auto &v : srom_undef)
-            fprintf(stderr, "\t%s\n", v.c_str());
-        
-        
-        nvram::nvram_map m(vars);
+        /* Report SROM/CIS differences */
+        nvram::nvram_map m(vars, cis_vstrs);
         m.emit_diagnostics();
     }
 };
