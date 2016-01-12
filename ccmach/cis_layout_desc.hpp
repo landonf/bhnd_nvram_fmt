@@ -28,6 +28,7 @@ PL_RECORD_STRUCT(cis_var_layout,
     (string,    name),
     (size_t,    offset),
     (size_t,    size),
+    (prop_type,    type),
     (size_t,    count)
 );
 

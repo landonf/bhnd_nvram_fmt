@@ -55,6 +55,12 @@ private:
 		}
 	}
 	
+	void alpha_sort (std::vector<string> &v) {
+		sort(v.begin(), v.end(), [](const string &lhs, string &rhs) {
+			return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
+		});
+	}
+	
 public:
 	nvram_map (const vector<shared_ptr<var>> &srom_vars,
 		   const vector<shared_ptr<cis_vstr>> &cis_vstrs,
@@ -134,22 +140,17 @@ public:
 			if (_srom_tbl.count(v.first) == 0)
 				srom_undef.push_back(v.first);
 		
-		for (const auto &v : _cis_vstr_tbl) {
+		for (const auto &v : _cis_vstr_tbl)
 			if (_cis_layout_tbl.count(v.first) == 0)
 				cis_layout_undef.push_back(v.first);
-		}
 		
 		for (const auto &v : _srom_tbl)
 			if (_cis_vstr_tbl.count(v.first) == 0)
 				cis_undef.push_back(v.first);
 		
-		sort(srom_undef.begin(), srom_undef.end(), [](const string &lhs, string &rhs) {
-			return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
-		});
-		
-		sort(cis_undef.begin(), cis_undef.end(), [](const string &lhs, string &rhs) {
-			return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
-		});
+		alpha_sort(srom_undef);
+		alpha_sort(cis_undef);
+		alpha_sort(cis_layout_undef);
 		
 		fprintf(stderr, "SROM vars not defined in CIS:\n");
 		for (const auto &v : cis_undef)

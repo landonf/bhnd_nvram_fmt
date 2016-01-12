@@ -15,12 +15,55 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
     NSString *varname;
     int sz;
     int count;
+    prop_type ptype;
 
     if (![s scanInt: &sz]) {
         /* 'special' var */
-        sz = 0;
-        count = 0;
+        if ([s scanString: @"s" intoString:NULL]) {
+            // TODO - ASCII count?
+            ptype = BHND_T_CHAR;
+            sz = 0;
+            count = 0;
+        } else {
+            ptype = BHND_T_UINT8;
+            sz = 0;
+            count = 0;
+        }
     } else {
+        switch (sz) {
+            case 0:
+                ptype = BHND_T_UINT8;
+                warnx("%s has unhandled 'special' encoding", layout.UTF8String);
+                break;
+            case 1:
+                ptype = BHND_T_UINT8;
+                break;
+            case 2:
+                ptype = BHND_T_UINT16;
+                break;
+            case 4:
+                ptype = BHND_T_UINT32;
+                break;
+            case 8:
+                ptype = BHND_T_UINT32;
+                sz = 4;
+                warnx("%s uses an 8 byte size spec; this is ignored and treated as a 4 byte number by wlu.c", layout.UTF8String);
+                break;
+            default:
+                if ([layout isEqualToString: @"6macaddr"]) {
+                    warnx("%s is used to derive the boardnum and requires special handling; treating as MAC-48 value", layout.UTF8String);
+                    ptype = BHND_T_UINT8;
+                    sz = 1;
+                    count = 48;
+                } else if ([layout isEqualToString: @"16uuid"]) {
+                    // TODO - do we need a UUID type?
+                    ptype = BHND_T_UINT8;
+                    sz = 1;
+                    count = 16;
+                } else {
+                    errx(EX_DATAERR, "unhandled size spec in %s", layout.UTF8String);
+                }
+        }
         /* array? */
         if ([s scanString: @"*" intoString: NULL]) {
             if (![s scanInt: &count])
@@ -33,7 +76,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
     if (![s scanCharactersFromSet: [NSCharacterSet whitespaceAndNewlineCharacterSet].invertedSet intoString: &varname])
         errx(EX_DATAERR, "failed to scan variable name in %s", layout.UTF8String);
 
-    return nvram::cis_var_layout(varname.UTF8String, offset, sz, count);
+    return nvram::cis_var_layout(varname.UTF8String, offset, sz, ptype, count);
 }
 
 vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {
