@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		058CD2991C456533008D9435 /* cis_layout_desc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 058CD2971C456533008D9435 /* cis_layout_desc.mm */; };
 		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
 		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
 		05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC11C40761D005E5D51 /* cis_tuples.mm */; };
@@ -74,6 +75,9 @@
 
 /* Begin PBXFileReference section */
 		050444B71C4185760040CBAC /* bcmsrom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bcmsrom.c; sourceTree = "<group>"; };
+		058CD2971C456533008D9435 /* cis_layout_desc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_layout_desc.mm; sourceTree = "<group>"; };
+		058CD2981C456533008D9435 /* cis_layout_desc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_layout_desc.hpp; sourceTree = "<group>"; };
+		058CD29C1C456633008D9435 /* nvtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvtypes.h; sourceTree = "<group>"; };
 		0595502A1C35E97D0032A4AE /* ccmach */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ccmach; sourceTree = BUILT_PRODUCTS_DIR; };
 		059550341C35EA100032A4AE /* ObjectDoc.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ObjectDoc.framework; sourceTree = "<group>"; };
 		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
@@ -299,6 +303,9 @@
 				05C56EC21C40761D005E5D51 /* cis_tuples.hpp */,
 				05C56EC41C42F48F005E5D51 /* nvram.mm */,
 				05C56EC51C42F48F005E5D51 /* nvram.hpp */,
+				058CD2971C456533008D9435 /* cis_layout_desc.mm */,
+				058CD2981C456533008D9435 /* cis_layout_desc.hpp */,
+				058CD29C1C456633008D9435 /* nvtypes.h */,
 			);
 			path = ccmach;
 			sourceTree = "<group>";
@@ -684,6 +691,7 @@
 				05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */,
 				05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */,
 				05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */,
+				058CD2991C456533008D9435 /* cis_layout_desc.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
