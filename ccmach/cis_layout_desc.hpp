@@ -30,13 +30,24 @@ PL_RECORD_STRUCT(cis_var_layout,
     (size_t,    size),
     (size_t,    count)
 );
-    
-PL_RECORD_STRUCT(cis_layout,
-    (symbolic_constant,    tag),
-    (compat_range,         compat),
-    (size_t,               tuple_size),
-    (vector<cis_var_layout>, vars)
-);
+
+class cis_layout {
+    PL_RECORD_FIELDS(cis_layout,
+        (symbolic_constant,    tag),
+        (compat_range,         compat),
+        (size_t,               tuple_size),
+        (vector<cis_var_layout>, vars)
+    );
+
+public:
+    vector<string> var_names () const {
+        vector<string> result;
+        for (const auto &vl : _vars) {
+            result.push_back(vl.name());
+        }
+        return result;
+    }
+};
 
 vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c);
 

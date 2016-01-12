@@ -41,6 +41,7 @@ private:
 
 	unordered_map<string, shared_ptr<var>> _srom_tbl;
 	unordered_map<string, shared_ptr<cis_vstr>> _cis_vstr_tbl;
+	unordered_multimap<string, cis_layout> _cis_layout_tbl;
 	unordered_multimap<string, phy_chain> _pavars;
 	unordered_multimap<string, phy_band> _povars;
 
@@ -65,6 +66,11 @@ public:
 		
 		for (const auto &v : cis_vstrs)
 			_cis_vstr_tbl.insert({v->name(), v});
+		
+		for (const auto &l : cis_layouts) {
+			for (const auto &v : l.var_names())
+				_cis_layout_tbl.insert({v, l});
+		}
 
 		populate_pavars(pavars);
 		populate_pavars(pavars_bwver_1);
@@ -129,20 +135,7 @@ public:
 				srom_undef.push_back(v.first);
 		
 		for (const auto &v : _cis_vstr_tbl) {
-			bool found = false;
-			const auto &name = v.first;
-			for (const auto &layout : _cis_layouts) {
-				for (const auto &v : layout.vars()) {
-					if (v.name() != name)
-						continue;
-					found = true;
-					break;
-				}
-				if (found)
-					break;
-			}
-
-			if (!found)
+			if (_cis_layout_tbl.count(v.first) == 0)
 				cis_layout_undef.push_back(v.first);
 		}
 		

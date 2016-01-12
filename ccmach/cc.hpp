@@ -58,8 +58,8 @@ public:
         return [_tu tokensForSourceRange: cursor.extent];
     }
     
-    PLClangToken *
-    resolve_macro_def(PLClangToken *t) {
+    NSArray *
+    resolve_macro_def_tokens(PLClangToken *t) {
         PLClangCursor *def;
         if (t.cursor.referencedCursor != nil)
             def = t.cursor.referencedCursor;
@@ -71,7 +71,7 @@ public:
         if (tokens.count < 2)
             errx(EXIT_FAILURE, "macro def %s unsupported token count %lu", t.spelling.UTF8String, (unsigned long)tokens.count);
         
-        return tokens[1];
+        return [tokens subarrayWithRange: NSMakeRange(1, tokens.count-1)];
     }
     
     /* Return the cursors composing the given array's initializers */
@@ -98,8 +98,11 @@ public:
     
     id<NSObject>
     token_literal(PLClangToken *t) {
-        if (t.kind == PLClangTokenKindIdentifier && t.cursor.isPreprocessing)
+        if (t.kind == PLClangTokenKindIdentifier && t.cursor.isPreprocessing) {
+            NSArray *tokens = resolve_macro_def_tokens(t);
+            
             return token_literal(resolve_macro_def(t));
+        }
         
         if (t.kind != PLClangTokenKindLiteral)
             return nil;
@@ -162,11 +165,12 @@ public:
     {
         uint32_t v = 0;
         char op = '\0';
-        
         if (tokens.count == 0)
             errx(EXIT_FAILURE, "empty token list");
-        
-        for (__strong PLClangToken *t in tokens) {
+
+        for (NSUInteger i = 0; i < tokens.count; i++) {
+            PLClangToken *t = tokens[i];
+
             if (t.kind == PLClangTokenKindIdentifier) {
                 t = resolve_macro_def(t);
                 
@@ -193,9 +197,6 @@ public:
                         case '/':
                             v /= nv;
                             break;
-                        case '(':   // XXX this is *not* correct behavior for grouping
-                        case ')':
-                            break;
                         default:
                             errx(EXIT_FAILURE, "unsupported op %c", op);
                     }
@@ -203,6 +204,24 @@ public:
                 }
                 case PLClangTokenKindPunctuation:
                     op = t.spelling.UTF8String[0];
+                    NSLog(@"t=%@ %@", [tokens[i] spelling], [tokens[i] cursor]);
+                    if (op == '(') {
+                        NSUInteger closeParen = i;
+                        for (NSUInteger o = closeParen; o < tokens.count; o++) {
+                            PLClangToken *nt = tokens[o];
+                            if (nt.kind == PLClangTokenKindPunctuation && nt.spelling.UTF8String[0] == ')') {
+                                closeParen = o;
+                                break;
+                            }
+                            NSLog(@"NO MATCH %@", tokens[o]);
+                        }
+                        
+                        if (closeParen == i) {
+                            errx(EXIT_FAILURE, "could not finding closing parenthesis in '%s'", tokens.description.UTF8String);
+                        }
+                    }
+                    
+                    
                     break;
                 default:
                     errx(EXIT_FAILURE, "Unsupported token type: %u", (unsigned int) t.kind);
