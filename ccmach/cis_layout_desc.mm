@@ -16,6 +16,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
     int sz;
     int count;
     prop_type ptype;
+    bool special_case = false;
 
     if (![s scanInt: &sz]) {
         /* 'special' var */
@@ -24,16 +25,15 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
             ptype = BHND_T_CHAR;
             sz = 0;
             count = 0;
+            special_case = true;
         } else {
-            ptype = BHND_T_UINT8;
-            sz = 0;
-            count = 0;
+            errx(EX_DATAERR, "can't parse initial type char in %s", layout.UTF8String);
         }
     } else {
         switch (sz) {
             case 0:
                 ptype = BHND_T_UINT8;
-                warnx("%s has unhandled 'special' encoding", layout.UTF8String);
+                special_case = true;
                 break;
             case 1:
                 ptype = BHND_T_UINT8;
@@ -48,6 +48,8 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
                 ptype = BHND_T_UINT32;
                 sz = 4;
                 warnx("%s uses an 8 byte size spec; this is ignored and treated as a 4 byte number by wlu.c", layout.UTF8String);
+                special_case = true;
+                // TODO - do we need to skip 4 bytes?
                 break;
             default:
                 if ([layout isEqualToString: @"6macaddr"]) {
@@ -55,6 +57,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
                     ptype = BHND_T_UINT8;
                     sz = 1;
                     count = 48;
+                    special_case = true;
                 } else if ([layout isEqualToString: @"16uuid"]) {
                     // TODO - do we need a UUID type?
                     ptype = BHND_T_UINT8;
@@ -76,7 +79,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
     if (![s scanCharactersFromSet: [NSCharacterSet whitespaceAndNewlineCharacterSet].invertedSet intoString: &varname])
         errx(EX_DATAERR, "failed to scan variable name in %s", layout.UTF8String);
 
-    return nvram::cis_var_layout(varname.UTF8String, offset, sz, ptype, count);
+    return nvram::cis_var_layout(varname.UTF8String, offset, sz, ptype, count, special_case);
 }
 
 vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {

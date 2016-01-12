@@ -164,6 +164,14 @@ public:
 		for (const auto &v : cis_layout_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
 
+		fprintf(stderr, "CIS vars requiring special case decoding:\n");
+		for (const auto &l : _cis_layouts) {
+			for (const auto &v : l.vars()) {
+				if (v.special_case()) {
+					fprintf(stderr, "\t%s\n", v.name().c_str());
+				}
+			}
+		}
 	}
 };
 
