@@ -1073,8 +1073,9 @@ public:
         }];
         
         for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
-            auto vars = [@(t->params) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
-            NSLog(@"%@", vars);
+            parse_layouts(t);
+//            auto vars = [@(t->params) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
+//            NSLog(@"%@", vars);
         }
         
         /* Report SROM/CIS differences */

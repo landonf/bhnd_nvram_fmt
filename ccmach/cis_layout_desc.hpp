@@ -23,6 +23,6 @@
 #include <Foundation/Foundation.h>
 
 
-void parse_layouts (NSString *layouts);
+void parse_layouts (const cis_tuple_t *t);
 
 #endif
