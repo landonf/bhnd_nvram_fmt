@@ -226,6 +226,15 @@ PL_RECORD_STRUCT(cis_tag,
 	(NSString *,		comment)
 );
 
+class cis_tuple {
+	PL_RECORD_FIELDS(cis_tuple,
+		(uint8_t,	tag),
+		(compat_range,	compat),
+		(size_t,	len),
+		(string,	vars)
+	);
+};
+
 /*  */
 struct cis_vstr {
 	PL_RECORD_FIELDS(cis_vstr,
