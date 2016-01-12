@@ -10,6 +10,7 @@
 		058CD2991C456533008D9435 /* cis_layout_desc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 058CD2971C456533008D9435 /* cis_layout_desc.mm */; };
 		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
 		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
+		05B746961C45799A001BFCD8 /* cc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05B746941C45799A001BFCD8 /* cc.mm */; };
 		05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC11C40761D005E5D51 /* cis_tuples.mm */; };
 		05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC41C42F48F005E5D51 /* nvram.mm */; };
 		05C56F441C430100005E5D51 /* PLStdCPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05C56F351C42FFC5005E5D51 /* PLStdCPP.framework */; };
@@ -83,6 +84,8 @@
 		059550361C35EAA80032A4AE /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; tabWidth = 4; usesTabs = 0; };
 		0599679E1C38DD9B00CB31ED /* nvram_map */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = nvram_map; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		0599679F1C38DFA300CB31ED /* map.awk */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = map.awk; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
+		05B746941C45799A001BFCD8 /* cc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cc.mm; sourceTree = "<group>"; };
+		05B746951C45799A001BFCD8 /* cc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cc.hpp; sourceTree = "<group>"; };
 		05C56EC11C40761D005E5D51 /* cis_tuples.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_tuples.mm; sourceTree = "<group>"; };
 		05C56EC21C40761D005E5D51 /* cis_tuples.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_tuples.hpp; sourceTree = "<group>"; };
 		05C56EC41C42F48F005E5D51 /* nvram.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nvram.mm; sourceTree = "<group>"; };
@@ -306,6 +309,8 @@
 				058CD2971C456533008D9435 /* cis_layout_desc.mm */,
 				058CD2981C456533008D9435 /* cis_layout_desc.hpp */,
 				058CD29C1C456633008D9435 /* nvtypes.h */,
+				05B746941C45799A001BFCD8 /* cc.mm */,
+				05B746951C45799A001BFCD8 /* cc.hpp */,
 			);
 			path = ccmach;
 			sourceTree = "<group>";
@@ -690,6 +695,7 @@
 				059550371C35EAA80032A4AE /* main.mm in Sources */,
 				05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */,
 				05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */,
+				05B746961C45799A001BFCD8 /* cc.mm in Sources */,
 				05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */,
 				058CD2991C456533008D9435 /* cis_layout_desc.mm in Sources */,
 			);

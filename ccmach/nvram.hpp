@@ -37,6 +37,7 @@ private:
 	vector<shared_ptr<var>> _srom_vars;
 	vector<shared_ptr<cis_vstr>> _cis_vstrs;
 	vector<nvram::cis_tag> _cis_consts;
+	vector<cis_layout> _cis_layouts;
 
 	unordered_map<string, shared_ptr<var>> _srom_tbl;
 	unordered_map<string, shared_ptr<cis_vstr>> _cis_vstr_tbl;
@@ -54,7 +55,10 @@ private:
 	}
 	
 public:
-	nvram_map (const vector<shared_ptr<var>> &srom_vars, const vector<shared_ptr<cis_vstr>> &cis_vstrs, const vector<nvram::cis_tag> &cis_consts) : _srom_vars(srom_vars), _cis_vstrs(cis_vstrs), _cis_consts(cis_consts)
+	nvram_map (const vector<shared_ptr<var>> &srom_vars,
+		   const vector<shared_ptr<cis_vstr>> &cis_vstrs,
+		   const vector<nvram::cis_tag> &cis_consts,
+		   const vector<cis_layout> &cis_layouts) : _srom_vars(srom_vars), _cis_vstrs(cis_vstrs), _cis_consts(cis_consts), _cis_layouts(cis_layouts)
 	{
 		for (const auto &v : srom_vars)
 			_srom_tbl.insert({v->name(), v});
@@ -78,6 +82,7 @@ public:
 	void emit_diagnostics () {
 		vector<string> srom_undef;
 		vector<string> cis_undef;
+		vector<string> cis_layout_undef;
 		
 		for (auto &vs : _cis_vstrs) {
 			/* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
@@ -123,6 +128,24 @@ public:
 			if (_srom_tbl.count(v.first) == 0)
 				srom_undef.push_back(v.first);
 		
+		for (const auto &v : _cis_vstr_tbl) {
+			bool found = false;
+			const auto &name = v.first;
+			for (const auto &layout : _cis_layouts) {
+				for (const auto &v : layout.vars()) {
+					if (v.name() != name)
+						continue;
+					found = true;
+					break;
+				}
+				if (found)
+					break;
+			}
+
+			if (!found)
+				cis_layout_undef.push_back(v.first);
+		}
+		
 		for (const auto &v : _srom_tbl)
 			if (_cis_vstr_tbl.count(v.first) == 0)
 				cis_undef.push_back(v.first);
@@ -142,6 +165,11 @@ public:
 		fprintf(stderr, "CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
+		
+		fprintf(stderr, "CIS vars missing layout records:\n");
+		for (const auto &v : cis_layout_undef)
+			fprintf(stderr, "\t%s\n", v.c_str());
+
 	}
 };
 

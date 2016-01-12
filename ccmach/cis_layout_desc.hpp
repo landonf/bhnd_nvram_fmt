@@ -10,7 +10,7 @@
 #define _cis_layout_desc_h_
 
 #include "nvtypes.h"
-
+#include "cc.hpp"
 
 #include <string>
 #include <unistd.h>
@@ -22,7 +22,24 @@
 
 #include <Foundation/Foundation.h>
 
+namespace nvram {
 
-void parse_layouts (const cis_tuple_t *t);
+PL_RECORD_STRUCT(cis_var_layout,
+    (string,    name),
+    (size_t,    offset),
+    (size_t,    size),
+    (size_t,    count)
+);
+    
+PL_RECORD_STRUCT(cis_layout,
+    (symbolic_constant,    tag),
+    (compat_range,         compat),
+    (size_t,               tuple_size),
+    (vector<cis_var_layout>, vars)
+);
+
+vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c);
+
+}
 
 #endif
