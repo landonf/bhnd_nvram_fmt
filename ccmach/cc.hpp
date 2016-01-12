@@ -60,14 +60,14 @@ public:
     
     NSArray *
     resolve_macro_def_tokens(PLClangToken *t) {
-        PLClangCursor *def;
-        if (t.cursor.referencedCursor != nil)
-            def = t.cursor.referencedCursor;
-        else
-            def = t.cursor;
-        
+        if (t.kind != PLClangTokenKindIdentifier)
+            errx(EXIT_FAILURE, "can't resolve non-identifier token %s", t.spelling.UTF8String);
+
+        PLClangCursor *def = find_symbol(t.spelling.UTF8String);
+        if (def.referencedCursor != nil)
+            def = def.referencedCursor;
+
         NSArray *tokens = [_tu tokensForSourceRange: def.extent];
-        
         if (tokens.count < 2)
             errx(EXIT_FAILURE, "macro def %s unsupported token count %lu", t.spelling.UTF8String, (unsigned long)tokens.count);
         
@@ -97,11 +97,21 @@ public:
     }
     
     id<NSObject>
+    tokens_literal(NSArray *tokens)
+    {
+        if (tokens.count == 0)
+            errx(EX_DATAERR, "empty token array");
+
+        if (tokens.count == 1)
+            return token_literal(tokens[0]);
+
+        return [NSNumber numberWithUnsignedInteger:tokens_literal_u32(tokens)];
+    }
+    
+    id<NSObject>
     token_literal(PLClangToken *t) {
         if (t.kind == PLClangTokenKindIdentifier && t.cursor.isPreprocessing) {
-            NSArray *tokens = resolve_macro_def_tokens(t);
-            
-            return token_literal(resolve_macro_def(t));
+            return tokens_literal(resolve_macro_def_tokens(t));
         }
         
         if (t.kind != PLClangTokenKindLiteral)
@@ -170,17 +180,50 @@ public:
 
         for (NSUInteger i = 0; i < tokens.count; i++) {
             PLClangToken *t = tokens[i];
-
-            if (t.kind == PLClangTokenKindIdentifier) {
-                t = resolve_macro_def(t);
-                
-            } else if (t.kind == PLClangTokenKindComment) {
-                continue;
-            }
             
             switch (t.kind) {
+                case PLClangTokenKindPunctuation:
+                case PLClangTokenKindIdentifier:
                 case PLClangTokenKindLiteral: {
-                    uint32_t nv = token_literal_u32(t);
+                    uint32_t nv;
+                    if (t.kind == PLClangTokenKindLiteral) {
+                        nv = token_literal_u32(t);
+                    } else if (t.kind == PLClangTokenKindIdentifier) {
+                        NSArray *resolved = resolve_macro_def_tokens(t);
+                        id<NSObject> obj = tokens_literal(resolved);
+                        if (obj == nil || ![obj isKindOfClass: [NSNumber class]])
+                            errx(EX_DATAERR, "could not resolve identifier token %s (got %s)", t.spelling.UTF8String, obj.description.UTF8String);
+                        nv = [(NSNumber *)obj unsignedIntValue];
+                    } else if (t.kind == PLClangTokenKindPunctuation) {
+                        if (t.spelling.UTF8String[0] != '(') {
+                            op = t.spelling.UTF8String[0];
+                            break;
+                        }
+
+                        NSUInteger closeParen = i;
+                        for (NSUInteger o = closeParen; o < tokens.count; o++) {
+                            PLClangToken *nt = tokens[o];
+                            if (nt.kind == PLClangTokenKindPunctuation && nt.spelling.UTF8String[0] == ')') {
+                                closeParen = o;
+                                break;
+                            }
+                        }
+                        
+                        if (closeParen == i) {
+                            errx(EXIT_FAILURE, "could not finding closing parenthesis in '%s'", tokens.description.UTF8String);
+                        }
+                        
+                        NSArray *subexpr = [tokens subarrayWithRange: NSMakeRange(i+1, closeParen-i-1)];
+                        i = closeParen+1;
+                        
+                        id<NSObject> obj = tokens_literal(subexpr);
+                        if (obj == nil || ![obj isKindOfClass: [NSNumber class]])
+                            errx(EX_DATAERR, "could not resolve identifier token %s", t.spelling.UTF8String);
+                        nv = [(NSNumber *)obj unsignedIntValue];
+                    } else {
+                        errx(EX_SOFTWARE, "unreachable case reached!");
+                    }
+
                     switch (op) {
                         case '\0':
                             v = nv;
@@ -202,26 +245,8 @@ public:
                     }
                     break;
                 }
-                case PLClangTokenKindPunctuation:
-                    op = t.spelling.UTF8String[0];
-                    NSLog(@"t=%@ %@", [tokens[i] spelling], [tokens[i] cursor]);
-                    if (op == '(') {
-                        NSUInteger closeParen = i;
-                        for (NSUInteger o = closeParen; o < tokens.count; o++) {
-                            PLClangToken *nt = tokens[o];
-                            if (nt.kind == PLClangTokenKindPunctuation && nt.spelling.UTF8String[0] == ')') {
-                                closeParen = o;
-                                break;
-                            }
-                            NSLog(@"NO MATCH %@", tokens[o]);
-                        }
-                        
-                        if (closeParen == i) {
-                            errx(EXIT_FAILURE, "could not finding closing parenthesis in '%s'", tokens.description.UTF8String);
-                        }
-                    }
-                    
-                    
+                case PLClangTokenKindComment:
+                    /* Ignore */
                     break;
                 default:
                     errx(EXIT_FAILURE, "Unsupported token type: %u", (unsigned int) t.kind);

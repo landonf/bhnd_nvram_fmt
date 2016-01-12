@@ -51,8 +51,6 @@ vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {
     }
 
     for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
-        warnx("can't find constant for tag %hhx (%s)", t->tag, t->params);
-
         if (tags.count(t->tag) == 0)
             errx(EX_DATAERR, "can't find constant for tag %hhx (%s)", t->tag, t->params);
         auto tag = tags.at(t->tag);
