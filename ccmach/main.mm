@@ -33,6 +33,10 @@ private:
     NSDictionary *_symbols;
 
 public:
+    PLClangCursor *translationUnit (void) {
+        return _tu.cursor;
+    }
+
     PLClangCursor *find_symbol (const string &name) {
         return _symbols[@(name.c_str())];
     }
@@ -1000,6 +1004,7 @@ public:
             return ([@(lhs->name().c_str()) compare: @(rhs->name().c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
         });
 
+#if 0
         for (const auto &v : vars) {
             printf("%s:\n", v->name().c_str());
             for (const auto &sp : *v->sprom_offsets()) {
@@ -1020,16 +1025,55 @@ public:
                 printf(" }\n");
             }
         }
+#endif
 
-        /* Extract CIS decode info */
+        /* Extract CIS decode info from the parser */
         auto cis_tuples = extract_cis_tuples();
         vector<shared_ptr<nvram::cis_vstr>> cis_vstrs;
         for (const auto &t : cis_tuples)
             for (const auto &v : t->vars)
                 cis_vstrs.emplace_back(make_shared<nvram::cis_vstr>(v));
+
+        /* Find CIS constants/descriptions */
+        __block vector<nvram::cis_tag> cis_constants;
+        [_c->translationUnit() visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
+            NSError *error;
+            auto regex = [NSRegularExpression regularExpressionWithPattern: @"(^/\\*[ \t]*|[ \t]*\\*/$)"
+                                                                   options:NSRegularExpressionCaseInsensitive
+                                                                     error:&error];
+            if (regex == nil)
+                errx(EXIT_FAILURE, "failed to parse regex: %s", [error description].UTF8String);
+            
+            auto ws_regex = [NSRegularExpression regularExpressionWithPattern: @"[ \t\n\r]+\\*[ \t\n\r]+"
+                                                                   options:NSRegularExpressionCaseInsensitive
+                                                                     error:&error];
+            if (ws_regex == nil)
+                errx(EXIT_FAILURE, "failed to parse regex: %s", [error description].UTF8String);
+
+            switch (cursor.kind) {
+                case PLClangCursorKindMacroDefinition: {
+                    if (![cursor.spelling hasPrefix: @"HNBU_"])
+                        return PLClangCursorVisitContinue;
+
+                    NSString *comment = nil;
+                    for (PLClangToken *t in _c->get_tokens(cursor)) {
+                        if (t.kind == PLClangTokenKindComment) {
+                            comment = [regex stringByReplacingMatchesInString: t.spelling options: 0 range: NSMakeRange(0, t.spelling.length) withTemplate: @""];
+                            comment = [ws_regex stringByReplacingMatchesInString: comment options: 0 range: NSMakeRange(0, comment.length) withTemplate: @"\n"];
+                            break;
+                        }
+                    }
+
+                    cis_constants.emplace_back(_c->resolve_constant(cursor.spelling.UTF8String), comment);
+                    return PLClangCursorVisitContinue;
+                }
+                default:
+                    return PLClangCursorVisitRecurse;
+            }
+        }];
         
         /* Report SROM/CIS differences */
-        nvram::nvram_map m(vars, cis_vstrs);
+        nvram::nvram_map m(vars, cis_vstrs, cis_constants);
         m.emit_diagnostics();
     }
 };

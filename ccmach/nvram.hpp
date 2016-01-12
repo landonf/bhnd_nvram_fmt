@@ -221,6 +221,11 @@ PL_RECORD_STRUCT(sprom_struct,
 	(shared_ptr<vector<uint16_t>>,	offsets)
 );
 
+PL_RECORD_STRUCT(cis_tag,
+	(symbolic_constant,	constant),
+	(NSString *,		comment)
+);
+
 /*  */
 struct cis_vstr {
 	PL_RECORD_FIELDS(cis_vstr,
@@ -349,6 +354,7 @@ class nvram_map {
 private:
 	vector<shared_ptr<var>> _srom_vars;
 	vector<shared_ptr<cis_vstr>> _cis_vstrs;
+	vector<nvram::cis_tag> _cis_consts;
 
 	unordered_map<string, shared_ptr<var>> _srom_tbl;
 	unordered_map<string, shared_ptr<cis_vstr>> _cis_vstr_tbl;
@@ -366,7 +372,7 @@ private:
 	}
 	
 public:
-	nvram_map (const vector<shared_ptr<var>> &srom_vars, const vector<shared_ptr<cis_vstr>> &cis_vstrs) : _srom_vars(srom_vars), _cis_vstrs(cis_vstrs)
+	nvram_map (const vector<shared_ptr<var>> &srom_vars, const vector<shared_ptr<cis_vstr>> &cis_vstrs, const vector<nvram::cis_tag> &cis_consts) : _srom_vars(srom_vars), _cis_vstrs(cis_vstrs), _cis_consts(cis_consts)
 	{
 		for (const auto &v : srom_vars)
 			_srom_tbl.insert({v->name(), v});
