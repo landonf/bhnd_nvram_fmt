@@ -92,8 +92,6 @@ vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {
 
         auto tag = c->resolve_constant(name.UTF8String);
         tags.insert({tag.value(), tag});
-        if ([name hasPrefix: @"OTP_"])
-            NSLog(@"mapped %s to 0x%x", tag.name().c_str(), tag.value());
     }
 
     for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {

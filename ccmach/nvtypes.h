@@ -60,9 +60,11 @@ bool prop_type_compat (prop_type lhs, prop_type rhs);
 typedef enum {
     SFMT_HEX,		/**< hex format */
     SFMT_DECIMAL,		/**< decimal format */
+    SFMT_HEXBIN,     /**< binary data, in hex, padded to 2 characters per byte */
     SFMT_MACADDR,		/**< mac address (canonical form, hex octets,
                          seperated with ':') */
     SFMT_CCODE,		/**< count code format (2-3 ASCII chars, or hex string) */
+    SFMT_ASCII,     /**< ASCII string */
     SFMT_LEDDC,		/**< LED PWM duty-cycle (2 bytes -- on/off) */
 } str_fmt;
 
@@ -260,7 +262,33 @@ struct cis_vstr {
     
 public:
     bool is_name_incomplete () const { return name().find("%") != string::npos; }
-    
+
+    str_fmt sfmt () {
+        NSArray *elems = [@(_fmt_str.c_str()) componentsSeparatedByString: @","];
+        string efmt = [elems[0] UTF8String];
+        
+        if (_name == "leddc" && efmt == "0x%04x")
+            return SFMT_LEDDC;
+        if (efmt == "0x%x")
+            return SFMT_HEX;
+        else if (efmt == "%d")
+            return SFMT_DECIMAL;
+        else if (_name == "ccode" && efmt == "%s")
+            return SFMT_CCODE;
+        else if (efmt == "%s")
+            return SFMT_ASCII;
+        else if (_name == "oem" && efmt == "%02x%02x%02x%02x%02x%02x%02x%02x")
+            return SFMT_HEXBIN;
+        else if (_name == "ccode" && efmt == "0x0")
+            return SFMT_CCODE;
+        else if (_name == "ccode" && efmt == "%c%c")
+            return SFMT_CCODE;
+        else {
+            errx(EXIT_FAILURE, "unknown %s vstr format: %s", _name.c_str(), _fmt_str.c_str());
+            return SFMT_HEX;
+        }
+    }
+
     const cis_tuple_t *hnbu_entry () const {
         for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
             if (t->tag != _cis_tag.value())

@@ -102,7 +102,7 @@ public:
 			if (vs->cis_tag().name() == "HNBU_CHIPID" && vs->name() == "boardtype")
 				continue;
 			
-			printf("\t%s ", vs->name().c_str());
+			printf("\t%s %s", vs->name().c_str(), to_string(vs->sfmt()).c_str());
 			
 			vector<nvram::compat_range> srom_compats;
 			if (_srom_tbl.count(vs->name()) > 0) {
@@ -155,7 +155,7 @@ public:
 		fprintf(stderr, "SROM vars not defined in CIS:\n");
 		for (const auto &v : cis_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
-		
+
 		fprintf(stderr, "CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
