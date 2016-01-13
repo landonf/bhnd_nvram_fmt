@@ -153,9 +153,34 @@ public:
 		alpha_sort(cis_layout_undef);
 		
 		fprintf(stderr, "SROM vars not defined in CIS:\n");
-		for (const auto &v : cis_undef)
-			fprintf(stderr, "\t%s\n", v.c_str());
+		auto varb_regex = [NSRegularExpression regularExpressionWithPattern: @"[0-9]([a-z][0-9])?$" options: 0 error: nil];
+		for (const auto &v : cis_undef) {
+			auto base = v;
+			string match;
+			bool found_match = false;
 
+			base.pop_back();
+			while (base.size() >= 3 && !found_match) {
+				for (const auto &vstr : _cis_vstr_tbl) {
+					if ([@(vstr.first.c_str()) hasPrefix: @(base.c_str())]) {
+						match = vstr.first;
+						found_match = true;
+						break;
+					}
+				}
+				base.pop_back();
+				if (![varb_regex matchesInString: @(base.c_str()) options: 0 range: NSMakeRange(0, base.size())])
+					break;
+			}
+			
+			if (!found_match)
+				fprintf(stderr, "\t%s\n", v.c_str());
+			else
+				fprintf(stderr, "\t%s (found base %s)\n", v.c_str(), match.c_str());
+
+		}
+
+#if 0
 		fprintf(stderr, "CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
@@ -172,6 +197,7 @@ public:
 				}
 			}
 		}
+#endif
 	}
 };
 
