@@ -814,17 +814,7 @@ public:
         __block vector<nvram::cis_tag> cis_constants;
         [_c->translationUnit() visitChildrenUsingBlock:^PLClangCursorVisitResult(PLClangCursor *cursor) {
             NSError *error;
-            auto regex = [NSRegularExpression regularExpressionWithPattern: @"(^/\\*[ \t]*|[ \t]*\\*/$)"
-                                                                   options:NSRegularExpressionCaseInsensitive
-                                                                     error:&error];
-            if (regex == nil)
-                errx(EXIT_FAILURE, "failed to parse regex: %s", [error description].UTF8String);
-            
-            auto ws_regex = [NSRegularExpression regularExpressionWithPattern: @"[ \t\n\r]+\\*[ \t\n\r]+"
-                                                                   options:NSRegularExpressionCaseInsensitive
-                                                                     error:&error];
-            if (ws_regex == nil)
-                errx(EXIT_FAILURE, "failed to parse regex: %s", [error description].UTF8String);
+
 
             switch (cursor.kind) {
                 case PLClangCursorKindMacroDefinition: {
@@ -834,6 +824,18 @@ public:
                     NSString *comment = nil;
                     for (PLClangToken *t in _c->get_tokens(cursor)) {
                         if (t.kind == PLClangTokenKindComment) {
+                            auto regex = [NSRegularExpression regularExpressionWithPattern: @"(^/\\*[ \t]*|[ \t]*\\*/$)"
+                                                                                   options:NSRegularExpressionCaseInsensitive
+                                                                                     error:&error];
+                            if (regex == nil)
+                                errx(EXIT_FAILURE, "failed to parse regex: %s", [error description].UTF8String);
+                            
+                            auto ws_regex = [NSRegularExpression regularExpressionWithPattern: @"[ \t\n\r]+\\*[ \t\n\r]+"
+                                                                                      options:NSRegularExpressionCaseInsensitive
+                                                                                        error:&error];
+                            if (ws_regex == nil)
+                                errx(EXIT_FAILURE, "failed to parse regex: %s", [error description].UTF8String);
+                            
                             comment = [regex stringByReplacingMatchesInString: t.spelling options: 0 range: NSMakeRange(0, t.spelling.length) withTemplate: @""];
                             comment = [ws_regex stringByReplacingMatchesInString: comment options: 0 range: NSMakeRange(0, comment.length) withTemplate: @"\n"];
                             break;
