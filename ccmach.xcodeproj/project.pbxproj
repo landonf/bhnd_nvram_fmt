@@ -11,7 +11,6 @@
 		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
 		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
 		05B746961C45799A001BFCD8 /* cc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05B746941C45799A001BFCD8 /* cc.mm */; };
-		05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC11C40761D005E5D51 /* cis_tuples.mm */; };
 		05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */ = {isa = PBXBuildFile; fileRef = 05C56EC41C42F48F005E5D51 /* nvram.mm */; };
 		05C56F441C430100005E5D51 /* PLStdCPP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 05C56F351C42FFC5005E5D51 /* PLStdCPP.framework */; };
 		05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */ = {isa = PBXBuildFile; fileRef = 05FDE57E1C3721DA0035C177 /* nvram_map.c */; };
@@ -86,8 +85,6 @@
 		0599679F1C38DFA300CB31ED /* map.awk */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = text; path = map.awk; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		05B746941C45799A001BFCD8 /* cc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cc.mm; sourceTree = "<group>"; };
 		05B746951C45799A001BFCD8 /* cc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cc.hpp; sourceTree = "<group>"; };
-		05C56EC11C40761D005E5D51 /* cis_tuples.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_tuples.mm; sourceTree = "<group>"; };
-		05C56EC21C40761D005E5D51 /* cis_tuples.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_tuples.hpp; sourceTree = "<group>"; };
 		05C56EC41C42F48F005E5D51 /* nvram.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = nvram.mm; sourceTree = "<group>"; };
 		05C56EC51C42F48F005E5D51 /* nvram.hpp */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.cpp.h; path = nvram.hpp; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		05C56EEC1C42FFC5005E5D51 /* applicative.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = applicative.h; sourceTree = "<group>"; };
@@ -302,8 +299,6 @@
 				059550361C35EAA80032A4AE /* main.mm */,
 				05FDE57D1C36FF7B0035C177 /* nvram_map.h */,
 				05FDE57E1C3721DA0035C177 /* nvram_map.c */,
-				05C56EC11C40761D005E5D51 /* cis_tuples.mm */,
-				05C56EC21C40761D005E5D51 /* cis_tuples.hpp */,
 				05C56EC41C42F48F005E5D51 /* nvram.mm */,
 				05C56EC51C42F48F005E5D51 /* nvram.hpp */,
 				058CD2971C456533008D9435 /* cis_layout_desc.mm */,
@@ -696,7 +691,6 @@
 				05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */,
 				05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */,
 				05B746961C45799A001BFCD8 /* cc.mm in Sources */,
-				05C56EC31C40761D005E5D51 /* cis_tuples.mm in Sources */,
 				058CD2991C456533008D9435 /* cis_layout_desc.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
