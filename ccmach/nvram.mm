@@ -44,6 +44,30 @@ string std::to_string(nvram::prop_type t) {
     }
 }
 
+string nvram::prop_type_str (prop_type t) {
+    switch (t) {
+        case nvram::BHND_T_UINT8: return "BHND_T_UINT8";
+        case nvram::BHND_T_UINT16: return "BHND_T_UINT16";
+        case nvram::BHND_T_UINT32: return "BHND_T_UINT32";
+        case nvram::BHND_T_INT8: return "BHND_T_INT8";
+        case nvram::BHND_T_INT16: return "BHND_T_INT16";
+        case nvram::BHND_T_INT32: return "BHND_T_INT32";
+        case nvram::BHND_T_CHAR: return "BHND_T_CHAR";
+    }
+}
+
+size_t nvram::prop_type_size (prop_type t) {
+    switch (t) {
+        case nvram::BHND_T_UINT8: return 1;
+        case nvram::BHND_T_UINT16: return 2;
+        case nvram::BHND_T_UINT32: return 4;
+        case nvram::BHND_T_INT8: return 1;
+        case nvram::BHND_T_INT16: return 2;
+        case nvram::BHND_T_INT32: return 4;
+        case nvram::BHND_T_CHAR: return 1;
+    }
+}
+
 static nvram::grouping srom_misc =       { "srom_misc",            "SROM variables not supported by CIS",  0xFF };
 static nvram::grouping paparams_c0 =     { "HNBU_PAPARMS_C0",      NULL,  HNBU_PAPARMS_C0 };
 static nvram::grouping paparams_c1 =     { "HNBU_PAPARMS_C1",      NULL,  HNBU_PAPARMS_C1 };
@@ -188,9 +212,100 @@ unordered_map<string, value_seg> cis_subst_layout = {
     { "bxa5g",      { 1, BHND_T_UINT8, 1, 0x18, 3 }},
 
     // HNBU_FEM
-    //{ "antswctl2g", { 0, BHND_T_UINT8, 1, 0xF8, 3 }},
-    //{ "triso2g", { 0, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "pdetrange2g", { 0, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "extpagain2g", { 0, BHND_T_UINT8, 1, 0x6, 1 }},
+    { "tssipos2g",   { 0, BHND_T_UINT8, 1, 0x1, 0 }},
+    { "antswctl2g",  { 1, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "triso2g",     { 1, BHND_T_UINT8, 1, 0x7, 0 }},
+    
+    { "pdetrange5g", { 2, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "extpagain5g", { 2, BHND_T_UINT8, 1, 0x6, 1 }},
+    { "tssipos5g",   { 2, BHND_T_UINT8, 1, 0x1, 0 }},
+    { "antswctl5g",  { 3, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "triso5g",     { 3, BHND_T_UINT8, 1, 0x7, 0 }},
 
+    // HNBU_TEMPTHRESH
+    { "temps_period", { 1, BHND_T_UINT8, 1, 0xF0, 4 }},  // XXX: Note that period/hysteresis is reversed from the SROM encoding
+    { "temps_hysteresis", { 1, BHND_T_UINT8, 1, 0x0F, 0 }},
+    
+    { "tempcorrx", { 4, BHND_T_UINT8, 1, 0xFC, 2 }},
+    { "tempsense_option", { 4, BHND_T_UINT8, 1, 0x3, 0 }},
+    
+    // HNBU_FEM_CFG
+    //      fem_cfg1
+    { "epagain2g",      { 0, BHND_T_UINT8, 1, 0xE, 1 }},
+    { "tssiposslope2g", { 0, BHND_T_UINT8, 1, 0x1, 0 }},
+    { "pdgain2g",       { 0, BHND_T_UINT16, 1, 0x1F0, 4 }},
+    { "femctrl",        { 1, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "papdcap2g",      { 1, BHND_T_UINT8, 1, 0x4, 2 }},
+    { "tworangetssi2g", { 1, BHND_T_UINT8, 1, 0x2, 1 }},
+    //      fem_cfg2
+    { "epagain5g",      { 2, BHND_T_UINT8, 1, 0xE, 1 }},
+    { "tssiposslope5g", { 2, BHND_T_UINT8, 1, 0x1, 0 }},
+    { "pdgain5g",       { 2, BHND_T_UINT16, 1, 0x1F0, 4 }},
+    { "gainctrlsph",    { 3, BHND_T_UINT8, 1, 0xF8, 3 }},
+    { "papdcap5g",      { 3, BHND_T_UINT8, 1, 0x4, 2 }},
+    { "tworangetssi5g", { 3, BHND_T_UINT8, 1, 0x2, 1 }},
+
+    
+    // HNBU_ACRXGAINS_C0
+    // rxgains
+    { "rxgains2gtrelnabypa0",   { 0, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains2gtrisoa0",       { 0, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains2gelnagaina0",    { 0, BHND_T_UINT8, 1, 0x7, 0 }},
+    { "rxgains5gtrelnabypa0",   { 1, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5gtrisoa0",       { 1, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5gelnagaina0",    { 1, BHND_T_UINT8, 1, 0x7, 0 }},
+    
+    // rxgains1
+    { "rxgains5ghtrelnabypa0",   { 2, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5ghtrisoa0",       { 2, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5ghelnagaina0",    { 2, BHND_T_UINT8, 1, 0x7, 0 }},
+    { "rxgains5gmtrelnabypa0",   { 3, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5gmtrisoa0",       { 3, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5gmelnagaina0",    { 3, BHND_T_UINT8, 1, 0x7, 0 }},
+
+    // HNBU_ACRXGAINS_C1
+    // rxgains
+    { "rxgains2gtrelnabypa1",   { 0, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains2gtrisoa1",       { 0, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains2gelnagaina1",    { 0, BHND_T_UINT8, 1, 0x7, 0 }},
+    { "rxgains5gtrelnabypa1",   { 1, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5gtrisoa1",       { 1, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5gelnagaina1",    { 1, BHND_T_UINT8, 1, 0x7, 0 }},
+    
+    // rxgains1
+    { "rxgains5ghtrelnabypa1",   { 2, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5ghtrisoa1",       { 2, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5ghelnagaina1",    { 2, BHND_T_UINT8, 1, 0x7, 0 }},
+    { "rxgains5gmtrelnabypa1",   { 3, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5gmtrisoa1",       { 3, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5gmelnagaina1",    { 3, BHND_T_UINT8, 1, 0x7, 0 }},
+
+    // HNBU_ACRXGAINS_C2
+    // rxgains
+    { "rxgains2gtrelnabypa2",   { 0, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains2gtrisoa2",       { 0, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains2gelnagaina2",    { 0, BHND_T_UINT8, 1, 0x7, 0 }},
+    { "rxgains5gtrelnabypa2",   { 1, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5gtrisoa2",       { 1, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5gelnagaina2",    { 1, BHND_T_UINT8, 1, 0x7, 0 }},
+    
+    // rxgains1
+    { "rxgains5ghtrelnabypa2",   { 2, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5ghtrisoa2",       { 2, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5ghelnagaina2",    { 2, BHND_T_UINT8, 1, 0x7, 0 }},
+    { "rxgains5gmtrelnabypa2",   { 3, BHND_T_UINT8, 1, 0x80, 7 }},
+    { "rxgains5gmtrisoa2",       { 3, BHND_T_UINT8, 1, 0x78, 3 }},
+    { "rxgains5gmelnagaina2",    { 3, BHND_T_UINT8, 1, 0x7, 0 }},
+
+    
+    // HNBU_PDOFF_2G
+    { "pdoffset2g40ma0", { 0, BHND_T_UINT8, 1, 0xF, 0 }},
+    { "pdoffset2g40ma1", { 0, BHND_T_UINT8, 1, 0xF0, 4 }},
+    { "pdoffset2g40ma2", { 1, BHND_T_UINT8, 1, 0xF, 0 }},
+    { "pdoffset2g40mvalid", { 1, BHND_T_UINT8, 1, 0x80, 7 }},
+    
 #if 0
 case HNBU_RSSISMBXA2G:
     ASSERT(sromrev == 3);

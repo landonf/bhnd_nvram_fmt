@@ -55,6 +55,8 @@ typedef enum {
 
 prop_type prop_type_widen (prop_type operand);
 bool prop_type_compat (prop_type lhs, prop_type rhs);
+string prop_type_str (prop_type operand);
+size_t prop_type_size (prop_type t);
 
 /** NVRAM variable string representations */
 typedef enum {

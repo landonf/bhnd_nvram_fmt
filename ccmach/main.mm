@@ -358,6 +358,10 @@ private:
             
             nvram::sprom_offset sp_off(nvram::compat_range::from_revmask(n->revmask), vals);
             v->sprom_offsets()->push_back(sp_off);
+            
+            sort(v->sprom_offsets()->begin(), v->sprom_offsets()->end(), [](const nvram::sprom_offset &lhs, const nvram::sprom_offset &rhs) {
+                return (lhs.compat().first() < rhs.compat().first());
+            });
         }
 
         for (const auto &v : var_table)

@@ -219,7 +219,19 @@ public:
 				if (v.special_case() && cis_subst_layout.count(v.name()) == 0 && cis_known_special_cases.count(v.name()) == 0) {
 					fprintf(stderr, "\t%s", v.name().c_str());
 					if (_srom_tbl.count(v.name()) > 0) {
-						fprintf(stderr, " (found srom var layout)\n");
+						auto srom_offset = _srom_tbl.at(v.name())->sprom_offsets()->at(0);
+						if (srom_offset.values()->size() == 1 && srom_offset.values()->at(0).segments()->size() == 1) {
+							auto srom_seg = srom_offset.values()->at(0).segments()->at(0);
+							fprintf(stderr, " : { \"%s\", { <OFFSET>, %s, %zu, 0x%X, %zd }},\n",
+								v.name().c_str(),
+								prop_type_str(srom_seg.type()).c_str(),
+								srom_seg.count(),
+								srom_seg.mask(),
+								srom_seg.shift());
+
+						} else {
+							fprintf(stderr, " (found complex srom var layout)\n");
+						}
 					} else {
 						fprintf(stderr, "\n");
 					}
