@@ -41,6 +41,8 @@ struct grouping {
 };
 
 extern unordered_map<string, grouping&> srom_subst_groupings;
+extern vector<cis_layout> cis_subst_layout;
+extern unordered_set<string> cis_known_special_cases;
 
 class nvram_map {
 private:
@@ -52,6 +54,7 @@ private:
 	unordered_map<string, shared_ptr<var>> _srom_tbl;
 	unordered_map<string, shared_ptr<cis_vstr>> _cis_vstr_tbl;
 	unordered_multimap<string, cis_layout> _cis_layout_tbl;
+	unordered_multimap<string, cis_layout> _cis_subst_layout_tbl;
 	unordered_multimap<string, phy_chain> _pavars;
 	unordered_multimap<string, phy_band> _povars;
 
@@ -86,6 +89,11 @@ public:
 		for (const auto &l : cis_layouts) {
 			for (const auto &v : l.var_names())
 				_cis_layout_tbl.insert({v, l});
+		}
+		
+		for (const auto &l : cis_subst_layout) {
+			for (const auto &v : l.var_names())
+				_cis_subst_layout_tbl.insert({v, l});
 		}
 
 		populate_pavars(pavars);
@@ -161,8 +169,8 @@ public:
 		alpha_sort(srom_undef);
 		alpha_sort(cis_undef);
 		alpha_sort(cis_layout_undef);
-		
-		fprintf(stderr, "SROM vars not defined in CIS:\n");
+
+		fprintf(stderr, "# SROM vars not defined in CIS (no substitute groupings defined):\n");
 		auto varb_regex = [NSRegularExpression regularExpressionWithPattern: @"[0-9]([a-z][0-9])?$" options: 0 error: nil];
 		for (const auto &v : cis_undef) {
 			auto base = v;
@@ -183,36 +191,49 @@ public:
 					break;
 			}
 			
-			if (!found_match) {
-				fprintf(stderr, "\t%s\n", v.c_str());
-			} else {
-				const auto &entry = _cis_vstr_tbl.at(match);
-				fprintf(stderr, "\t%s (found base %s family %s)\n", v.c_str(), match.c_str(), entry->cis_tag().name().c_str());
-			}
-			
-			if (srom_subst_groupings.count(v) != 1)
+			if (srom_subst_groupings.count(v) != 1) {
+				if (!found_match) {
+					fprintf(stderr, "\t%s\n", v.c_str());
+				} else {
+					const auto &entry = _cis_vstr_tbl.at(match);
+					fprintf(stderr, "\t%s (found base %s family %s)\n", v.c_str(), match.c_str(), entry->cis_tag().name().c_str());
+				}
+				
 				errx(EXIT_FAILURE, "no substitute grouping defined for %s", v.c_str());
+			}
 		}
 
 		
-		fprintf(stderr, "CIS vars missing layout records:\n");
-		for (const auto &v : cis_layout_undef)
-			fprintf(stderr, "\t%s\n", v.c_str());
-#if 1
-		fprintf(stderr, "CIS vars not defined in SPROM:\n");
+		fprintf(stderr, "# CIS vars missing layout records:\n");
+		for (const auto &v : cis_layout_undef) {
+			fprintf(stderr, "\t%s", v.c_str());
+			if (_srom_tbl.count(v) > 0) {
+				fprintf(stderr, " (found srom var layout)\n");
+			} else {
+				fprintf(stderr, "\n");
+			}
+		}
+
+		fprintf(stderr, "# CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
 
 
-		fprintf(stderr, "CIS vars requiring special case decoding:\n");
+		fprintf(stderr, "# CIS vars requiring special case decoding:\n");
 		for (const auto &l : _cis_layouts) {
 			for (const auto &v : l.vars()) {
-				if (v.special_case()) {
-					fprintf(stderr, "\t%s\n", v.name().c_str());
+				if (v.special_case() && _cis_subst_layout_tbl.count(v.name()) == 0 && cis_known_special_cases.count(v.name()) == 0) {
+					fprintf(stderr, "\t%s", v.name().c_str());
+					if (_srom_tbl.count(v.name()) > 0) {
+						fprintf(stderr, " (found srom var layout)\n");
+					} else {
+						fprintf(stderr, "\n");
+					}
+					errx(EXIT_FAILURE, "explicit layout definition required for %s", v.name().c_str());
 				}
 			}
 		}
-#endif
+
 	}
 };
 

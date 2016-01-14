@@ -48,8 +48,6 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
                 ptype = BHND_T_UINT32;
                 sz = 4;
                 warnx("%s uses an 8 byte size spec; this is ignored and treated as a 4 byte number by wlu.c", layout.UTF8String);
-                special_case = true;
-                // TODO - do we need to skip 4 bytes?
                 break;
             default:
                 if ([layout isEqualToString: @"6macaddr"]) {
@@ -97,10 +95,28 @@ vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {
     for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
         if (tags.count(t->tag) == 0)
             errx(EX_DATAERR, "can't find constant for tag %hhx (%s)", t->tag, t->params);
-        auto tag = tags.at(t->tag);
+        
+        symbolic_constant tag("", 0xFF);
+        ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
+        switch (t->tag) {
+            case OTP_VERS_1:
+                tag = tags.at(CISTPL_VERS_1);
+                break;
+            case OTP_MANFID:
+                tag = tags.at(CISTPL_MANFID);
+                break;
+            case OTP_RAW:
+            case OTP_RAW1:
+                continue;
+            default:
+                tag = tags.at(CISTPL_BRCM_HNBU);
+                hnbu_tag = ftl::just(tags.at(t->tag));
+                break;
+                
+        }
 
         if (strlen(t->params) == 0) {
-            result.emplace_back(tag, compat_range::from_revmask(t->revmask), t->len, vector<cis_var_layout>());
+            result.emplace_back(tag, hnbu_tag, compat_range::from_revmask(t->revmask), t->len, vector<cis_var_layout>());
             continue; // special case
         }
 
@@ -112,7 +128,7 @@ vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {
             vars.push_back(vl);
             offset += vl.size() * vl.count();
         }
-        result.emplace_back(tag, compat_range::from_revmask(t->revmask), t->len, vars);
+        result.emplace_back(tag, hnbu_tag, compat_range::from_revmask(t->revmask), t->len, vars);
     }
     
     return result;

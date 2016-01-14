@@ -163,3 +163,13 @@ unordered_map<string, grouping&> nvram::srom_subst_groupings = {
 #endif
 };
 
+unordered_set<string> nvram::cis_known_special_cases = {
+    /* Standard CIS tuple */
+    "manf",
+    "productname"
+};
+
+
+vector<nvram::cis_layout> nvram::cis_subst_layout = {
+    
+};

@@ -20,6 +20,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "maybe.h"
+
 #include <Foundation/Foundation.h>
 
 namespace nvram {
@@ -35,7 +37,8 @@ PL_RECORD_STRUCT(cis_var_layout,
 
 class cis_layout {
     PL_RECORD_FIELDS(cis_layout,
-        (symbolic_constant,    tag),
+        (symbolic_constant,                code),
+        (ftl::maybe<symbolic_constant>,    hnbu_tag),
         (compat_range,         compat),
         (size_t,               tuple_size),
         (vector<cis_var_layout>, vars)
