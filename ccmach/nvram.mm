@@ -194,6 +194,8 @@ unordered_set<string> nvram::cis_known_special_cases = {
     
     /* Requires special handling, but the layout is perfectly standard */
     "macaddr",
+
+    "usbssmdio0", // XXX: look at the comments in cis_subst_layout for this value.
 };
 
 namespace nvram {
@@ -306,23 +308,59 @@ unordered_map<string, value_seg> cis_subst_layout = {
     { "pdoffset2g40ma2", { 1, BHND_T_UINT8, 1, 0xF, 0 }},
     { "pdoffset2g40mvalid", { 1, BHND_T_UINT8, 1, 0x80, 7 }},
     
-#if 0
-case HNBU_RSSISMBXA2G:
-    ASSERT(sromrev == 3);
-    varbuf_append(&b, vstr_rssismf2g, cis[i + 1] & 0xf);
-    varbuf_append(&b, vstr_rssismc2g, (cis[i + 1] >> 4) & 0xf);
-    varbuf_append(&b, vstr_rssisav2g, cis[i + 2] & 0x7);
-    varbuf_append(&b, vstr_bxa2g, (cis[i + 2] >> 3) & 0x3);
-    break;
+
+    // Manually constructed layouts follow
     
-case HNBU_RSSISMBXA5G:
-    ASSERT(sromrev == 3);
-    varbuf_append(&b, vstr_rssismf5g, cis[i + 1] & 0xf);
-    varbuf_append(&b, vstr_rssismc5g, (cis[i + 1] >> 4) & 0xf);
-    varbuf_append(&b, vstr_rssisav5g, cis[i + 2] & 0x7);
-    varbuf_append(&b, vstr_bxa5g, (cis[i + 2] >> 3) & 0x3);
-    break;
-#endif
+    // HNBU_CC
+    { "cc", { 0, BHND_T_UINT8, 1, 0xF, 0 }},
+    
+    // HNBU_OEM
+    { "oem", { 0, BHND_T_UINT8, 8, 0xF, 0 }},
+
+    // HNBU_PAPARMS
+    { "pa0b0_lo", { (size_t)-1, BHND_T_UINT16, 1, 0xFFFF, 0 }}, // XXXLAYOUT- we have no way of specifying that these
+    { "pa0b1_lo", { (size_t)-2, BHND_T_UINT16, 1, 0xFFFF, 0 }}, // are appended to whatever variables may exist.
+    { "pa0b2_lo", { (size_t)-3, BHND_T_UINT16, 1, 0xFFFF, 0 }}, // we probably want to key off SROM revision
+
+
+    // CISTPL_CFTABLE
+    { "regwindowsz", { 5, BHND_T_UINT16, 1, 0xFFFF, 0 }},
+
+    // HNBU_USBFLAGS
+    { "usbflags",   { 0, BHND_T_UINT32, 1, 0xFFFFFFFF, 0 }},
+
+    // HNBU_USB30PHY_NOSS
+    { "usbnoss",   { 0, BHND_T_UINT8, 1, 0xFF, 0 }},
+
+    // HNBU_USBSSPHY_MDIO
+    // XXXLAYOUT the size of the array in bytes is specified in the first byte
+    // XXXLAYOUT the 4 array elements are 3 bytes in length and overlap; we can't use a dumb count
+    // { "usbssmdio0", {0, BHND_T_UINT32, 4, 0x00FFFFFF, 0 }} // XXXLAYOUT - we have no way of saying "as many as fit in the defined lenght"
+
+
+    // HNBU_USBSSPHY_SLEEP0
+    { "usbssphy_sleep0", { 0, BHND_T_UINT16, 1, 0xFFFF, 0 }},
+    // HNBU_USBSSPHY_SLEEP1
+    { "usbssphy_sleep1", { 0, BHND_T_UINT16, 1, 0xFFFF, 0 }},
+    // HNBU_USBSSPHY_SLEEP2
+    { "usbssphy_sleep2", { 0, BHND_T_UINT16, 1, 0xFFFF, 0 }},
+    // HNBU_USBSSPHY_SLEEP3
+    { "usbssphy_sleep3", { 0, BHND_T_UINT16, 1, 0xFFFF, 0 }},
+    
+    // HNBU_USBSSPHY_UTMI_CTL0
+    { "usbssphy_utmi_ctl0", { 0, BHND_T_UINT32, 1, 0xFFFFFFFF, 0 }},
+    // HNBU_USBSSPHY_UTMI_CTL1
+    { "usbssphy_utmi_ctl1", { 0, BHND_T_UINT32, 1, 0xFFFFFFFF, 0 }},
+    // HNBU_USBSSPHY_UTMI_CTL2
+    { "usbssphy_utmi_ctl2", { 0, BHND_T_UINT32, 1, 0xFFFFFFFF, 0 }},
+    
+    // HNBU_USBUTMI_CTL
+    { "usbutmi_ctl", { 0, BHND_T_UINT16, 1, 0xFFFF, 0 }},
+
+    // HNBU_WOWLGPIO
+    { "wowl_gpio", { 0, BHND_T_UINT8, 1, 0x7F, 0 }},
+    { "wowl_gpiopol", { 0, BHND_T_UINT8, 1, 0x80, 7 }},
+
 };
 
 }

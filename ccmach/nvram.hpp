@@ -198,15 +198,7 @@ public:
 		}
 
 		
-		fprintf(stderr, "# CIS vars missing layout records:\n");
-		for (const auto &v : cis_layout_undef) {
-			fprintf(stderr, "\t%s", v.c_str());
-			if (_srom_tbl.count(v) > 0) {
-				fprintf(stderr, " (found srom var layout)\n");
-			} else {
-				fprintf(stderr, "\n");
-			}
-		}
+
 
 		fprintf(stderr, "# CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
@@ -238,6 +230,32 @@ public:
 					errx(EXIT_FAILURE, "explicit layout definition required for %s", v.name().c_str());
 				}
 			}
+		}
+		
+		fprintf(stderr, "# CIS vars missing layout records:\n");
+		for (const auto &v : cis_layout_undef) {
+			if (cis_subst_layout.count(v) > 0 || cis_known_special_cases.count(v) > 0)
+				continue;
+			
+			fprintf(stderr, "\t%s", v.c_str());
+			if (_srom_tbl.count(v) > 0) {
+				auto srom_offset = _srom_tbl.at(v)->sprom_offsets()->at(0);
+				if (srom_offset.values()->size() == 1 && srom_offset.values()->at(0).segments()->size() == 1) {
+					auto srom_seg = srom_offset.values()->at(0).segments()->at(0);
+					fprintf(stderr, " : { \"%s\", { <OFFSET>, %s, %zu, 0x%X, %zd }},\n",
+						v.c_str(),
+						prop_type_str(srom_seg.type()).c_str(),
+						srom_seg.count(),
+						srom_seg.mask(),
+						srom_seg.shift());
+					
+				} else {
+					fprintf(stderr, " (found complex srom var layout)\n");
+				}
+			} else {
+				fprintf(stderr, "\n");
+			}
+			errx(EXIT_FAILURE, "explicit layout definition required for %s", v.c_str());
 		}
 
 	}

@@ -1017,7 +1017,7 @@ static const cis_tuple_t cis_hnbuvars[] = {
 	{HNBU_AGBGA,		0xfffff800, 7, "1agbg0 1agbg1 1agbg2 1aga0 1aga1 1aga2"},
 	{HNBU_USBDESC_COMPOSITE, 0xffffffff, 3, "2usbdesc_composite"},
 	{HNBU_UUID, 		0xffffffff, 17,	"16uuid"},
-	{HNBU_WOWLGPIO,		0xffffffff, 2,  "1wowl_gpio"},
+	{HNBU_WOWLGPIO,		0xffffffff, 2,  "0wowl_gpio 0wowl_gpiopol"},
 	{HNBU_ACRXGAINS_C0,	0xfffff800, 5, "0rxgains5gtrelnabypa0 0rxgains5gtrisoa0 "
 	"0rxgains5gelnagaina0 0rxgains2gtrelnabypa0 0rxgains2gtrisoa0 0rxgains2gelnagaina0 "
 	"0rxgains5ghtrelnabypa0 0rxgains5ghtrisoa0 0rxgains5ghelnagaina0 0rxgains5gmtrelnabypa0 "
