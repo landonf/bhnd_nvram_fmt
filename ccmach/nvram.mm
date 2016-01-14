@@ -44,13 +44,13 @@ string std::to_string(nvram::prop_type t) {
     }
 }
 
-static nvram::grouping srom_misc =  { "srom_misc",            "SROM variables not supported by CIS",  0xFF };
-static nvram::grouping paparams_c0 =     { "",      "",  HNBU_PAPARMS_C0 };
-static nvram::grouping paparams_c1 =     { "",      "",  HNBU_PAPARMS_C1 };
-static nvram::grouping paparams_c2 =     { "",      "",  HNBU_PAPARMS_C2 };
-static nvram::grouping paparams_c3 =     { "",      "",  HNBU_PAPARMS_C3 };
+static nvram::grouping srom_misc =       { "srom_misc",            "SROM variables not supported by CIS",  0xFF };
+static nvram::grouping paparams_c0 =     { "HNBU_PAPARMS_C0",      NULL,  HNBU_PAPARMS_C0 };
+static nvram::grouping paparams_c1 =     { "HNBU_PAPARMS_C1",      NULL,  HNBU_PAPARMS_C1 };
+static nvram::grouping paparams_c2 =     { "HNBU_PAPARMS_C2",      NULL,  HNBU_PAPARMS_C2 };
+static nvram::grouping paparams_c3 =     { "HNBU_PAPARMS_C3",      NULL,  HNBU_PAPARMS_C3 };
 
-static nvram::grouping rxgainerr =       { "",      "",  HNBU_RXGAIN_ERR };
+static nvram::grouping rxgainerr =       { "HNBU_RXGAIN_ERR",      NULL,  HNBU_RXGAIN_ERR };
 
 unordered_map<string, grouping&> nvram::srom_subst_groupings = {
     { "cckPwrOffset",       srom_misc },

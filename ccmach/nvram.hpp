@@ -33,9 +33,11 @@ using namespace pl;
 namespace nvram {
 
 struct grouping {
-	string		name;
-	string		desc;
-	uint8_t		cis_tag; // if any, or 0xFF.
+	const char	*name;
+	const char	*desc;
+	uint8_t		 cis_tag; // if any, or 0xFF.
+
+	bool builtin () { return (cis_tag != 0xFF); }
 };
 
 extern unordered_map<string, grouping&> srom_subst_groupings;
@@ -196,7 +198,7 @@ public:
 		fprintf(stderr, "CIS vars missing layout records:\n");
 		for (const auto &v : cis_layout_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
-#if 0
+#if 1
 		fprintf(stderr, "CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
