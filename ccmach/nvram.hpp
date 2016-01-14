@@ -32,6 +32,14 @@ using namespace pl;
 
 namespace nvram {
 
+struct grouping {
+	string		name;
+	string		desc;
+	uint8_t		cis_tag; // if any, or 0xFF.
+};
+
+extern unordered_map<string, grouping&> srom_subst_groupings;
+
 class nvram_map {
 private:
 	vector<shared_ptr<var>> _srom_vars;
@@ -145,7 +153,7 @@ public:
 				cis_layout_undef.push_back(v.first);
 		
 		for (const auto &v : _srom_tbl)
-			if (_cis_vstr_tbl.count(v.first) == 0)
+			if (_cis_vstr_tbl.count(v.first) == 0 && _cis_layout_tbl.count(v.first) == 0)
 				cis_undef.push_back(v.first);
 		
 		alpha_sort(srom_undef);
@@ -173,21 +181,26 @@ public:
 					break;
 			}
 			
-			if (!found_match)
+			if (!found_match) {
 				fprintf(stderr, "\t%s\n", v.c_str());
-			else
-				fprintf(stderr, "\t%s (found base %s)\n", v.c_str(), match.c_str());
-
+			} else {
+				const auto &entry = _cis_vstr_tbl.at(match);
+				fprintf(stderr, "\t%s (found base %s family %s)\n", v.c_str(), match.c_str(), entry->cis_tag().name().c_str());
+			}
+			
+			if (srom_subst_groupings.count(v) != 1)
+				errx(EXIT_FAILURE, "no substitute grouping defined for %s", v.c_str());
 		}
 
-#if 0
-		fprintf(stderr, "CIS vars not defined in SPROM:\n");
-		for (const auto &v : srom_undef)
-			fprintf(stderr, "\t%s\n", v.c_str());
 		
 		fprintf(stderr, "CIS vars missing layout records:\n");
 		for (const auto &v : cis_layout_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
+#if 0
+		fprintf(stderr, "CIS vars not defined in SPROM:\n");
+		for (const auto &v : srom_undef)
+			fprintf(stderr, "\t%s\n", v.c_str());
+
 
 		fprintf(stderr, "CIS vars requiring special case decoding:\n");
 		for (const auto &l : _cis_layouts) {

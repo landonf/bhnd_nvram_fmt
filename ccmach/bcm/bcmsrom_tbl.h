@@ -946,6 +946,14 @@ static const cis_tuple_t cis_hnbuvars[] = {
 	{HNBU_PAPARMS_C1,	0x000007fe, 31, "1maxp2ga1 1itt2ga1 2pa2gw0a1 2pa2gw1a1 "
 	"2pa2gw2a1 1maxp5ga1 1itt5ga1 1maxp5gha1 1maxp5gla1 2pa5gw0a1 2pa5gw1a1 2pa5gw2a1 "
 	"2pa5glw0a1 2pa5glw1a1 2pa5glw2a1 2pa5ghw0a1 2pa5ghw1a1 2pa5ghw2a1"},
+#if 1
+    {HNBU_PAPARMS_C2,	0x000007fe, 31, "1maxp2ga2 1itt2ga2 2pa2gw0a2 2pa2gw1a2 "
+        "2pa2gw2a2 1maxp5ga2 1itt5ga2 1maxp5gha2 1maxp5gla2 2pa5gw0a2 2pa5gw1a2 2pa5gw2a2 "
+        "2pa5glw0a2 2pa5glw1a2 2pa5glw2a2 2pa5ghw0a2 2pa5ghw1a2 2pa5ghw2a2"},
+    {HNBU_PAPARMS_C3,	0x000007fe, 31, "1maxp2ga3 1itt2ga3 2pa2gw0a3 2pa2gw1a3 "
+        "2pa2gw2a3 1maxp5ga3 1itt5ga3 1maxp5gha3 1maxp5gla3 2pa5gw0a3 2pa5gw1a3 2pa5gw2a3 "
+        "2pa5glw0a3 2pa5glw1a3 2pa5glw2a3 2pa5ghw0a3 2pa5ghw1a3 2pa5ghw2a3"},
+#endif
 	{HNBU_PO_CCKOFDM,	0xffffffff, 19, "2cck2gpo 4ofdm2gpo 4ofdm5gpo 4ofdm5glpo "
 	"4ofdm5ghpo"},
 	{HNBU_PO_MCS2G,		0xffffffff, 17, "2mcs2gpo0 2mcs2gpo1 2mcs2gpo2 2mcs2gpo3 "
