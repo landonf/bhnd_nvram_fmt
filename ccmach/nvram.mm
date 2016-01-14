@@ -166,10 +166,48 @@ unordered_map<string, grouping&> nvram::srom_subst_groupings = {
 unordered_set<string> nvram::cis_known_special_cases = {
     /* Standard CIS tuple */
     "manf",
-    "productname"
-};
-
-
-vector<nvram::cis_layout> nvram::cis_subst_layout = {
+    "productname",
     
+    /* Requires special handling, but the layout is perfectly standard */
+    "macaddr",
 };
+
+namespace nvram {
+
+unordered_map<string, value_seg> cis_subst_layout = {
+    // HNBU_RSSISMBXA2G
+    { "rssismf2g",  { 0, BHND_T_UINT8, 1, 0x0F, 0 }},
+    { "rssismc2g",  { 0, BHND_T_UINT8, 1, 0xF0, 4 }},
+    { "rssisav2g",  { 1, BHND_T_UINT8, 1, 0x07, 0 }},
+    { "bxa2g",      { 1, BHND_T_UINT8, 1, 0x18, 3 }},
+
+    // HNBU_RSSISMBXA5G
+    { "rssismf5g",  { 0, BHND_T_UINT8, 1, 0x0F, 0 }},
+    { "rssismc5g",  { 0, BHND_T_UINT8, 1, 0xF0, 4 }},
+    { "rssisav5g",  { 1, BHND_T_UINT8, 1, 0x07, 0 }},
+    { "bxa5g",      { 1, BHND_T_UINT8, 1, 0x18, 3 }},
+
+    // HNBU_FEM
+    //{ "antswctl2g", { 0, BHND_T_UINT8, 1, 0xF8, 3 }},
+    //{ "triso2g", { 0, BHND_T_UINT8, 1, 0xF8, 3 }},
+
+#if 0
+case HNBU_RSSISMBXA2G:
+    ASSERT(sromrev == 3);
+    varbuf_append(&b, vstr_rssismf2g, cis[i + 1] & 0xf);
+    varbuf_append(&b, vstr_rssismc2g, (cis[i + 1] >> 4) & 0xf);
+    varbuf_append(&b, vstr_rssisav2g, cis[i + 2] & 0x7);
+    varbuf_append(&b, vstr_bxa2g, (cis[i + 2] >> 3) & 0x3);
+    break;
+    
+case HNBU_RSSISMBXA5G:
+    ASSERT(sromrev == 3);
+    varbuf_append(&b, vstr_rssismf5g, cis[i + 1] & 0xf);
+    varbuf_append(&b, vstr_rssismc5g, (cis[i + 1] >> 4) & 0xf);
+    varbuf_append(&b, vstr_rssisav5g, cis[i + 2] & 0x7);
+    varbuf_append(&b, vstr_bxa5g, (cis[i + 2] >> 3) & 0x3);
+    break;
+#endif
+};
+
+}

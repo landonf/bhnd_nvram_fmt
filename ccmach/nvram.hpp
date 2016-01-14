@@ -41,7 +41,7 @@ struct grouping {
 };
 
 extern unordered_map<string, grouping&> srom_subst_groupings;
-extern vector<cis_layout> cis_subst_layout;
+extern unordered_map<string, nvram::value_seg> cis_subst_layout;
 extern unordered_set<string> cis_known_special_cases;
 
 class nvram_map {
@@ -54,7 +54,6 @@ private:
 	unordered_map<string, shared_ptr<var>> _srom_tbl;
 	unordered_map<string, shared_ptr<cis_vstr>> _cis_vstr_tbl;
 	unordered_multimap<string, cis_layout> _cis_layout_tbl;
-	unordered_multimap<string, cis_layout> _cis_subst_layout_tbl;
 	unordered_multimap<string, phy_chain> _pavars;
 	unordered_multimap<string, phy_band> _povars;
 
@@ -89,11 +88,6 @@ public:
 		for (const auto &l : cis_layouts) {
 			for (const auto &v : l.var_names())
 				_cis_layout_tbl.insert({v, l});
-		}
-		
-		for (const auto &l : cis_subst_layout) {
-			for (const auto &v : l.var_names())
-				_cis_subst_layout_tbl.insert({v, l});
 		}
 
 		populate_pavars(pavars);
@@ -222,7 +216,7 @@ public:
 		fprintf(stderr, "# CIS vars requiring special case decoding:\n");
 		for (const auto &l : _cis_layouts) {
 			for (const auto &v : l.vars()) {
-				if (v.special_case() && _cis_subst_layout_tbl.count(v.name()) == 0 && cis_known_special_cases.count(v.name()) == 0) {
+				if (v.special_case() && cis_subst_layout.count(v.name()) == 0 && cis_known_special_cases.count(v.name()) == 0) {
 					fprintf(stderr, "\t%s", v.name().c_str());
 					if (_srom_tbl.count(v.name()) > 0) {
 						fprintf(stderr, " (found srom var layout)\n");
