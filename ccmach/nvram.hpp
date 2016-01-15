@@ -115,7 +115,7 @@ public:
 			if (vs->cis_tag().name() == "HNBU_CHIPID" && vs->name() == "boardtype")
 				continue;
 			
-			printf("\t%s", vs->name().c_str());
+			fprintf(stderr, "\t%s", vs->name().c_str());
 			
 			vector<nvram::compat_range> srom_compats;
 			if (_srom_tbl.count(vs->name()) > 0) {
@@ -126,7 +126,7 @@ public:
 			}
 			
 			if (!vs->has_hnbu_entry() && !vs->asserted_revmask() && srom_compats.size() == 0) {
-				printf("(no range found; assuming >= 0)");
+				fprintf(stderr, "(no range found; assuming >= 0)");
 			} else {
 				NSMutableArray *elems = [NSMutableArray array];
 				if (vs->has_hnbu_entry()) {
@@ -142,10 +142,10 @@ public:
 					[elems addObject: [NSString stringWithFormat: @"asrt %s", nvram::compat_range::from_revmask(vs->asserted_revmask()).description().c_str()]];
 				}
 				
-				printf("(%s)", [elems componentsJoinedByString: @", "].UTF8String);
+				fprintf(stderr, "(%s)", [elems componentsJoinedByString: @", "].UTF8String);
 			}
 			
-			printf("\n");
+			fprintf(stderr, "\n");
 		}
 		
 		/* Find undefs */
