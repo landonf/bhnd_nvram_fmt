@@ -292,8 +292,14 @@ public:
     }
 
     const cis_tuple_t *hnbu_entry () const {
+        auto cis_tag = _cis_tag.value();
+        if (cis_tag == CISTPL_VERS_1)
+            cis_tag = OTP_VERS_1;
+        else if (cis_tag == CISTPL_MANFID)
+            cis_tag = OTP_MANFID;
+        
         for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
-            if (t->tag != _cis_tag.value())
+            if (t->tag != cis_tag)
                 continue;
             
             auto vars = [@(t->params) componentsSeparatedByCharactersInSet: [NSCharacterSet whitespaceCharacterSet]];
@@ -301,7 +307,13 @@ public:
                 const char *cstr = v.UTF8String;
                 const char *p;
                 
-                for (p = cstr; isdigit(*p) || *p == '*'; p++);
+                p = cstr;
+                if (*p == 's') {
+                    p++;
+                } else {
+                    for (p = cstr; isdigit(*p) || *p == '*'; p++);
+                }
+                
                 auto offset = p - cstr;
                 NSString *tv = [v substringFromIndex: offset];
                 if (![tv isEqual: @(_name.c_str())])

@@ -107,14 +107,15 @@ public:
 		vector<string> srom_undef;
 		vector<string> cis_undef;
 		vector<string> cis_layout_undef;
-		
+
+		fprintf(stderr, "# CIS vars missing revision ranges:\n");
 		for (auto &vs : _cis_vstrs) {
 			/* boardtype is aliased across HNBU_CHIPID and HNBU_BOARDTYPE; in HNBU_CHIPID, it's written
 			 * as the subdevid */
 			if (vs->cis_tag().name() == "HNBU_CHIPID" && vs->name() == "boardtype")
 				continue;
 			
-			printf("\t%s %s", vs->name().c_str(), to_string(vs->sfmt()).c_str());
+			printf("\t%s", vs->name().c_str());
 			
 			vector<nvram::compat_range> srom_compats;
 			if (_srom_tbl.count(vs->name()) > 0) {
@@ -125,7 +126,7 @@ public:
 			}
 			
 			if (!vs->has_hnbu_entry() && !vs->asserted_revmask() && srom_compats.size() == 0) {
-				printf("(unknown revs)");
+				printf("(no range found; assuming >= 0)");
 			} else {
 				NSMutableArray *elems = [NSMutableArray array];
 				if (vs->has_hnbu_entry()) {
