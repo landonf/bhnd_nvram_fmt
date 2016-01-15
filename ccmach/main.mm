@@ -655,9 +655,9 @@ private:
                         addtl.push_back(vap);
                     }
                 } else if (cs->tag.name() == "HNBU_USBSSPHY_MDIO" && vs.name() == "usbssmdio%d") {
-                    // TODO
-                    // XXX As many as will fit
-                    vs = vs.name([NSString stringWithFormat: @(vs.name().c_str()), 0].UTF8String);
+                    // TODO: size-prefixed array
+                    // XXX As many as will fit, 0...inf
+                    vs = vs.name("usbssmdio");
                 }
 
                 idx++;
@@ -825,11 +825,34 @@ public:
             NSError *error;
 
 
+            NSSet *ignorable = [NSSet setWithArray: @[
+                @"HNBU_GPIOTIMER",          // not parsed; use is unknown
+                @"HNBU_HNBUCIS",            // signals end of standard CIS tuples
+                @"HNBU_PAPARMS_SSLPNPHY",   // not parsed; use is unknown
+                @"HNBU_RSSISMBXA2G_SSLPNPHY",   // not parsed; use is unknown
+                @"HNBU_BRMIN",              // bootloader specific
+                @"HNBU_BRMAX",              // bootloader specific
+                @"HNBU_PATCH",              // bootloader specific
+                @"HNBU_PATCH_AUTOINC",              // bootloader specific
+                @"HNBU_PATCH2",              // bootloader specific
+                @"HNBU_PATCH_AUTOINC8",              // bootloader specific
+                @"HNBU_PATCH8",              // bootloader specific
+                @"HNBU_PMUREGS",              // bootloader specific
+                @"HNBU_USBRDY",// bootloader specific
+                @"HNBU_USBREGS",// bootloader specific
+                @"HNBU_BLDR_TIMEOUT",// bootloader specific
+                @"HNBU_MDIO_REGLIST", // bootloader specific
+                @"HNBU_MDIOEX_REGLIST", // bootloader specific
+                @"HNBU_PUBKEY", // bootloader specific
+                @"HNBU_GCI_CCR", // bootloader specific
+
+            ]];
             switch (cursor.kind) {
                 case PLClangCursorKindMacroDefinition: {
-                    if (![cursor.spelling hasPrefix: @"HNBU_"])
+                    if (![cursor.spelling hasPrefix: @"HNBU_"] || [ignorable containsObject: cursor.spelling])
                         return PLClangCursorVisitContinue;
 
+                    
                     NSString *comment = nil;
                     for (PLClangToken *t in _c->get_tokens(cursor)) {
                         if (t.kind == PLClangTokenKindComment) {

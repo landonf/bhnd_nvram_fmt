@@ -199,8 +199,6 @@ unordered_set<string> nvram::cis_known_special_cases = {
     
     /* Requires special handling, but the layout is perfectly standard */
     "macaddr",
-
-    "usbssmdio0", // XXX: look at the comments in cis_subst_layout for this value.
 };
 
 namespace nvram {
@@ -340,7 +338,7 @@ unordered_map<string, value_seg> cis_subst_layout = {
     // HNBU_USBSSPHY_MDIO
     // XXXLAYOUT the size of the array in bytes is specified in the first byte
     // XXXLAYOUT the 4 array elements are 3 bytes in length and overlap; we can't use a dumb count
-    // { "usbssmdio0", {0, BHND_T_UINT32, 4, 0x00FFFFFF, 0 }} // XXXLAYOUT - we have no way of saying "as many as fit in the defined lenght"
+    { "usbssmdio", {0, BHND_T_UINT32, 4, 0x00FFFFFF, 0 }}, // XXXLAYOUT - we have no way of saying "as many as fit in the defined lenght"
 
 
     // HNBU_USBSSPHY_SLEEP0

@@ -15,7 +15,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
     NSScanner *s = [NSScanner scannerWithString: layout];
     NSString *varname;
     int sz;
-    int count;
+    int count = 1;
     prop_type ptype;
     uint32_t mask;
     size_t shift = 0;
@@ -115,35 +115,50 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
 
 vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {
     vector<cis_layout> result;
-    unordered_map<uint32, symbolic_constant> tags;
+    unordered_map<uint32, symbolic_constant> cis_tags;
+    unordered_map<uint32, symbolic_constant> hnbu_tags;
 
     for (NSString *name in c->symbols()) {
-        if (![name hasPrefix: @"HNBU_"] && ![name hasPrefix: @"CISTPL_"] && ![name hasPrefix: @"OTP_"])
+        if (![name hasPrefix: @"HNBU_"] && ![name isEqual: @"OTP_RAW1"] && ![name isEqual: @"OTP_VERS_1"] && ![name isEqual: @"OTP_MANFID"] && ![name isEqual: @"OTP_RAW1"])
             continue;
 
         auto tag = c->resolve_constant(name.UTF8String);
-        tags.insert({tag.value(), tag});
+        if (hnbu_tags.count(tag.value()) > 0)
+            errx(EX_DATAERR, "duplicate constant value for %s", name.UTF8String);
+    
+        hnbu_tags.insert({tag.value(), tag});
+    }
+    
+    for (NSString *name in c->symbols()) {
+        if (![name hasPrefix: @"CISTPL_"])
+            continue;
+        
+        auto tag = c->resolve_constant(name.UTF8String);
+        if (cis_tags.count(tag.value()) > 0)
+            errx(EX_DATAERR, "duplicate CIS constant value for %s", name.UTF8String);
+        cis_tags.insert({tag.value(), tag});
     }
 
     for (const cis_tuple_t *t = cis_hnbuvars; t->tag != 0xFF; t++) {
-        if (tags.count(t->tag) == 0)
-            errx(EX_DATAERR, "can't find constant for tag %hhx (%s)", t->tag, t->params);
-        
         symbolic_constant tag("", 0xFF);
         ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
         switch (t->tag) {
             case OTP_VERS_1:
-                tag = tags.at(CISTPL_VERS_1);
+                tag = cis_tags.at(CISTPL_VERS_1);
                 break;
             case OTP_MANFID:
-                tag = tags.at(CISTPL_MANFID);
+                tag = cis_tags.at(CISTPL_MANFID);
                 break;
             case OTP_RAW:
             case OTP_RAW1:
                 continue;
             default:
-                tag = tags.at(CISTPL_BRCM_HNBU);
-                hnbu_tag = ftl::just(tags.at(t->tag));
+                tag = cis_tags.at(CISTPL_BRCM_HNBU);
+                
+                if (hnbu_tags.count(t->tag) == 0)
+                    errx(EX_DATAERR, "can't find constant for tag %hhx (%s)", t->tag, t->params);
+
+                hnbu_tag = ftl::just(hnbu_tags.at(t->tag));
                 break;
                 
         }

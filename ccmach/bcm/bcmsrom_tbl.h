@@ -899,6 +899,28 @@ static const cis_tuple_t cis_hnbuvars[] = {
 	{OTP_RAW1,		0xffffffff, 0, ""},	/* special case */
 	{OTP_VERS_1,	0xffffffff, 0, "smanf sproductname"},	/* special case (non BRCM tuple) */
 	{OTP_MANFID,	0xffffffff, 4, "2manfid 2prodid"},	/* special case (non BRCM tuple) */
+    {HNBU_OEM,      0x00000002, 9, "0oem"}, /* special case; byte array */
+    {HNBU_CC,       0x00000002, 2, "0cc"},
+    
+    {HNBU_ANT5G,    0xFFFFFFFF, 3,  "1aa5g 1ag1"},
+    {HNBU_USBFLAGS, 0xFFFFFFFF, 5,  "0usbflags"},
+    {HNBU_USBUTMI_CTL, 0xFFFFFFFF, 3, "0usbutmi_ctl"},
+    {HNBU_USBSSPHY_SLEEP0,0xFFFFFFFF,3,"0usbssphy_sleep0"},
+    {HNBU_USBSSPHY_SLEEP1,0xFFFFFFFF,3,"0usbssphy_sleep1"},
+    {HNBU_USBSSPHY_SLEEP2,0xFFFFFFFF,3,"0usbssphy_sleep2"},
+    {HNBU_USBSSPHY_SLEEP3,0xFFFFFFFF,3,"0usbssphy_sleep3"},
+
+    {HNBU_USBSSPHY_UTMI_CTL0,0xFFFFFFFF,5,"0usbssphy_utmi_ctl0"},
+    {HNBU_USBSSPHY_UTMI_CTL1,0xFFFFFFFF,5,"0usbssphy_utmi_ctl1"},
+    {HNBU_USBSSPHY_UTMI_CTL2,0xFFFFFFFF,5,"0usbssphy_utmi_ctl2"},
+
+    {HNBU_USBSSPHY_MDIO,0xFFFFFFFF,0,"0usbssmdio"},
+    
+    {HNBU_USB30PHY_NOSS,0xFFFFFFFF,2,"0usbnoss"},
+    
+    {HNBU_USB30PHY_U1U2,0xFFFFFFFF,2,"1usb30u1u2"},
+    {HNBU_USB30PHY_REGS,0xFFFFFFFF,0,"4*4usb30regs0 4*4usb30regs1"},
+   
 	/* Unified OTP: tupple to embed USB manfid inside SDIO CIS */
 	{HNBU_UMANFID,		0xffffffff, 8, "8usbmanfid"},
 	{HNBU_SROMREV,		0xffffffff, 2, "1sromrev"},
