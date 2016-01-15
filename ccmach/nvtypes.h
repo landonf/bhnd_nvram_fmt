@@ -52,6 +52,7 @@ typedef enum {
     BHND_T_INT32,	/**< signed 32 bit integer */
     
     BHND_T_CHAR,	/**< ascii char */
+    BHND_T_CSTR     /**< NUL-terminated string */
 } prop_type;
 
 prop_type prop_type_widen (prop_type operand);
@@ -146,6 +147,7 @@ public:
             case BHND_T_UINT8:
             case BHND_T_INT8:
             case BHND_T_CHAR:
+            case BHND_T_CSTR:
                 return (mask() == 0xFF);
             case BHND_T_UINT16:
             case BHND_T_INT16:

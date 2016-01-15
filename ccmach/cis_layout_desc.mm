@@ -7,6 +7,7 @@
 //
 
 #include "cis_layout_desc.hpp"
+#include "nvram.hpp"
 
 namespace nvram {
 
@@ -16,36 +17,76 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
     int sz;
     int count;
     prop_type ptype;
+    uint32_t mask;
+    size_t shift = 0;
     bool special_case = false;
 
-    if (![s scanInt: &sz]) {
-        /* 'special' var */
-        if ([s scanString: @"s" intoString:NULL]) {
-            // TODO - ASCII count?
-            ptype = BHND_T_CHAR;
-            sz = 0;
-            count = 0;
-            special_case = true;
+    bool isInt;
+    bool isString = false;
+    bool isArray = false;
+    isInt = [s scanInt: &sz];
+    if (!isInt) {
+        isString = [s scanString: @"s" intoString:NULL];
+    } else {
+        /* array? */
+        isArray = [s scanString: @"*" intoString: NULL];
+        if (isArray) {
+            if (![s scanInt: &count])
+                errx(EX_DATAERR, "array specifier missing length in %s", layout.UTF8String);
         } else {
-            errx(EX_DATAERR, "can't parse initial type char in %s", layout.UTF8String);
+            count = 1;
         }
+    }
+
+    if (!isInt && !isString)
+        errx(EX_DATAERR, "can't parse initial type char in %s", layout.UTF8String);
+
+    if (![s scanCharactersFromSet: [NSCharacterSet whitespaceAndNewlineCharacterSet].invertedSet intoString: &varname])
+        errx(EX_DATAERR, "failed to scan variable name in %s", layout.UTF8String);
+
+    if (isString) {
+        ptype = BHND_T_CSTR;
+        sz = 0;
+        count = 0;
+        mask = 0xFF;
+        special_case = true;
     } else {
         switch (sz) {
-            case 0:
+            case 0: {
                 ptype = BHND_T_UINT8;
-                special_case = true;
+                shift = 0;
+                mask = 0xFF;
+
+                if (cis_subst_layout.count(varname.UTF8String) == 0) {
+                    errx(EX_DATAERR, "%s missing CIS layout record, no substitute found", varname.UTF8String);
+                }
+                
+                const auto &vseg = cis_subst_layout.at(varname.UTF8String);
+                if (vseg.offset() != offset) {
+                    warnx("layout has different offset for %s; expected %zu, got %zu", layout.UTF8String, offset, vseg.offset());
+                }
+                offset = vseg.offset();
+                ptype = vseg.type();
+                count = (int) vseg.count();
+                mask = vseg.mask();
+                shift = vseg.shift();
                 break;
+            }
             case 1:
                 ptype = BHND_T_UINT8;
+                mask = 0xFF;
                 break;
             case 2:
                 ptype = BHND_T_UINT16;
+                mask = 0xFFFFF;
                 break;
             case 4:
                 ptype = BHND_T_UINT32;
+                mask = 0xFFFFFFFF;
                 break;
             case 8:
                 ptype = BHND_T_UINT32;
+                mask = 0xFFFFFFFF;
                 sz = 4;
                 warnx("%s uses an 8 byte size spec; this is ignored and treated as a 4 byte number by wlu.c", layout.UTF8String);
                 break;
@@ -54,30 +95,22 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
                     warnx("%s is used to derive the boardnum and requires special handling; treating as MAC-48 value", layout.UTF8String);
                     ptype = BHND_T_UINT8;
                     sz = 1;
+                    mask = 0xFF;
                     count = 48;
                     special_case = true;
                 } else if ([layout isEqualToString: @"16uuid"]) {
                     // TODO - do we need a UUID type?
                     ptype = BHND_T_UINT8;
+                    mask = 0xFF;
                     sz = 1;
                     count = 16;
                 } else {
                     errx(EX_DATAERR, "unhandled size spec in %s", layout.UTF8String);
                 }
         }
-        /* array? */
-        if ([s scanString: @"*" intoString: NULL]) {
-            if (![s scanInt: &count])
-                errx(EX_DATAERR, "array specifier missing length in %s", layout.UTF8String);
-        } else {
-            count = 1;
-        }
     }
 
-    if (![s scanCharactersFromSet: [NSCharacterSet whitespaceAndNewlineCharacterSet].invertedSet intoString: &varname])
-        errx(EX_DATAERR, "failed to scan variable name in %s", layout.UTF8String);
-
-    return nvram::cis_var_layout(varname.UTF8String, offset, sz, ptype, count, special_case);
+    return nvram::cis_var_layout(varname.UTF8String, offset, sz, ptype, count, mask, shift, special_case);
 }
 
 vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c) {

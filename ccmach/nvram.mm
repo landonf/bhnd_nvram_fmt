@@ -24,6 +24,8 @@ prop_type nvram::prop_type_widen (prop_type operand) {
             return BHND_T_INT32;
         case BHND_T_CHAR:
             return BHND_T_CHAR;
+        case BHND_T_CSTR:
+            return BHND_T_CSTR;
     }
 }
 
@@ -40,6 +42,7 @@ string std::to_string(nvram::prop_type t) {
         case nvram::BHND_T_INT16: return "i16";
         case nvram::BHND_T_INT32: return "i32";
         case nvram::BHND_T_CHAR: return "char";
+        case nvram::BHND_T_CSTR: return "cstr";
             
     }
 }
@@ -53,6 +56,7 @@ string nvram::prop_type_str (prop_type t) {
         case nvram::BHND_T_INT16: return "BHND_T_INT16";
         case nvram::BHND_T_INT32: return "BHND_T_INT32";
         case nvram::BHND_T_CHAR: return "BHND_T_CHAR";
+        case nvram::BHND_T_CSTR: return "BHND_T_CSTR";
     }
 }
 
@@ -65,6 +69,7 @@ size_t nvram::prop_type_size (prop_type t) {
         case nvram::BHND_T_INT16: return 2;
         case nvram::BHND_T_INT32: return 4;
         case nvram::BHND_T_CHAR: return 1;
+        case nvram::BHND_T_CSTR: return 1;
     }
 }
 

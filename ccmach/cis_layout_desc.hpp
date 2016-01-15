@@ -32,6 +32,8 @@ PL_RECORD_STRUCT(cis_var_layout,
     (size_t,    size),
     (prop_type,    type),
     (size_t,    count),
+    (uint32_t,  mask),
+    (ssize_t,   shift),
     (bool,      special_case)
 );
 
