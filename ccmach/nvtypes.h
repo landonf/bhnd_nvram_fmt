@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "maybe.h"
 #include "record_type.hpp"
 
 #include <Foundation/Foundation.h>
@@ -342,22 +343,37 @@ public:
     }
 };
 
+PL_RECORD_STRUCT(var_set_cis,
+    (symbolic_constant,             tag),
+    (ftl::maybe<symbolic_constant>, hnbu_tag),
+    (compat_range,                  compat)
+);
+
 /** NVRAM variable */
 class var {
     PL_RECORD_FIELDS(var,
-                     (string,				name),
-                     (prop_type,				type),
-                     (str_fmt,				sfmt),
-                     (size_t,				count),
-                     (uint32_t,				flags),
-                     (shared_ptr<vector<sprom_offset>>,	sprom_offsets)
-                     );
+        (string,				name),
+        (prop_type,				type),
+        (str_fmt,				sfmt),
+        (size_t,				count),
+        (uint32_t,				flags),
+        (shared_ptr<vector<sprom_offset>>,	sprom_offsets)
+    );
 public:
     bool operator < (const var &other) const {
         return ([@(name().c_str()) compare:@(other.name().c_str()) options:NSNumericSearch] == NSOrderedAscending);
     }
 };
 
+/** NVRAM struct / CIS tuple */
+class var_set {
+    PL_RECORD_FIELDS(var_set,
+        (string,                    name),
+        (var_set_cis,               cis),
+        (string,                    comment),
+        (shared_ptr<vector<var>>,   vars)
+    );
+};
 
 class phy {
 public:

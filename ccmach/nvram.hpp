@@ -44,7 +44,7 @@ extern unordered_map<string, grouping&> srom_subst_groupings;
 extern unordered_map<string, nvram::value_seg> cis_subst_layout;
 extern unordered_set<string> cis_known_special_cases;
 	
-	class genmap;
+class genmap;
 
 class nvram_map {
 	friend class genmap;
@@ -76,7 +76,49 @@ private:
 		});
 	}
 	
+	const cis_layout &get_layout (const symbolic_constant &tag, ftl::maybe<symbolic_constant> &hnbu_tag) {
+		for (const auto &l : _cis_layouts) {
+			if (l.code() == tag && l.hnbu_tag() == hnbu_tag)
+				return l;
+		}
+		
+		errx(EXIT_FAILURE, "layout for %s:%s not found", tag.name().c_str(), hnbu_tag.is<symbolic_constant>() ? ftl::get<symbolic_constant>(hnbu_tag).name().c_str() : "<none>");
+	}
 public:
+	vector<var_set> var_sets () {
+		unordered_map<string, var_set> sets;
+		
+		for (const auto &ct : _cis_consts) {
+			symbolic_constant tag = ct.constant();
+			ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
+			string name = ct.constant().name();
+			
+			
+			if (strncmp(ct.constant().name().c_str(), "CISTPL_", strlen("CISTPL_")) == 0) {
+				tag = ct.constant();
+			} else {
+				tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
+				hnbu_tag = ftl::just(ct.constant());
+			}
+			auto layout = get_layout(tag, hnbu_tag);
+
+#if 0
+			
+			var_set vs(
+				name,
+				var_set_cis(tag, hnbu_tag, )
+			);
+			sets.insert({ct.constant().name(), NULL});
+#endif
+		}
+		
+		vector<var_set> result;
+		for (const auto &kv : sets)
+			result.push_back(kv.second);
+		return result;
+	}
+	
+	
 	nvram_map (const vector<shared_ptr<var>> &srom_vars,
 		   const vector<shared_ptr<cis_vstr>> &cis_vstrs,
 		   const vector<nvram::cis_tag> &cis_consts,

@@ -24,7 +24,7 @@ int genmap::print (const char *fmt, ...) {
 }
 
 void genmap::generate() {
-    
+    _nv.var_sets();
 }
 
 }
