@@ -8,6 +8,7 @@
 
 #include "nvram.hpp"
 #include "cc.hpp"
+#include "genmap.hpp"
 
 #include <stdio.h>
 
@@ -690,14 +691,18 @@ private:
 public:
     Extractor(int argc, char * const argv[]) {
         int optchar;
+        bool diag = false;
         
         static struct option longopts[] = {
             { "help",       no_argument,        NULL,          'h' },
             { NULL,           0,                NULL,           0  }
         };
         
-        while ((optchar = getopt_long(argc, argv, "h", longopts, NULL)) != -1) {
+        while ((optchar = getopt_long(argc, argv, "hd", longopts, NULL)) != -1) {
             switch (optchar) {
+                case 'd':
+                    diag = true;
+                    break;
                 case 'h':
                     // TODO
                     break;
@@ -861,7 +866,12 @@ public:
         nvram::nvram_map m(vars, cis_vstrs, cis_constants, cis_layouts);
         
         /* Report SROM/CIS differences */
-        m.emit_diagnostics();
+        if (diag)
+            m.emit_diagnostics();
+
+        /* Emit the map */
+        auto g = nvram::genmap(m);
+        g.generate();
     }
 };
 

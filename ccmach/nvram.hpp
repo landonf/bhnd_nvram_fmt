@@ -43,8 +43,11 @@ struct grouping {
 extern unordered_map<string, grouping&> srom_subst_groupings;
 extern unordered_map<string, nvram::value_seg> cis_subst_layout;
 extern unordered_set<string> cis_known_special_cases;
+	
+	class genmap;
 
 class nvram_map {
+	friend class genmap;
 private:
 	vector<shared_ptr<var>> _srom_vars;
 	vector<shared_ptr<cis_vstr>> _cis_vstrs;
@@ -101,6 +104,19 @@ public:
 				_povars.insert({str.UTF8String, pb});
 			}
 		}
+	}
+	
+	unordered_set<string> vars () {
+		unordered_set<string> vset;
+		for (const auto &v : _srom_vars)
+			vset.insert(v->name());
+		for (const auto &v : _cis_vstrs)
+			vset.insert(v->name());
+		for (const auto &l : _cis_layouts)
+			for (const auto &v : l.vars())
+				vset.insert(v.name());
+		
+		return vset;
 	}
 	
 	void emit_diagnostics () {

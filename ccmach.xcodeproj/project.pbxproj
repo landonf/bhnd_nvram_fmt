@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		058089661C488A52004DDD20 /* genmap.mm in Sources */ = {isa = PBXBuildFile; fileRef = 058089641C488A52004DDD20 /* genmap.mm */; };
 		058CD2991C456533008D9435 /* cis_layout_desc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 058CD2971C456533008D9435 /* cis_layout_desc.mm */; };
 		059550351C35EA100032A4AE /* ObjectDoc.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 059550341C35EA100032A4AE /* ObjectDoc.framework */; };
 		059550371C35EAA80032A4AE /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 059550361C35EAA80032A4AE /* main.mm */; };
@@ -75,6 +76,8 @@
 
 /* Begin PBXFileReference section */
 		050444B71C4185760040CBAC /* bcmsrom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bcmsrom.c; sourceTree = "<group>"; };
+		058089641C488A52004DDD20 /* genmap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = genmap.mm; sourceTree = "<group>"; };
+		058089651C488A52004DDD20 /* genmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = genmap.hpp; sourceTree = "<group>"; };
 		058CD2971C456533008D9435 /* cis_layout_desc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_layout_desc.mm; sourceTree = "<group>"; };
 		058CD2981C456533008D9435 /* cis_layout_desc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_layout_desc.hpp; sourceTree = "<group>"; };
 		058CD29C1C456633008D9435 /* nvtypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvtypes.h; sourceTree = "<group>"; };
@@ -306,6 +309,8 @@
 				058CD29C1C456633008D9435 /* nvtypes.h */,
 				05B746941C45799A001BFCD8 /* cc.mm */,
 				05B746951C45799A001BFCD8 /* cc.hpp */,
+				058089651C488A52004DDD20 /* genmap.hpp */,
+				058089641C488A52004DDD20 /* genmap.mm */,
 			);
 			path = ccmach;
 			sourceTree = "<group>";
@@ -688,6 +693,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				059550371C35EAA80032A4AE /* main.mm in Sources */,
+				058089661C488A52004DDD20 /* genmap.mm in Sources */,
 				05FDE57F1C3721DA0035C177 /* nvram_map.c in Sources */,
 				05C56EC61C42F48F005E5D51 /* nvram.mm in Sources */,
 				05B746961C45799A001BFCD8 /* cc.mm in Sources */,
