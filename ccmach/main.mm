@@ -845,6 +845,13 @@ public:
                 @"HNBU_MDIOEX_REGLIST", // bootloader specific
                 @"HNBU_PUBKEY", // bootloader specific
                 @"HNBU_GCI_CCR", // bootloader specific
+                
+                @"HNBU_SROM3SWRGN", // SPECIAL!!! SROM embedded in CIS; requires special handling.
+                
+                @"HNBU_RESERVED", // post-mfg-specific private
+                @"HNBU_CUSTOM2",
+                
+                @"HNBU_ACPAPARAM", // not parsed; use is unknown
 
             ]];
             switch (cursor.kind) {
