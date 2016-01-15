@@ -70,6 +70,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
                 count = (int) vseg.count();
                 mask = vseg.mask();
                 shift = vseg.shift();
+                sz = (int) prop_type_size(ptype);
                 break;
             }
             case 1:
