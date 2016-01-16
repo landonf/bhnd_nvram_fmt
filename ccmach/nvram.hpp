@@ -92,8 +92,7 @@ public:
 			symbolic_constant tag = ct.constant();
 			ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
 			string name = ct.constant().name();
-			
-			
+
 			if (strncmp(ct.constant().name().c_str(), "CISTPL_", strlen("CISTPL_")) == 0) {
 				tag = ct.constant();
 			} else {
@@ -101,15 +100,19 @@ public:
 				hnbu_tag = ftl::just(ct.constant());
 			}
 			auto layout = get_layout(tag, hnbu_tag);
-
-#if 0
+			
+			NSString *comment = ct.comment();
+			if (comment == nil)
+				comment = @"";
 			
 			var_set vs(
 				name,
-				var_set_cis(tag, hnbu_tag, )
+				var_set_cis(tag, hnbu_tag, layout.compat()),
+				comment.UTF8String,
+				make_shared<vector<var>>()
 			);
-			sets.insert({ct.constant().name(), NULL});
-#endif
+			sets.insert({ct.constant().name(), vs});
+			printf("added %s->\n", ct.constant().name().c_str());
 		}
 		
 		vector<var_set> result;

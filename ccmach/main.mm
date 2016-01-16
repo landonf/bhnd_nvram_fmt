@@ -856,10 +856,22 @@ public:
             ]];
             switch (cursor.kind) {
                 case PLClangCursorKindMacroDefinition: {
-                    if (![cursor.spelling hasPrefix: @"HNBU_"] || [ignorable containsObject: cursor.spelling])
+                    NSString *constant = cursor.spelling;
+
+                    if (![constant hasPrefix: @"HNBU_"] && ![constant isEqual: @"OTP_VERS_1"] && ![constant isEqual: @"OTP_MANFID"])
                         return PLClangCursorVisitContinue;
 
                     
+                    if ([ignorable containsObject: cursor.spelling])
+                        return PLClangCursorVisitContinue;
+                    
+                    if ([constant isEqual: @"OTP_VERS_1"]) {
+                        constant = @"CISTPL_VERS_1";
+
+                    } else if ([constant isEqual: @"OTP_MANFID"]) {
+                        constant = @"CISTPL_MANFID";
+                    }
+
                     NSString *comment = nil;
                     for (PLClangToken *t in _c->get_tokens(cursor)) {
                         if (t.kind == PLClangTokenKindComment) {
@@ -881,7 +893,7 @@ public:
                         }
                     }
 
-                    cis_constants.emplace_back(_c->resolve_constant(cursor.spelling.UTF8String), comment);
+                    cis_constants.emplace_back(_c->resolve_constant(constant.UTF8String), comment);
                     return PLClangCursorVisitContinue;
                 }
                 default:

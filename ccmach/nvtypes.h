@@ -371,7 +371,7 @@ public:
 class var_set {
     PL_RECORD_FIELDS(var_set,
         (string,                    name),
-        (var_set_cis,               cis),
+        (ftl::maybe<var_set_cis>,               cis),
         (string,                    comment),
         (shared_ptr<vector<var>>,   vars)
     );
