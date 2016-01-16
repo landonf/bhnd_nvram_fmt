@@ -37,7 +37,7 @@ struct grouping {
 	const char	*desc;
 	uint8_t		 cis_tag; // if any, or 0xFF.
 
-	bool builtin () { return (cis_tag != 0xFF); }
+	bool builtin () const { return (cis_tag != 0xFF); }
 };
 
 extern unordered_map<string, grouping&> srom_subst_groupings;
@@ -107,12 +107,36 @@ public:
 			
 			var_set vs(
 				name,
-				var_set_cis(tag, hnbu_tag, layout.compat()),
+				ftl::just(var_set_cis(tag, hnbu_tag, layout.compat())),
 				comment.UTF8String,
 				make_shared<vector<var>>()
 			);
 			sets.insert({ct.constant().name(), vs});
-			printf("added %s->\n", ct.constant().name().c_str());
+		}
+		
+		for (const auto &grtuple : srom_subst_groupings) {
+			const auto gr = grtuple.second;
+			
+			if (sets.count(gr.name) > 0)
+				continue;
+			
+			auto vsc = ftl::nothing<var_set_cis>();
+			if (gr.builtin()) {
+				auto tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
+				auto hnbu_tag = ftl::just(symbolic_constant(gr.name, gr.cis_tag));
+				auto layout = get_layout(tag, hnbu_tag);
+				vsc = ftl::just(var_set_cis(tag, hnbu_tag, layout.compat()));
+			}
+			
+			var_set vs(
+				gr.name,
+				vsc,
+				gr.desc,
+				make_shared<vector<var>>()
+			);
+			
+			sets.insert({gr.name, vs});
+
 		}
 		
 		vector<var_set> result;
