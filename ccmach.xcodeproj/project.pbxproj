@@ -141,6 +141,7 @@
 		05C56F211C42FFC5005E5D51 /* record_type.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = record_type.hpp; sourceTree = "<group>"; };
 		05C56F221C42FFC5005E5D51 /* record_type_tests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = record_type_tests.mm; sourceTree = "<group>"; };
 		05C56F231C42FFC5005E5D51 /* unit_type.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = unit_type.hpp; sourceTree = "<group>"; };
+		05D2DDDE1C4C6101008CDF2E /* nvram_map_v2 */ = {isa = PBXFileReference; lastKnownFileType = text; path = nvram_map_v2; sourceTree = "<group>"; };
 		05FDE5041C36E4410035C177 /* aidmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aidmp.h; sourceTree = "<group>"; };
 		05FDE5051C36E4410035C177 /* amemc_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = amemc_core.h; sourceTree = "<group>"; };
 		05FDE5061C36E4410035C177 /* armca9_core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = armca9_core.h; sourceTree = "<group>"; };
@@ -278,6 +279,7 @@
 		059550211C35E97D0032A4AE = {
 			isa = PBXGroup;
 			children = (
+				05D2DDDE1C4C6101008CDF2E /* nvram_map_v2 */,
 				0599679F1C38DFA300CB31ED /* map.awk */,
 				0599679E1C38DD9B00CB31ED /* nvram_map */,
 				059550341C35EA100032A4AE /* ObjectDoc.framework */,
