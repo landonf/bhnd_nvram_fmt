@@ -315,31 +315,22 @@ private:
             
             base_val.segments()->push_back(base_seg);
             size_t more_width = n->width;
-            while (n->flags & SRFL_MORE) {
-                i++;
-                n = &(*nvars)[i];
-                base_val.segments()->emplace_back(n->off, n->get_type(), 1, n->valmask, static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8)));
-                
-                more_width += n->width;
-            }
-            vals->push_back(base_val);
+            uint32_t revmask = n->revmask;
             
-            while (n->flags & SRFL_ARRAY) {
-                nvram::value val(make_shared<vector<nvram::value_seg>>());
-                
-                i++;
-                n = &(*nvars)[i];
-                
-                val.segments()->emplace_back(
-                    n->off,
-                    n->get_type(),
-                    1,
-                    n->valmask,
-                    static_cast<ssize_t>(__builtin_ctz(n->valmask))
-                );
-                
-                more_width = n->width;
+            if (!(n->flags & SRFL_ARRAY)) {
                 while (n->flags & SRFL_MORE) {
+                    i++;
+                    n = &(*nvars)[i];
+                    base_val.segments()->emplace_back(n->off, n->get_type(), 1, n->valmask, static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8)));
+                    
+                    more_width += n->width;
+                }
+                vals->push_back(base_val);
+            } else {
+                vals->push_back(base_val);
+                while (n->flags & SRFL_ARRAY) {
+                    nvram::value val(make_shared<vector<nvram::value_seg>>());
+                    
                     i++;
                     n = &(*nvars)[i];
                     
@@ -348,16 +339,30 @@ private:
                         n->get_type(),
                         1,
                         n->valmask,
-                        static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
+                        static_cast<ssize_t>(__builtin_ctz(n->valmask))
                     );
                     
-                    more_width += n->width;
+                    more_width = n->width;
+                    while (n->flags & SRFL_MORE) {
+                        i++;
+                        n = &(*nvars)[i];
+                        
+                        val.segments()->emplace_back(
+                            n->off,
+                            n->get_type(),
+                            1,
+                            n->valmask,
+                            static_cast<ssize_t>(__builtin_ctz(n->valmask) - (more_width * 8))
+                        );
+                        
+                        more_width += n->width;
+                    }
+                    
+                    vals->push_back(val);
                 }
-                
-                vals->push_back(val);
             }
-            
-            nvram::sprom_offset sp_off(nvram::compat_range::from_revmask(n->revmask), vals);
+
+            nvram::sprom_offset sp_off(nvram::compat_range::from_revmask(revmask), vals);
             v->sprom_offsets()->push_back(sp_off);
             
             /* Sort by compat range */
