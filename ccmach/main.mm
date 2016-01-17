@@ -760,6 +760,7 @@ public:
                 uint32_t max = _c->tokens_literal_u32(_c->get_tokens(maxCursor));
                 
                 shared_ptr<nvram::var> newv;
+                bool add_var = false;
                 for (uint32_t i = 0; i < max; i++) {
                     NSString *path = [NSString stringWithFormat: @"%s%u", cfg->path_pfx, i];
                     PLClangCursor *c = _c->find_symbol(path.UTF8String);
@@ -780,6 +781,7 @@ public:
                             
                             string name = v->name() + to_string(i);
                             if (path_var_tbl.count(name) == 0) {
+                                add_var = true;
                                 newv = make_shared<nvram::var>(v->name(name).sprom_offsets(make_shared<vector<nvram::sprom_offset>>()));
                                 path_var_tbl.insert({name, newv});
                             } else {
@@ -789,7 +791,7 @@ public:
                         }
                     }
                     
-                    if (newv)
+                    if (add_var)
                         vars.push_back(newv);
                 }
             }
