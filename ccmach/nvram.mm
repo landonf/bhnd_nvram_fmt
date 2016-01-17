@@ -56,13 +56,13 @@ string std::to_string(nvram::prop_type t) {
 
 string std::to_string(nvram::str_fmt f) {
     switch (f) {
-            case SFMT_HEX:      return "SFMT_HEX";
-            case SFMT_DECIMAL:      return "SFMT_DECIMAL";
-            case SFMT_HEXBIN:      return "SFMT_HEXBIN";
-            case SFMT_MACADDR:      return "SFMT_MACADDR";
-            case SFMT_CCODE:      return "SFMT_CCODE";
-            case SFMT_ASCII:      return "SFMT_ASCII";
-            case SFMT_LEDDC:      return "SFMT_LEDDC";
+            case SFMT_HEX:      return "hex";
+            case SFMT_DECIMAL:      return "decimal";
+            case SFMT_HEXBIN:      return "hexbin";
+            case SFMT_MACADDR:      return "macaddr";
+            case SFMT_CCODE:      return "ccode";
+            case SFMT_ASCII:      return "ascii";
+            case SFMT_LEDDC:      return "leddc";
     }
 }
 
@@ -544,7 +544,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                     errx(EX_DATAERR, "%s cis/srom mismatch: flags 0x%x(cis) != 0x%x(srom)", v->name().c_str(), v->flags(), sv->flags());
                 }
             }
-            
+
             v->sprom_offsets()->insert(v->sprom_offsets()->end(), sv->sprom_offsets()->begin(), sv->sprom_offsets()->end());
         }
     }

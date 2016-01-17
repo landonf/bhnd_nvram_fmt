@@ -20,6 +20,10 @@ private:
 
 public:
     int print(const char *fmt, ...);
+    int println(const char *fmt, ...);
+    int vprint(const char *fmt, va_list args);
+    int prints(const char *fmt, ...);
+
     genmap (const nvram_map &nv) : _nv(nv) {}
 
     void generate();

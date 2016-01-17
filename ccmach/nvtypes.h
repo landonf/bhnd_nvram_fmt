@@ -125,9 +125,20 @@ public:
         if (last() == MAX_SPROMREV)
             return [NSString stringWithFormat: @">= %u", first()].UTF8String;
         else if (first() == last())
-            return [NSString stringWithFormat: @"%u", first()].UTF8String;
+            return [NSString stringWithFormat: @"== %u", first()].UTF8String;
         else
             return [NSString stringWithFormat: @"%u-%u", first(), last()].UTF8String;
+    }
+    
+    bool elidable () const {
+        return (_first == 0 && _last == MAX_SPROMREV);
+    }
+    
+    string revdesc () const {
+        if (!elidable())
+            return description();
+        else
+            return "";
     }
 };
 
@@ -168,7 +179,7 @@ public:
     }
     
     string description () const {
-        NSMutableString *ret = [NSMutableString stringWithFormat: @"0x%zx", offset()];
+        NSMutableString *ret = [NSMutableString stringWithFormat: @"0x%zX", offset()];
         if (!has_defaults()) {
             [ret appendString: @" ("];
             if (!has_default_mask()) {

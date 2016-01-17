@@ -79,7 +79,7 @@ static cis_var_layout parse_layout (NSString *layout, size_t offset) {
                 break;
             case 2:
                 ptype = BHND_T_UINT16;
-                mask = 0xFFFFF;
+                mask = 0xFFFF;
                 break;
             case 4:
                 ptype = BHND_T_UINT32;
