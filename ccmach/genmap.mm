@@ -61,48 +61,79 @@ int genmap::prints(const char *fmt, ...) {
 
 void genmap::generate() {
     auto vsets = _nv.var_sets();
-    for (const auto &v : vsets) {
-        if (v->comment().size() > 0)
-            println("# %s", [@(v->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);
-        prints("%s", v->name().c_str(), ^{
-            if (v->cis().is<var_set_cis>()) {
-                auto cis = ftl::get<var_set_cis>(v->cis());
+    for (const auto &vs : vsets) {
+        if (vs->comment().size() > 0)
+            println("# %s", [@(vs->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);
+    
+        prints("%s", vs->name().c_str(), ^{
+            if (vs->cis().is<var_set_cis>()) {
+                auto cis = ftl::get<var_set_cis>(vs->cis());
                 
-                print("cis_tuple\t%s\t(%s", cis.compat().revdesc().c_str(), cis.tag().name().c_str());
+                print("cis_tuple\t0x%x", cis.tag().value());
                 if (cis.hnbu_tag().is<symbolic_constant>()) {
-                    printf(", %s", ftl::get<symbolic_constant>(cis.hnbu_tag()).name().c_str());
+                    printf(",0x%x", ftl::get<symbolic_constant>(cis.hnbu_tag()).value());
                 }
-                printf(")\n");
+                printf("\n");
+                
+                println("compat\t\t%s", cis.compat().description().c_str());
             }
             
-            for (const auto &v : *v->vars()) {
+            for (const auto &v : *vs->vars()) {
                 string vtype = to_string(v->type());
                 if (v->count() > 1)
                     vtype += "[" + to_string(v->count()) + "]";
 
                 prints("%s %s", vtype.c_str(), v->name().c_str(), ^{
-                    println("sfmt\t%s", to_string(v->sfmt()).c_str());
+                    if (v->sfmt() != SFMT_HEX)
+                        println("sfmt\t%s", to_string(v->sfmt()).c_str());
+                    
                     for (const auto &cis : *v->cis_offsets()) {
-                        string type = to_string(cis.type());
-                        if (cis.count() > 1)
-                            type += "[" + to_string(cis.count()) + "]";
+                        const auto &value = cis.value();
+                        string type = to_string(value.type());
+                        if (value.count() > 1)
+                            type += "[" + to_string(value.count()) + "]";
                         
-                        auto seg = value_seg(cis.offset(), cis.type(), cis.count(), cis.mask(), cis.shift());
-
+                        if (type == vtype)
+                            type = " ";
+                        else
+                            type = " " + type + " @ ";
                         
-                        print("cis\t{ %s @ %s", type.c_str(), seg.description().c_str());
+                        string rdesc = cis.compat().description();
+                        if (cis.compat() == ftl::get<var_set_cis>(vs->cis()).compat())
+                            rdesc = "\t";
+                        else
+                            rdesc = " " + rdesc + "\t";
+                        
+                        print("cis%s{%s%s", rdesc.c_str(), type.c_str(), value.cis_description().c_str());
                         printf(" }\n");
                     }
                     
                     
                     for (const auto &sp : *v->sprom_offsets()) {
-                        print("srom %s\t{ ", sp.compat().revdesc().c_str());
+                        auto rdesc = sp.compat().description();
+                        // TODO: Saner method for determining covered sromrevs
+                        if (vs->cis().is<var_set_cis>() && sp.compat() == ftl::get<var_set_cis>(vs->cis()).compat() && v->sprom_offsets()->size() == 1)
+                            rdesc = " ";
+                        else
+                            rdesc = " " + rdesc;
+                        
+                        print("srom%s\t{ ", rdesc.c_str());
                         for (size_t vi = 0; vi < sp.values()->size(); vi++) {
                             const auto &val = sp.values()->at(vi);
                             auto segs = val.segments();
                             for (size_t seg = 0; seg < segs->size(); seg++) {
                                 auto s = segs->at(seg);
-                                printf("%s @ %s", to_string(s.type()).c_str(), s.description().c_str());
+
+                                string type = to_string(s.type());
+                                if (s.count() > 1)
+                                    type += "[" + to_string(s.count()) + "]";
+                                
+                                if (type == vtype)
+                                    type = "";
+                                else
+                                    type = " " + type + " @ ";
+                                
+                                printf("%s%s", type.c_str(), s.description().c_str());
                                 if (seg+1 < segs->size())
                                     printf(" | ");
                             }
@@ -113,7 +144,6 @@ void genmap::generate() {
                         printf(" }\n");
                     }
                 });
-
             }
 
         });

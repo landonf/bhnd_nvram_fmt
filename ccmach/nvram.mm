@@ -57,7 +57,7 @@ string std::to_string(nvram::prop_type t) {
 string std::to_string(nvram::str_fmt f) {
     switch (f) {
             case SFMT_HEX:      return "hex";
-            case SFMT_DECIMAL:      return "decimal";
+            case SFMT_DECIMAL:      return "sdec";
             case SFMT_HEXBIN:      return "hexbin";
             case SFMT_MACADDR:      return "macaddr";
             case SFMT_CCODE:      return "ccode";
@@ -571,8 +571,9 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 flags = _srom_tbl.at(v.name())->flags();
             }
             
-            auto vl = make_shared<vector<cis_var_layout>>();
-            vl->push_back(v);
+            cis_offset coff(layout.compat(), value_seg(v.offset(), ptype, v.count(), v.mask(), v.shift()));
+            auto vl = make_shared<vector<cis_offset>>();
+            vl->push_back(coff);
             vars->push_back(make_shared<var>(
                 v.name(),
                 ptype,
@@ -673,7 +674,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                     sfmt,
                     sv->count(),
                     sv->flags(),
-                    make_shared<vector<cis_var_layout>>(),
+                    make_shared<vector<cis_offset>>(),
                     make_shared<vector<sprom_offset>>()
                 );
                 vs->vars()->push_back(v);

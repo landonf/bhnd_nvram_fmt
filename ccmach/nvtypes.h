@@ -178,6 +178,30 @@ public:
         return (has_default_mask() && has_default_shift());
     }
     
+    string cis_description () const {
+        NSMutableString *ret = [NSMutableString stringWithFormat: @"0x%zX", offset()];
+        if (!has_defaults()) {
+            [ret appendString: @" ("];
+            if (!has_default_mask()) {
+                [ret appendFormat: @"&0x%X", mask()];
+                if (!has_default_shift())
+                    [ret appendString: @", "];
+            }
+            
+            if (!has_default_shift()) {
+                if (shift() < 0) {
+                    [ret appendFormat: @"<<%zd", -shift()];
+                } else {
+                    [ret appendFormat: @">>%zd", shift()];
+                }
+            }
+            
+            [ret appendString: @")"];
+        }
+        
+        return (ret.UTF8String);
+    }
+    
     string description () const {
         NSMutableString *ret = [NSMutableString stringWithFormat: @"0x%zX", offset()];
         if (!has_defaults()) {
@@ -246,6 +270,14 @@ class sprom_offset {
         return max_width;
     }
 #endif
+};
+    
+/** CIS variable offset */
+class cis_offset {
+    PL_RECORD_FIELDS(cis_offset,
+                     (compat_range,			compat),/**< sprom compatibility declaration */
+                     (value_seg,	value)	/**< value descriptor(s) */
+    );
 };
 
 PL_RECORD_STRUCT(sprom_struct,
@@ -362,17 +394,6 @@ PL_RECORD_STRUCT(var_set_cis,
     (ftl::maybe<symbolic_constant>, hnbu_tag),
     (compat_range,                  compat)
 );
-    
-    PL_RECORD_STRUCT(cis_var_layout,
-                     (string,    name),
-                     (size_t,    offset),
-                     (size_t,    size),
-                     (prop_type,    type),
-                     (size_t,    count),
-                     (uint32_t,  mask),
-                     (ssize_t,   shift),
-                     (bool,      special_case)
-                     );
 
 
 /** NVRAM variable */
@@ -383,7 +404,7 @@ class var {
         (str_fmt,				sfmt),
         (size_t,				count),
         (uint32_t,				flags),
-        (shared_ptr<vector<cis_var_layout>>, cis_offsets),
+        (shared_ptr<vector<cis_offset>>, cis_offsets),
         (shared_ptr<vector<sprom_offset>>,	sprom_offsets)
     );
 public:
