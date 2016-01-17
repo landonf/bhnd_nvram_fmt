@@ -954,10 +954,10 @@ static const cis_tuple_t cis_hnbuvars[] = {
 	{HNBU_RXPO5G,		0xffffffff, 2, "1rxpo5g"},
 	{HNBU_BOARDNUM,		0xffffffff, 3, "2boardnum"},
 	{HNBU_MACADDR,		0xffffffff, 7, "6macaddr"},	/* special case */
-	{HNBU_RDLSN,		0xffffffff, 3, "2rdlsn"},
+	//{HNBU_RDLSN,		0xffffffff, 3, "2rdlsn"},
 	{HNBU_BOARDTYPE,	0xffffffff, 3, "2boardtype"},
 	{HNBU_LEDDC,		0xffffffff, 3, "2leddc"},
-	{HNBU_RDLRNDIS,		0xffffffff, 2, "1rdlndis"},
+	//{HNBU_RDLRNDIS,		0xffffffff, 2, "1rdlndis"},
 	{HNBU_CHAINSWITCH,	0xffffffff, 5, "1txchain 1rxchain 2antswitch"},
 	{HNBU_REGREV,		0xffffffff, 2, "1regrev"},
 	{HNBU_FEM,		0x000007fe, 5, "0antswctl2g 0triso2g 0pdetrange2g 0extpagain2g "
@@ -991,7 +991,7 @@ static const cis_tuple_t cis_hnbuvars[] = {
 	{HNBU_PO_STBC,		0xffffffff, 3, "2stbcpo"},
 	{HNBU_PO_40M,		0xffffffff, 3, "2bw40po"},
 	{HNBU_PO_40MDUP,	0xffffffff, 3, "2bwduppo"},
-	{HNBU_RDLRWU,		0xffffffff, 2, "1rdlrwu"},
+	//{HNBU_RDLRWU,		0xffffffff, 2, "1rdlrwu"},
 	{HNBU_WPS,		0xffffffff, 3, "1wpsgpio 1wpsled"},
 	{HNBU_USBFS,		0xffffffff, 2, "1usbfs"},
 	{HNBU_ELNA2G,           0xffffffff, 2, "1elna2g"},

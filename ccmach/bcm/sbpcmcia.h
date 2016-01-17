@@ -173,13 +173,13 @@
 #define HNBU_RXPO5G		0x17	/* 4328 5G RX power offset, 1 byte */
 #define HNBU_BOARDNUM		0x18	/* board serial number, independent of mac addr */
 #define HNBU_MACADDR		0x19	/* mac addr override for the standard CIS LAN_NID */
-#define HNBU_RDLSN		0x1a	/* 2 bytes; serial # advertised in USB descriptor */
+//#define HNBU_RDLSN		0x1a	/* 2 bytes; serial # advertised in USB descriptor */
 #define HNBU_BOARDTYPE		0x1b	/* 2 bytes; boardtype */
 #define HNBU_LEDDC		0x1c	/* 2 bytes; LED duty cycle */
 #define HNBU_HNBUCIS		0x1d	/* what follows is proprietary HNBU CIS format */
 #define HNBU_PAPARMS_SSLPNPHY	0x1e	/* SSLPNPHY PA params */
 #define HNBU_RSSISMBXA2G_SSLPNPHY 0x1f /* SSLPNPHY RSSI mid pt sel & board switch arch */
-#define HNBU_RDLRNDIS		0x20	/* 1 byte; 1 = RDL advertises RNDIS config */
+//#define HNBU_RDLRNDIS		0x20	/* 1 byte; 1 = RDL advertises RNDIS config */
 #define HNBU_CHAINSWITCH	0x21	/* 2 byte; txchain, rxchain */
 #define HNBU_REGREV		0x22	/* 1 byte; */
 #define HNBU_FEM		0x23	/* 2 or 4 byte: 11n frontend specification */
@@ -196,7 +196,7 @@
 #define HNBU_PO_40M		0x2e	/* 2 bytes: 40Mhz channel 2g/5g power offset */
 #define HNBU_PO_40MDUP		0x2f	/* 2 bytes: 40Mhz channel dup 2g/5g power offset */
 
-#define HNBU_RDLRWU		0x30	/* 1 byte; 1 = RDL advertises Remote Wake-up */
+//#define HNBU_RDLRWU		0x30	/* 1 byte; 1 = RDL advertises Remote Wake-up */
 #define HNBU_WPS		0x31	/* 1 byte; GPIO pin for WPS button */
 #define HNBU_USBFS		0x32	/* 1 byte; 1 = USB advertises FS mode only */
 #define HNBU_BRMIN		0x33	/* 4 byte bootloader min resource mask */

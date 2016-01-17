@@ -350,6 +350,18 @@ PL_RECORD_STRUCT(var_set_cis,
     (ftl::maybe<symbolic_constant>, hnbu_tag),
     (compat_range,                  compat)
 );
+    
+    PL_RECORD_STRUCT(cis_var_layout,
+                     (string,    name),
+                     (size_t,    offset),
+                     (size_t,    size),
+                     (prop_type,    type),
+                     (size_t,    count),
+                     (uint32_t,  mask),
+                     (ssize_t,   shift),
+                     (bool,      special_case)
+                     );
+
 
 /** NVRAM variable */
 class var {
@@ -359,6 +371,7 @@ class var {
         (str_fmt,				sfmt),
         (size_t,				count),
         (uint32_t,				flags),
+        (shared_ptr<vector<cis_var_layout>>, cis_offsets),
         (shared_ptr<vector<sprom_offset>>,	sprom_offsets)
     );
 public:

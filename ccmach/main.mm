@@ -271,7 +271,7 @@ private:
             if (name.length() == 0)
                 errx(EXIT_FAILURE, "variable has zero-length name");
 
-            auto v = make_shared<nvram::var>(name, n->get_type(), n->get_sfmt(), 0 /* array count */, n->nvram_flags(), make_shared<vector<nvram::sprom_offset>>());
+            auto v = make_shared<nvram::var>(name, n->get_type(), n->get_sfmt(), 0 /* array count */, n->nvram_flags(), make_shared<vector<nvram::cis_var_layout>>(), make_shared<vector<nvram::sprom_offset>>());
             
             /* Compare against previous variable with this name, or
              * register the new variable */

@@ -84,67 +84,35 @@ private:
 		
 		errx(EXIT_FAILURE, "layout for %s:%s not found", tag.name().c_str(), hnbu_tag.is<symbolic_constant>() ? ftl::get<symbolic_constant>(hnbu_tag).name().c_str() : "<none>");
 	}
-public:
-	vector<var_set> var_sets () {
-		unordered_map<string, var_set> sets;
+	
+	bool has_vstr (const string &vname) {
+		auto vn = vname;
 		
-		for (const auto &ct : _cis_consts) {
-			symbolic_constant tag = ct.constant();
-			ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
-			string name = ct.constant().name();
-
-			if (strncmp(ct.constant().name().c_str(), "CISTPL_", strlen("CISTPL_")) == 0) {
-				tag = ct.constant();
-			} else {
-				tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
-				hnbu_tag = ftl::just(ct.constant());
-			}
-			auto layout = get_layout(tag, hnbu_tag);
-			
-			NSString *comment = ct.comment();
-			if (comment == nil)
-				comment = @"";
-			
-			var_set vs(
-				name,
-				ftl::just(var_set_cis(tag, hnbu_tag, layout.compat())),
-				comment.UTF8String,
-				make_shared<vector<var>>()
-			);
-			sets.insert({ct.constant().name(), vs});
+		if (_cis_vstr_tbl.count(vname) == 0) {
+			char last = vn[vn.size() - 1];
+			if (isdigit(last) && last != '0')
+				vn[vn.size() - 1] = '0';
 		}
 		
-		for (const auto &grtuple : srom_subst_groupings) {
-			const auto gr = grtuple.second;
-			
-			if (sets.count(gr.name) > 0)
-				continue;
-			
-			auto vsc = ftl::nothing<var_set_cis>();
-			if (gr.builtin()) {
-				auto tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
-				auto hnbu_tag = ftl::just(symbolic_constant(gr.name, gr.cis_tag));
-				auto layout = get_layout(tag, hnbu_tag);
-				vsc = ftl::just(var_set_cis(tag, hnbu_tag, layout.compat()));
-			}
-			
-			var_set vs(
-				gr.name,
-				vsc,
-				gr.desc,
-				make_shared<vector<var>>()
-			);
-			
-			sets.insert({gr.name, vs});
-
-		}
-		
-		vector<var_set> result;
-		for (const auto &kv : sets)
-			result.push_back(kv.second);
-		return result;
+		return (_cis_vstr_tbl.count(vname) > 0);
 	}
 	
+	shared_ptr<cis_vstr> get_vstr (const string &vname) {
+		auto vn = vname;
+
+		if (_cis_vstr_tbl.count(vname) == 0) {
+			char last = vn[vn.size() - 1];
+			if (isdigit(last) && last != '0')
+				vn[vn.size() - 1] = '0';
+		}
+		
+		if (_cis_vstr_tbl.count(vn) == 0)
+			errx(EXIT_FAILURE, "missing vstr for %s", vname.c_str());
+
+		return _cis_vstr_tbl.at(vn);
+	}
+public:
+	vector<var_set> var_sets ();
 	
 	nvram_map (const vector<shared_ptr<var>> &srom_vars,
 		   const vector<shared_ptr<cis_vstr>> &cis_vstrs,

@@ -26,17 +26,6 @@
 
 namespace nvram {
 
-PL_RECORD_STRUCT(cis_var_layout,
-    (string,    name),
-    (size_t,    offset),
-    (size_t,    size),
-    (prop_type,    type),
-    (size_t,    count),
-    (uint32_t,  mask),
-    (ssize_t,   shift),
-    (bool,      special_case)
-);
-
 class cis_layout {
     PL_RECORD_FIELDS(cis_layout,
         (symbolic_constant,                code),

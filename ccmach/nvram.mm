@@ -365,5 +365,91 @@ unordered_map<string, value_seg> cis_subst_layout = {
     { "wowl_gpiopol", { 0, BHND_T_UINT8, 1, 0x80, 7 }},
 
 };
+    
+vector<var_set> nvram_map::var_sets () {
+    unordered_map<string, var_set> sets;
+    
+    for (const auto &ct : _cis_consts) {
+        symbolic_constant tag = ct.constant();
+        ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
+        string name = ct.constant().name();
+        
+        if (strncmp(ct.constant().name().c_str(), "CISTPL_", strlen("CISTPL_")) == 0) {
+            tag = ct.constant();
+        } else {
+            tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
+            hnbu_tag = ftl::just(ct.constant());
+        }
+        auto layout = get_layout(tag, hnbu_tag);
+        
+        NSString *comment = ct.comment();
+        if (comment == nil)
+            comment = @"";
+        
+        auto vars = make_shared<vector<var>>();
+        for (const auto &v : layout.vars()) {
+            str_fmt sfmt = SFMT_HEX;
+            if (has_vstr(v.name())) {
+                sfmt = get_vstr(v.name())->sfmt();
+            } else if (_srom_tbl.count(v.name()) > 0) {
+                sfmt = _srom_tbl.at(v.name())->sfmt();
+            } else if (v.name() == "usbmanfid" || v.name() == "muxenab") {
+                sfmt = SFMT_HEX;
+            } else {
+                errx(EXIT_FAILURE, "no known format for CIS var %s", v.name().c_str());
+            }
+            
+            vars->push_back(var(
+                                v.name(),
+                                v.type(),
+                                sfmt,
+                                v.count(),
+                                0, // TODO FLAGS
+                                make_shared<vector<cis_var_layout>>(),
+                                make_shared<vector<sprom_offset>>()
+                                ));
+            printf("cis var %s\n", v.name().c_str());
+        }
+        
+        var_set vs(
+                   name,
+                   ftl::just(var_set_cis(tag, hnbu_tag, layout.compat())),
+                   comment.UTF8String,
+                   vars
+                   );
+        sets.insert({ct.constant().name(), vs});
+    }
+    
+    for (const auto &grtuple : srom_subst_groupings) {
+        const auto gr = grtuple.second;
+        
+        if (sets.count(gr.name) > 0)
+            continue;
+        
+        auto vsc = ftl::nothing<var_set_cis>();
+        if (gr.builtin()) {
+            auto tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
+            auto hnbu_tag = ftl::just(symbolic_constant(gr.name, gr.cis_tag));
+            auto layout = get_layout(tag, hnbu_tag);
+            vsc = ftl::just(var_set_cis(tag, hnbu_tag, layout.compat()));
+        }
+        
+        var_set vs(
+            gr.name,
+            vsc,
+            gr.desc,
+            make_shared<vector<var>>()
+        );
+        
+        sets.insert({gr.name, vs});
+        
+    }
+    
+    vector<var_set> result;
+    for (const auto &kv : sets)
+        result.push_back(kv.second);
+    return result;
+}
+
 
 }
