@@ -170,6 +170,27 @@ public:
         }
     }
     
+    size_t size() {
+        switch (_type) {
+            case BHND_T_UINT8:
+            case BHND_T_INT8:
+            case BHND_T_CHAR:
+                return (1*_count);
+                break;
+            case BHND_T_UINT16:
+            case BHND_T_INT16:
+                return (2*_count);
+                break;
+            case BHND_T_UINT32:
+            case BHND_T_INT32:
+                return (4*_count);
+                break;
+            case BHND_T_CSTR:
+                errx(EXIT_FAILURE, "can't compute size of a variable width C string");
+                break;
+        }
+    }
+    
     bool has_default_shift () const {
         return (shift() == 0);
     }

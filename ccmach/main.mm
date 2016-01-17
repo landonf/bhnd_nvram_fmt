@@ -334,6 +334,26 @@ private:
                     i++;
                     n = &(*nvars)[i];
                     
+                    /* Group array elements */
+                    bool array_grouped = false;
+                    if (vals->size() >= 1 && !(n->flags & SRFL_MORE)) {
+                        auto &lval = vals->at(vals->size()-1);
+                        if (lval.segments()->size() == 1) {
+                            auto &lseg = lval.segments()->at(lval.segments()->size()-1);
+                            
+                            if (n->off == lseg.offset() + lseg.size()) {
+                                if (lseg.type() == n->get_type() && lseg.mask() == n->valmask) {
+                                    lval.segments()->at(lval.segments()->size()-1) = lseg.count(lseg.count() + 1);
+                                    array_grouped = true;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (array_grouped)
+                        continue;
+   
+                    
                     val.segments()->emplace_back(
                         n->off,
                         n->get_type(),
