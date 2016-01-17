@@ -69,9 +69,9 @@ void genmap::generate() {
             if (vs->cis().is<var_set_cis>()) {
                 auto cis = ftl::get<var_set_cis>(vs->cis());
                 
-                print("cis_tuple\t0x%x", cis.tag().value());
+                print("cis_tuple\t%s", cis.tag().name().c_str());
                 if (cis.hnbu_tag().is<symbolic_constant>()) {
-                    printf(",0x%x", ftl::get<symbolic_constant>(cis.hnbu_tag()).value());
+                    printf(",%s", ftl::get<symbolic_constant>(cis.hnbu_tag()).name().c_str());
                 }
                 printf("\n");
                 
