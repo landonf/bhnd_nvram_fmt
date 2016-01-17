@@ -12,7 +12,14 @@ using namespace nvram;
 
 const uint8_t nvram::compat_range::MAX_SPROMREV = 31;	/**< maximum supported SPROM revision */
 
-prop_type nvram::prop_type_widen (prop_type operand) {
+prop_type nvram::prop_type_widen (prop_type lhs, prop_type rhs) {
+    if (!nvram::prop_type_compat(lhs, rhs))
+        errx(EX_DATAERR, "incompatible property types");
+    
+    return max(lhs, rhs);
+}
+
+prop_type nvram::prop_type_widest (prop_type operand) {
     switch (operand) {
         case BHND_T_UINT8:
         case BHND_T_UINT16:
@@ -30,7 +37,7 @@ prop_type nvram::prop_type_widen (prop_type operand) {
 }
 
 bool nvram::prop_type_compat (prop_type lhs, prop_type rhs) {
-    return (prop_type_widen(lhs) == prop_type_widen(rhs));
+    return (prop_type_widest(lhs) == prop_type_widest(rhs));
 }
 
 string std::to_string(nvram::prop_type t) {
@@ -44,6 +51,18 @@ string std::to_string(nvram::prop_type t) {
         case nvram::BHND_T_CHAR: return "char";
         case nvram::BHND_T_CSTR: return "cstr";
             
+    }
+}
+
+string std::to_string(nvram::str_fmt f) {
+    switch (f) {
+            case SFMT_HEX:      return "SFMT_HEX";
+            case SFMT_DECIMAL:      return "SFMT_DECIMAL";
+            case SFMT_HEXBIN:      return "SFMT_HEXBIN";
+            case SFMT_MACADDR:      return "SFMT_MACADDR";
+            case SFMT_CCODE:      return "SFMT_CCODE";
+            case SFMT_ASCII:      return "SFMT_ASCII";
+            case SFMT_LEDDC:      return "SFMT_LEDDC";
     }
 }
 
@@ -366,9 +385,12 @@ unordered_map<string, value_seg> cis_subst_layout = {
 
 };
     
-vector<var_set> nvram_map::var_sets () {
-    unordered_map<string, var_set> sets;
-    
+vector<shared_ptr<var_set>> nvram_map::var_sets () {
+    unordered_map<string, shared_ptr<var_set>> sets;
+
+    /*
+     * Construct the CIS var sets
+     */
     for (const auto &ct : _cis_consts) {
         symbolic_constant tag = ct.constant();
         ftl::maybe<symbolic_constant> hnbu_tag = ftl::nothing<symbolic_constant>();
@@ -386,9 +408,11 @@ vector<var_set> nvram_map::var_sets () {
         if (comment == nil)
             comment = @"";
         
-        auto vars = make_shared<vector<var>>();
+        auto vars = make_shared<vector<shared_ptr<var>>>();
         for (const auto &v : layout.vars()) {
             str_fmt sfmt = SFMT_HEX;
+            uint32_t flags = 0;
+    
             if (has_vstr(v.name())) {
                 sfmt = get_vstr(v.name())->sfmt();
             } else if (_srom_tbl.count(v.name()) > 0) {
@@ -399,55 +423,161 @@ vector<var_set> nvram_map::var_sets () {
                 errx(EXIT_FAILURE, "no known format for CIS var %s", v.name().c_str());
             }
             
-            vars->push_back(var(
-                                v.name(),
-                                v.type(),
-                                sfmt,
-                                v.count(),
-                                0, // TODO FLAGS
-                                make_shared<vector<cis_var_layout>>(),
-                                make_shared<vector<sprom_offset>>()
-                                ));
-            printf("cis var %s\n", v.name().c_str());
+            /* Try to find a SROM var we can borrow flags from */
+            if (_srom_tbl.count(v.name()) > 0) {
+                flags = _srom_tbl.at(v.name())->flags();
+            }
+            
+            auto vl = make_shared<vector<cis_var_layout>>();
+            vl->push_back(v);
+            vars->push_back(make_shared<var>(
+                v.name(),
+                v.type(),
+                sfmt,
+                v.count(),
+                flags,
+                vl,
+                make_shared<vector<sprom_offset>>()
+            ));
         }
         
-        var_set vs(
-                   name,
-                   ftl::just(var_set_cis(tag, hnbu_tag, layout.compat())),
-                   comment.UTF8String,
-                   vars
-                   );
+        auto vs = make_shared<var_set>(
+            name,
+            ftl::just(var_set_cis(tag, hnbu_tag, layout.compat())),
+            comment.UTF8String,
+            vars
+        );
         sets.insert({ct.constant().name(), vs});
     }
     
+    /*
+     * Construct the SROM's stand-in varsets, unpopulated with SROM vars.
+     */
     for (const auto &grtuple : srom_subst_groupings) {
         const auto gr = grtuple.second;
-        
-        if (sets.count(gr.name) > 0)
-            continue;
-        
-        auto vsc = ftl::nothing<var_set_cis>();
-        if (gr.builtin()) {
-            auto tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
-            auto hnbu_tag = ftl::just(symbolic_constant(gr.name, gr.cis_tag));
-            auto layout = get_layout(tag, hnbu_tag);
-            vsc = ftl::just(var_set_cis(tag, hnbu_tag, layout.compat()));
+    
+        shared_ptr<var_set> vs;
+        if (sets.count(gr.name) == 0) {
+            auto vsc = ftl::nothing<var_set_cis>();
+            if (gr.builtin()) {
+                auto tag = symbolic_constant("CISTPL_BRCM_HNBU", CISTPL_BRCM_HNBU);
+                auto hnbu_tag = ftl::just(symbolic_constant(gr.name, gr.cis_tag));
+                auto layout = get_layout(tag, hnbu_tag);
+                vsc = ftl::just(var_set_cis(tag, hnbu_tag, layout.compat()));
+            }
+            
+            vs = make_shared<var_set>(
+                gr.name,
+                vsc,
+                gr.desc,
+                make_shared<vector<shared_ptr<var>>>()
+            );
+            sets.insert({gr.name, vs});
         }
-        
-        var_set vs(
-            gr.name,
-            vsc,
-            gr.desc,
-            make_shared<vector<var>>()
-        );
-        
-        sets.insert({gr.name, vs});
-        
+    }
+
+    /*
+     * Populate SROM vars
+     */
+    for (const auto &sv : _srom_vars) {
+        /* Find the appropriate var set(s) */
+        vector<shared_ptr<var_set>> vss;
+    
+        if (_cis_layout_tbl.count(sv->name()) == 0) {
+            if (srom_subst_groupings.count(sv->name()) == 0) {
+                errx(EX_DATAERR, "Missing group name for %s", sv->name().c_str());
+            }
+            const auto &gr = srom_subst_groupings.at(sv->name());
+            vss.push_back(sets.at(gr.name));
+        } else if (_cis_layout_tbl.count(sv->name()) > 1) {
+            auto iter = _cis_layout_tbl.equal_range(sv->name());
+            std::for_each(iter.first, iter.second, [&](decltype(_cis_layout_tbl)::value_type &cl){
+                vss.push_back(sets.at(cl.second.index_tag()));
+            });
+        }
+
+        /* Populate the var sets */
+        for (auto &vs : vss) {
+            shared_ptr<var> v;
+            for (auto &ventry : *vs->vars()) {
+                if (ventry->name() != sv->name())
+                    continue;
+                
+                v = ventry;
+                break;
+            }
+            if (!v) {
+                v = make_shared<var>(
+                    sv->name(),
+                    sv->type(),
+                    sv->sfmt(),
+                    sv->count(),
+                    sv->flags(),
+                    make_shared<vector<cis_var_layout>>(),
+                    make_shared<vector<sprom_offset>>()
+                );
+                vs->vars()->push_back(v);
+            } else {
+                if (v->type() != sv->type()) {
+                    if (!prop_type_compat(v->type(), sv->type()))
+                        warnx("%s cis/srom mismatch: %s(cis) != %s(srom)", v->name().c_str(), to_string(v->type()).c_str(), to_string(sv->type()).c_str());
+
+                    /* Widen the type */
+                    *v = v->type(prop_type_widen(v->type(), sv->type()));
+                }
+                
+                if (v->sfmt() != sv->sfmt()) {
+                    if (v->name() == "subband5gver" && sv->sfmt() == SFMT_HEX) {
+                        // CIS is wrong here
+                        *v = v->sfmt(sv->sfmt());
+                    } else {
+                        errx(EX_DATAERR, "%s cis/srom mismatch: sfmt %s(cis) != %s(srom)", v->name().c_str(), to_string(v->sfmt()).c_str(), to_string(sv->sfmt()).c_str());
+                    }
+                }
+                
+                if (v->count() != sv->count()) {
+                    warnx("'%s' cis/srom mismatch: count %zu(cis) != %zu(srom)", v->name().c_str(), v->count(), sv->count());
+                    *v = v->count(max(v->count(), sv->count()));
+                }
+                
+                if (v->flags() != sv->flags()) {
+                    errx(EX_DATAERR, "%s cis/srom mismatch: flags 0x%x(cis) != 0x%x(srom)", v->name().c_str(), v->flags(), sv->flags());
+                }
+            }
+            
+            v->sprom_offsets()->insert(v->sprom_offsets()->end(), sv->sprom_offsets()->begin(), sv->sprom_offsets()->end());
+        }
     }
     
-    vector<var_set> result;
+    vector<shared_ptr<var_set>> result;
     for (const auto &kv : sets)
         result.push_back(kv.second);
+    
+
+    /* Report vars that live in multiple var sets */
+    unordered_map<string, unordered_set<string>> vars_seen;
+    for (const auto &vs : result) {
+        for (const auto &v : *vs->vars()) {
+            if (vars_seen.count(v->name()) == 0)
+                vars_seen.insert({v->name(), unordered_set<string>()});
+            
+            vars_seen.at(v->name()).insert(vs->name());
+        }
+    }
+    
+    for (const auto &vpair : vars_seen) {
+        const auto &vname = vpair.first;
+        const auto &vset = vpair.second;
+        if (vset.size() <= 1)
+            continue;
+    
+        warnx("%s defined in multiple var sets:", vname.c_str());
+        for (const auto &sname : vset) {
+            fprintf(stderr, " %s ", sname.c_str());
+        };
+        fprintf(stderr, "\n");
+    }
+    
     return result;
 }
 

@@ -43,19 +43,20 @@ namespace nvram {
 
 /** NVRAM variable data types */
 typedef enum {
-    BHND_T_UINT8,	/**< unsigned 8 bit integer */
-    BHND_T_UINT16,	/**< unsigned 16 bit integer */
-    BHND_T_UINT32,	/**< unsigned 32 bit integer */
+    BHND_T_UINT8    = 0,	/**< unsigned 8 bit integer */
+    BHND_T_UINT16   = 1,	/**< unsigned 16 bit integer */
+    BHND_T_UINT32   = 2,	/**< unsigned 32 bit integer */
     
-    BHND_T_INT8,	/**< signed 8 bit integer */
-    BHND_T_INT16,	/**< signed 16 bit integer */
-    BHND_T_INT32,	/**< signed 32 bit integer */
+    BHND_T_INT8     = 3,	/**< signed 8 bit integer */
+    BHND_T_INT16    = 4,	/**< signed 16 bit integer */
+    BHND_T_INT32    = 5,	/**< signed 32 bit integer */
     
-    BHND_T_CHAR,	/**< ascii char */
-    BHND_T_CSTR     /**< NUL-terminated string */
+    BHND_T_CHAR     = 6,	/**< ascii char */
+    BHND_T_CSTR     = 7     /**< NUL-terminated string */
 } prop_type;
 
-prop_type prop_type_widen (prop_type operand);
+prop_type prop_type_widen (prop_type lhs, prop_type rhs);
+prop_type prop_type_widest (prop_type operand);
 bool prop_type_compat (prop_type lhs, prop_type rhs);
 string prop_type_str (prop_type operand);
 size_t prop_type_size (prop_type t);
@@ -386,7 +387,7 @@ class var_set {
         (string,                    name),
         (ftl::maybe<var_set_cis>,               cis),
         (string,                    comment),
-        (shared_ptr<vector<var>>,   vars)
+        (shared_ptr<vector<shared_ptr<var>>>,   vars)
     );
 };
 

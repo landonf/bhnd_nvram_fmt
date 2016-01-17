@@ -360,13 +360,18 @@ private:
             nvram::sprom_offset sp_off(nvram::compat_range::from_revmask(n->revmask), vals);
             v->sprom_offsets()->push_back(sp_off);
             
+            /* Sort by compat range */
             sort(v->sprom_offsets()->begin(), v->sprom_offsets()->end(), [](const nvram::sprom_offset &lhs, const nvram::sprom_offset &rhs) {
                 return (lhs.compat().first() < rhs.compat().first());
             });
         }
 
-        for (const auto &v : var_table)
-            ret.push_back(v.second);
+        /* Produce the result value */
+        for (const auto &vp : var_table) {
+            auto &v = vp.second;
+            ret.push_back(v);
+        }
+
         return ret;
     }
     
@@ -788,6 +793,16 @@ public:
         sort(vars.begin(), vars.end(), [](const shared_ptr<nvram::var> &lhs, shared_ptr<nvram::var> &rhs) {
             return ([@(lhs->name().c_str()) compare: @(rhs->name().c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
         });
+        
+        /* Assign real count values */
+        for (const auto &v : vars) {
+            size_t count = 0;
+            for (const auto &spoff : *v->sprom_offsets()) {
+                count = max(count, spoff.values()->size());
+            }
+            
+            *v = v->count(count);
+        }
 
 #if 0
         for (const auto &v : vars) {

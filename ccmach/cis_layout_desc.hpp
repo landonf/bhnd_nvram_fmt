@@ -43,6 +43,12 @@ public:
         }
         return result;
     }
+    
+    string index_tag () const {
+        if (_hnbu_tag.is<symbolic_constant>())
+            return ftl::get<symbolic_constant>(_hnbu_tag).name();
+        return _code.name();
+    }
 };
 
 vector<cis_layout> parse_layouts (shared_ptr<Compiler> &c);

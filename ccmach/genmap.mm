@@ -26,10 +26,10 @@ int genmap::print (const char *fmt, ...) {
 void genmap::generate() {
     auto vsets = _nv.var_sets();
     for (const auto &v : vsets) {
-        printf("%s {\n", v.name().c_str());
+        printf("%s {\n", v->name().c_str());
         _depth++;
-        if (v.cis().is<var_set_cis>()) {
-            auto cis = ftl::get<var_set_cis>(v.cis());
+        if (v->cis().is<var_set_cis>()) {
+            auto cis = ftl::get<var_set_cis>(v->cis());
             print("cis\t%s\t(%s", cis.compat().description().c_str(), cis.tag().name().c_str());
             if (cis.hnbu_tag().is<symbolic_constant>()) {
                 printf(", %s", ftl::get<symbolic_constant>(cis.hnbu_tag()).name().c_str());

@@ -112,7 +112,7 @@ private:
 		return _cis_vstr_tbl.at(vn);
 	}
 public:
-	vector<var_set> var_sets ();
+	vector<shared_ptr<var_set>> var_sets ();
 	
 	nvram_map (const vector<shared_ptr<var>> &srom_vars,
 		   const vector<shared_ptr<cis_vstr>> &cis_vstrs,
@@ -168,8 +168,6 @@ public:
 			if (vs->cis_tag().name() == "HNBU_CHIPID" && vs->name() == "boardtype")
 				continue;
 			
-			fprintf(stderr, "\t%s", vs->name().c_str());
-			
 			vector<nvram::compat_range> srom_compats;
 			if (_srom_tbl.count(vs->name()) > 0) {
 				const auto &svr = _srom_tbl.at(vs->name());
@@ -178,6 +176,13 @@ public:
 					srom_compats.push_back(sp.compat());
 			}
 			
+			
+			if (!vs->has_hnbu_entry() && !vs->asserted_revmask() && srom_compats.size() == 0) {
+				fprintf(stderr, "\t%s", vs->name().c_str());
+				fprintf(stderr, "(no range found; assuming >= 0)");
+				fprintf(stderr, "\n");
+			}
+#if 0
 			if (!vs->has_hnbu_entry() && !vs->asserted_revmask() && srom_compats.size() == 0) {
 				fprintf(stderr, "(no range found; assuming >= 0)");
 			} else {
@@ -199,6 +204,7 @@ public:
 			}
 			
 			fprintf(stderr, "\n");
+#endif
 		}
 		
 		/* Find undefs */
@@ -253,16 +259,19 @@ public:
 
 		
 
-
+#if 0
 		fprintf(stderr, "# CIS vars not defined in SPROM:\n");
 		for (const auto &v : srom_undef)
 			fprintf(stderr, "\t%s\n", v.c_str());
+#endif
 
-
-		fprintf(stderr, "# CIS vars requiring special case decoding:\n");
+		bool did_print_special_intro = false;
 		for (const auto &l : _cis_layouts) {
 			for (const auto &v : l.vars()) {
 				if (v.special_case() && cis_subst_layout.count(v.name()) == 0 && cis_known_special_cases.count(v.name()) == 0) {
+					if (!did_print_special_intro)
+						fprintf(stderr, "# CIS vars requiring special case decoding:\n");
+
 					fprintf(stderr, "\t%s", v.name().c_str());
 					if (_srom_tbl.count(v.name()) > 0) {
 						auto srom_offset = _srom_tbl.at(v.name())->sprom_offsets()->at(0);
@@ -320,6 +329,7 @@ public:
 
 namespace std {
 	string to_string(nvram::prop_type t);
+	string to_string(nvram::str_fmt t);
 }
 
 #include "cis_layout_desc.hpp"
