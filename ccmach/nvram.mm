@@ -220,6 +220,129 @@ unordered_set<string> nvram::cis_known_special_cases = {
     "macaddr",
 };
 
+static unordered_map<string, prop_type> cis_ptype_overrides = {
+    {"rxpo2g",  BHND_T_INT8},
+    {"rxpo5g",  BHND_T_INT8}
+};
+
+static unordered_map<string, str_fmt> sfmt_overrides = {
+    // CIS is wrong-ish here
+    {"subband5gver", SFMT_HEX},
+    {"boardnum", SFMT_HEX},
+    {"bxa2g", SFMT_HEX},
+    {"bxa5g", SFMT_HEX},
+    {"opo", SFMT_HEX},
+    {"macaddr", SFMT_MACADDR},
+    
+    {"rssisav2g", SFMT_HEX},
+    {"rssisav5g", SFMT_HEX},
+    {"rssismc2g", SFMT_HEX},
+    {"rssismc5g", SFMT_HEX},
+    {"rssismf2g", SFMT_HEX},
+    {"rssismf5g", SFMT_HEX},
+    {"cc", SFMT_HEX},
+    
+    {"tempcorrx", SFMT_HEX},
+    {"tempsense_option", SFMT_HEX},
+    {"tempsense_slope", SFMT_HEX},
+    {"tempthresh", SFMT_HEX},
+    
+    {"tri2g", SFMT_HEX},
+    {"tri5g", SFMT_HEX},
+    {"tri2gh", SFMT_HEX},
+    {"tri2gl", SFMT_HEX},
+
+    {"tri5gl", SFMT_HEX},
+    {"tri5gh", SFMT_HEX},
+
+    // SROM is wrong-ish here
+    {"epagain2g", SFMT_DECIMAL},
+    {"epagain5g", SFMT_DECIMAL},
+    {"femctrl", SFMT_DECIMAL},
+    {"gainctrlsph", SFMT_DECIMAL},
+    {"noiselvl2ga0", SFMT_DECIMAL},
+    {"noiselvl2ga1", SFMT_DECIMAL},
+    {"noiselvl2ga2", SFMT_DECIMAL},
+    {"noiselvl5ga0", SFMT_DECIMAL},
+    {"noiselvl5ga1", SFMT_DECIMAL},
+    {"noiselvl5ga2", SFMT_DECIMAL},
+    {"pa0b0", SFMT_DECIMAL},
+    {"pa0b1", SFMT_DECIMAL},
+    {"pa0b2", SFMT_DECIMAL},
+    {"pa1b0", SFMT_DECIMAL},
+    {"pa1b1", SFMT_DECIMAL},
+    {"pa1b2", SFMT_DECIMAL},
+
+    {"tempoffset", SFMT_DECIMAL},
+    {"temps_hysteresis", SFMT_DECIMAL},
+    {"temps_period", SFMT_DECIMAL},
+    
+    {"tssiposslope2g", SFMT_DECIMAL},
+    {"tssiposslope5g", SFMT_DECIMAL},
+    {"tworangetssi2g", SFMT_DECIMAL},
+    {"tworangetssi5g", SFMT_DECIMAL},
+    
+    {"xtalfreq", SFMT_DECIMAL},
+    
+
+    {"pa0maxpwr", SFMT_DECIMAL},
+    {"pa0itssit", SFMT_DECIMAL},
+    {"pa1hib0", SFMT_DECIMAL},
+    {"pa1hib1", SFMT_DECIMAL},
+    {"pa1hib2", SFMT_DECIMAL},
+
+    {"pa1himaxpwr", SFMT_DECIMAL},
+    {"pa1itssit", SFMT_DECIMAL},
+    {"pa1lob0", SFMT_DECIMAL},
+    {"pa1lob1", SFMT_DECIMAL},
+    {"pa1lob2", SFMT_DECIMAL},
+    {"pa1lomaxpwr", SFMT_DECIMAL},
+    {"pa1maxpwr", SFMT_DECIMAL},
+    {"paparambwver", SFMT_DECIMAL},
+    {"papdcap2g", SFMT_DECIMAL},
+    {"papdcap5g", SFMT_DECIMAL},
+    {"pdgain2g", SFMT_DECIMAL},
+    {"pdgain5g", SFMT_DECIMAL},
+    {"phycal_tempdelta", SFMT_DECIMAL},
+    
+    {"rxgains2gelnagaina0", SFMT_DECIMAL},
+    {"rxgains2gelnagaina1", SFMT_DECIMAL},
+    {"rxgains2gelnagaina2", SFMT_DECIMAL},
+    {"rxgains2gtrelnabypa0", SFMT_DECIMAL},
+    {"rxgains2gtrelnabypa1", SFMT_DECIMAL},
+    {"rxgains2gtrelnabypa2", SFMT_DECIMAL},
+    {"rxgains2gtrisoa0", SFMT_DECIMAL},
+    {"rxgains2gtrisoa1", SFMT_DECIMAL},
+    {"rxgains2gtrisoa2", SFMT_DECIMAL},
+    {"rxgains5gelnagaina0", SFMT_DECIMAL},
+    {"rxgains5gelnagaina1", SFMT_DECIMAL},
+    {"rxgains5gelnagaina2", SFMT_DECIMAL},
+    {"rxgains5ghelnagaina0", SFMT_DECIMAL},
+    {"rxgains5ghelnagaina1", SFMT_DECIMAL},
+    {"rxgains5ghelnagaina2", SFMT_DECIMAL},
+    {"rxgains5ghtrelnabypa0", SFMT_DECIMAL},
+    {"rxgains5ghtrelnabypa1", SFMT_DECIMAL},
+    {"rxgains5ghtrelnabypa2", SFMT_DECIMAL},
+    {"rxgains5ghtrisoa0", SFMT_DECIMAL},
+    {"rxgains5ghtrisoa1", SFMT_DECIMAL},
+    {"rxgains5ghtrisoa2", SFMT_DECIMAL},
+    {"rxgains5gmelnagaina0", SFMT_DECIMAL},
+    {"rxgains5gmelnagaina1", SFMT_DECIMAL},
+    {"rxgains5gmelnagaina2", SFMT_DECIMAL},
+    {"rxgains5gmtrelnabypa0", SFMT_DECIMAL},
+    {"rxgains5gmtrelnabypa1", SFMT_DECIMAL},
+    {"rxgains5gmtrelnabypa2", SFMT_DECIMAL},
+    {"rxgains5gmtrisoa0", SFMT_DECIMAL},
+    {"rxgains5gmtrisoa1", SFMT_DECIMAL},
+    {"rxgains5gmtrisoa2", SFMT_DECIMAL},
+    {"rxgains5gtrelnabypa0", SFMT_DECIMAL},
+    {"rxgains5gtrelnabypa1", SFMT_DECIMAL},
+    {"rxgains5gtrelnabypa2", SFMT_DECIMAL},
+    {"rxgains5gtrisoa0", SFMT_DECIMAL},
+    {"rxgains5gtrisoa1", SFMT_DECIMAL},
+    {"rxgains5gtrisoa2", SFMT_DECIMAL},
+};
+
 namespace nvram {
 
 unordered_map<string, value_seg> cis_subst_layout = {
@@ -412,6 +535,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
         for (const auto &v : layout.vars()) {
             str_fmt sfmt = SFMT_HEX;
             uint32_t flags = 0;
+            prop_type ptype = v.type();
     
             if (has_vstr(v.name())) {
                 sfmt = get_vstr(v.name())->sfmt();
@@ -421,6 +545,25 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 sfmt = SFMT_HEX;
             } else {
                 errx(EXIT_FAILURE, "no known format for CIS var %s", v.name().c_str());
+            }
+
+            if (sfmt_overrides.count(v.name()) > 0) {
+                sfmt = sfmt_overrides.at(v.name());
+            }
+            
+            if (cis_ptype_overrides.count(v.name()) > 0) {
+                ptype = cis_ptype_overrides.at(v.name());
+            }
+            
+            switch (v.type()) {
+                case BHND_T_INT8:
+                case BHND_T_INT16:
+                case BHND_T_INT32:
+                    if (sfmt != SFMT_DECIMAL)
+                        errx(EX_DATAERR, "CIS '%s' defines a non-decimal SFMT for a signed integer", v.name().c_str());
+                    break;
+                default:
+                    break;
             }
             
             /* Try to find a SROM var we can borrow flags from */
@@ -432,7 +575,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
             vl->push_back(v);
             vars->push_back(make_shared<var>(
                 v.name(),
-                v.type(),
+                ptype,
                 sfmt,
                 v.count(),
                 flags,
@@ -489,16 +632,33 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
             }
             const auto &gr = srom_subst_groupings.at(sv->name());
             vss.push_back(sets.at(gr.name));
-        } else if (_cis_layout_tbl.count(sv->name()) > 1) {
+        } else if (_cis_layout_tbl.count(sv->name()) > 0) {
             auto iter = _cis_layout_tbl.equal_range(sv->name());
             std::for_each(iter.first, iter.second, [&](decltype(_cis_layout_tbl)::value_type &cl){
                 vss.push_back(sets.at(cl.second.index_tag()));
             });
         }
-
+        
         /* Populate the var sets */
         for (auto &vs : vss) {
             shared_ptr<var> v;
+            str_fmt sfmt = sv->sfmt();
+            
+            if (sfmt_overrides.count(sv->name()) > 0) {
+                sfmt = sfmt_overrides.at(sv->name());
+            }
+            
+            switch (sv->type()) {
+                case BHND_T_INT8:
+                case BHND_T_INT16:
+                case BHND_T_INT32:
+                    if (sfmt != SFMT_DECIMAL)
+                        errx(EX_DATAERR, "SROM '%s' defines a non-decimal SFMT for a signed integer", sv->name().c_str());
+                    break;
+                default:
+                    break;
+            }
+    
             for (auto &ventry : *vs->vars()) {
                 if (ventry->name() != sv->name())
                     continue;
@@ -510,7 +670,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 v = make_shared<var>(
                     sv->name(),
                     sv->type(),
-                    sv->sfmt(),
+                    sfmt,
                     sv->count(),
                     sv->flags(),
                     make_shared<vector<cis_var_layout>>(),
@@ -519,20 +679,20 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 vs->vars()->push_back(v);
             } else {
                 if (v->type() != sv->type()) {
-                    if (!prop_type_compat(v->type(), sv->type()))
-                        warnx("%s cis/srom mismatch: %s(cis) != %s(srom)", v->name().c_str(), to_string(v->type()).c_str(), to_string(sv->type()).c_str());
+                    if (v->name() == "ccode" && sv->type() == BHND_T_CHAR) {
+                        // CIS is wrong-ish here
+                        *v = v->type(BHND_T_CHAR);
+                    } else {
+                        if (!prop_type_compat(v->type(), sv->type()))
+                            warnx("%s cis/srom mismatch: %s(cis) != %s(srom)", v->name().c_str(), to_string(v->type()).c_str(), to_string(sv->type()).c_str());
 
-                    /* Widen the type */
-                    *v = v->type(prop_type_widen(v->type(), sv->type()));
+                        /* Widen the type */
+                        *v = v->type(prop_type_widen(v->type(), sv->type()));
+                    }
                 }
                 
-                if (v->sfmt() != sv->sfmt()) {
-                    if (v->name() == "subband5gver" && sv->sfmt() == SFMT_HEX) {
-                        // CIS is wrong here
-                        *v = v->sfmt(sv->sfmt());
-                    } else {
-                        errx(EX_DATAERR, "%s cis/srom mismatch: sfmt %s(cis) != %s(srom)", v->name().c_str(), to_string(v->sfmt()).c_str(), to_string(sv->sfmt()).c_str());
-                    }
+                if (v->sfmt() != sfmt) {
+                       errx(EX_DATAERR, "%s cis/srom mismatch: sfmt %s(cis) != %s(srom)", v->name().c_str(), to_string(v->sfmt()).c_str(), to_string(sv->sfmt()).c_str());
                 }
                 
                 if (v->count() != sv->count()) {

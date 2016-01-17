@@ -125,7 +125,7 @@ public:
         if (last() == MAX_SPROMREV)
             return [NSString stringWithFormat: @">= %u", first()].UTF8String;
         else if (first() == last())
-            return [NSString stringWithFormat: @"== %u", first()].UTF8String;
+            return [NSString stringWithFormat: @"%u", first()].UTF8String;
         else
             return [NSString stringWithFormat: @"%u-%u", first(), last()].UTF8String;
     }
