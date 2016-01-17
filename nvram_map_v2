@@ -1,3 +1,2728 @@
+# CISTPL_MANFID
+CISTPL_MANFID {
+	cis_tuple	CISTPL_MANFID
+	compat		>= 0
+	u16 manfid {
+		cis	{ 0x0 }
+	}
+	u16 prodid {
+		cis	{ 0x2 }
+	}
+}
+
+# CISTPL_VERS_1
+CISTPL_VERS_1 {
+	cis_tuple	CISTPL_VERS_1
+	compat		>= 0
+	cstr manf {
+		sfmt	ascii
+		cis	{ 0x0 }
+	}
+	cstr productname {
+		sfmt	ascii
+		cis	{ 0x0 }
+	}
+}
+
+# Antennas available
+HNBU_AA {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AA
+	compat		>= 0
+	u8 aa2g {
+		cis	{ 0x0 }
+		srom 1-3	{ 0x5C (&0x30, >>4) }
+		srom 4-7	{ 0x5D }
+		srom 8-10	{ 0x9D }
+		srom >= 11	{ 0xA1 }
+	}
+	u8 aa5g {
+		cis	{ 0x1 }
+		srom 1-3	{ 0x5C (&0xC0, >>6) }
+		srom 4-7	{ 0x5C }
+		srom 8-10	{ 0x9C }
+		srom >= 11	{ 0xA0 }
+	}
+}
+
+# ACPHY PA trimming parameters: 40
+HNBU_ACPA_40 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_40
+	compat		>= 11
+	u16[12] pa5gbw40a0 {
+		cis	{ 0x0 }
+		srom 	{ 0x110 }
+	}
+}
+
+# ACPHY PA trimming parameters: 80
+HNBU_ACPA_80 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_80
+	compat		>= 11
+	u16[12] pa5gbw80a0 {
+		cis	{ 0x0 }
+		srom 	{ 0x138 }
+	}
+}
+
+# ACPHY PA trimming parameters: 40/80
+HNBU_ACPA_4080 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_4080
+	compat		>= 11
+	u16[12] pa5gbw4080a0 {
+		cis	{ 0x0 }
+		srom 	{ 0x138 }
+	}
+	u16[12] pa5gbw4080a1 {
+		cis	{ 0x18 }
+		srom 	{  u16 @ 0xB6,  u16 @ 0xBC,  u16 @ 0xCE,  u16 @ 0xD4,  u16[8] @ 0x128 }
+	}
+}
+
+# ACPHY PA parameters: chain 0
+HNBU_ACPA_C0 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C0
+	compat		>= 11
+	u16 subband5gver {
+		cis	{ 0x0 }
+		srom 8-10	{  u8 @ 0x1A5 (&0x7) }
+		srom >= 11	{ 0xD6 }
+	}
+	u16 maxp2ga0 {
+		cis	{ 0x2 }
+		srom 4-7	{  u8 @ 0x81 }
+		srom 8-10	{  u8 @ 0xC1 }
+		srom >= 11	{  u8 @ 0xD9 }
+	}
+	u16[3] pa2ga0 {
+		cis	{ 0x4 }
+		srom 	{ 0xDA }
+	}
+	u8[4] maxp5ga0 {
+		cis	{ 0xA }
+		srom 4-7	{  u8 @ 0x8B }
+		srom 8-10	{  u8 @ 0xC9 }
+		srom >= 11	{  u8 @ 0xE5,  u8 @ 0xE4,  u8 @ 0xE7,  u8 @ 0xE6 }
+	}
+	u16[12] pa5ga0 {
+		cis	{ 0xE }
+		srom 	{ 0xE8 }
+	}
+}
+
+# ACPHY PA parameters: chain 1
+HNBU_ACPA_C1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C1
+	compat		>= 11
+	u16 maxp2ga1 {
+		cis	{ 0x0 }
+		srom 4-7	{  u8 @ 0xAF }
+		srom 8-10	{  u8 @ 0xE1 }
+		srom >= 11	{  u8 @ 0x101 }
+	}
+	u16[3] pa2ga1 {
+		cis	{ 0x2 }
+		srom 	{ 0x102 }
+	}
+	u8[4] maxp5ga1 {
+		cis	{ 0x8 }
+		srom 4-7	{  u8 @ 0xB9 }
+		srom 8-10	{  u8 @ 0xE9 }
+		srom >= 11	{  u8 @ 0x10D,  u8 @ 0x10C,  u8 @ 0x10F,  u8 @ 0x10E }
+	}
+	u16[12] pa5ga1 {
+		cis	{ 0xC }
+		srom 	{ 0x110 }
+	}
+}
+
+# ACPHY PA parameters: chain 2
+HNBU_ACPA_C2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C2
+	compat		>= 11
+	u16 maxp2ga2 {
+		cis	{ 0x0 }
+		srom 4-7	{  u8 @ 0xDD }
+		srom 8-10	{  u8 @ 0x101 }
+		srom >= 11	{  u8 @ 0x129 }
+	}
+	u16[3] pa2ga2 {
+		cis	{ 0x2 }
+		srom 	{ 0x12A }
+	}
+	u8[4] maxp5ga2 {
+		cis	{ 0x8 }
+		srom 4-7	{  u8 @ 0xE7 }
+		srom 8-10	{  u8 @ 0x109 }
+		srom >= 11	{  u8 @ 0x135,  u8 @ 0x134,  u8 @ 0x137,  u8 @ 0x136 }
+	}
+	u16[12] pa5ga2 {
+		cis	{ 0xC }
+		srom 	{ 0x138 }
+	}
+}
+
+# ACPHY PA trimming parameters: CCK
+HNBU_ACPA_CCK {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_CCK
+	compat		>= 11
+	u16[3] pa2gccka0 {
+		cis	{ 0x0 }
+		srom 	{ 0x102 }
+	}
+}
+
+# ACPHY Power-per-rate 2gpo
+HNBU_ACPPR_2GPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_2GPO
+	compat		>= 11
+	u16 dot11agofdmhrbw202gpo {
+		cis	{ 0x0 }
+		srom 	{ 0x15C }
+	}
+	u16 ofdmlrbw202gpo {
+		cis	{ 0x2 }
+		srom 	{ 0x15E }
+	}
+}
+
+# ACPHY Power-per-rate 5gpo
+HNBU_ACPPR_5GPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_5GPO
+	compat		>= 11
+	u32 mcsbw805glpo {
+		cis	{ 0x0 }
+		srom 	{ 0x168 }
+	}
+	u32 mcsbw1605glpo {
+		cis	{ 0x4 }
+	}
+	u32 mcsbw805gmpo {
+		cis	{ 0x8 }
+		srom 	{ 0x178 }
+	}
+	u32 mcsbw1605gmpo {
+		cis	{ 0xC }
+	}
+	u32 mcsbw805ghpo {
+		cis	{ 0x10 }
+		srom 	{ 0x188 }
+	}
+	u32 mcsbw1605ghpo {
+		cis	{ 0x14 }
+	}
+	u16 mcslr5glpo {
+		cis	{ 0x18 }
+		srom 	{ 0x190 (&0xFFF) }
+	}
+	u16 mcslr5gmpo {
+		cis	{ 0x1A }
+		srom 	{ 0x192 }
+	}
+	u16 mcslr5ghpo {
+		cis	{ 0x1C }
+		srom 	{ 0x194 }
+	}
+}
+
+# ACPHY Power-per-rate sbpo
+HNBU_ACPPR_SBPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_SBPO
+	compat		>= 11
+	u16 sb20in40hrpo {
+		cis	{ 0x0 }
+		srom 	{ 0x196 }
+	}
+	u16 sb20in80and160hr5glpo {
+		cis	{ 0x2 }
+		srom 	{ 0x198 }
+	}
+	u16 sb40and80hr5glpo {
+		cis	{ 0x4 }
+		srom 	{ 0x19A }
+	}
+	u16 sb20in80and160hr5gmpo {
+		cis	{ 0x6 }
+		srom 	{ 0x19C }
+	}
+	u16 sb40and80hr5gmpo {
+		cis	{ 0x8 }
+		srom 	{ 0x19E }
+	}
+	u16 sb20in80and160hr5ghpo {
+		cis	{ 0xA }
+		srom 	{ 0x1A0 }
+	}
+	u16 sb40and80hr5ghpo {
+		cis	{ 0xC }
+		srom 	{ 0x1A2 }
+	}
+	u16 sb20in40lrpo {
+		cis	{ 0xE }
+		srom 	{ 0x1A4 }
+	}
+	u16 sb20in80and160lr5glpo {
+		cis	{ 0x10 }
+		srom 	{ 0x1A6 }
+	}
+	u16 sb40and80lr5glpo {
+		cis	{ 0x12 }
+		srom 	{ 0x1A8 }
+	}
+	u16 sb20in80and160lr5gmpo {
+		cis	{ 0x14 }
+		srom 	{ 0x1AA }
+	}
+	u16 sb40and80lr5gmpo {
+		cis	{ 0x16 }
+		srom 	{ 0x1AC }
+	}
+	u16 sb20in80and160lr5ghpo {
+		cis	{ 0x18 }
+		srom 	{ 0x1AE }
+	}
+	u16 sb40and80lr5ghpo {
+		cis	{ 0x1A }
+		srom 	{ 0x1B0 }
+	}
+	u16 dot11agduphrpo {
+		cis	{ 0x1C }
+		srom 	{ 0x1B2 }
+	}
+	u16 dot11agduplrpo {
+		cis	{ 0x1E }
+		srom 	{ 0x1B4 }
+	}
+}
+
+# ACPHY rxgains: chain 0
+HNBU_ACRXGAINS_C0 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C0
+	compat		>= 11
+	u8 rxgains5gtrelnabypa0 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x80, >>7) }
+		srom 	{ 0xE2 (&0x80, >>7) }
+	}
+	u8 rxgains5gtrisoa0 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x78, >>3) }
+		srom 	{ 0xE2 (&0x78, >>3) }
+	}
+	u8 rxgains5gelnagaina0 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x7) }
+		srom 	{ 0xE2 (&0x7) }
+	}
+	u8 rxgains2gtrelnabypa0 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x80, >>7) }
+		srom 	{ 0xE3 (&0x80, >>7) }
+	}
+	u8 rxgains2gtrisoa0 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x78, >>3) }
+		srom 	{ 0xE3 (&0x78, >>3) }
+	}
+	u8 rxgains2gelnagaina0 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x7) }
+		srom 	{ 0xE3 (&0x7) }
+	}
+	u8 rxgains5ghtrelnabypa0 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x80, >>7) }
+		srom 	{ 0xE0 (&0x80, >>7) }
+	}
+	u8 rxgains5ghtrisoa0 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x78, >>3) }
+		srom 	{ 0xE0 (&0x78, >>3) }
+	}
+	u8 rxgains5ghelnagaina0 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x7) }
+		srom 	{ 0xE0 (&0x7) }
+	}
+	u8 rxgains5gmtrelnabypa0 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x80, >>7) }
+		srom 	{ 0xE1 (&0x80, >>7) }
+	}
+	u8 rxgains5gmtrisoa0 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x78, >>3) }
+		srom 	{ 0xE1 (&0x78, >>3) }
+	}
+	u8 rxgains5gmelnagaina0 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x7) }
+		srom 	{ 0xE1 (&0x7) }
+	}
+}
+
+# ACPHY rxgains: chain 1
+HNBU_ACRXGAINS_C1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C1
+	compat		>= 11
+	u8 rxgains5gtrelnabypa1 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x80, >>7) }
+		srom 	{ 0x10A (&0x80, >>7) }
+	}
+	u8 rxgains5gtrisoa1 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x78, >>3) }
+		srom 	{ 0x10A (&0x78, >>3) }
+	}
+	u8 rxgains5gelnagaina1 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x7) }
+		srom 	{ 0x10A (&0x7) }
+	}
+	u8 rxgains2gtrelnabypa1 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x80, >>7) }
+		srom 	{ 0x10B (&0x80, >>7) }
+	}
+	u8 rxgains2gtrisoa1 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x78, >>3) }
+		srom 	{ 0x10B (&0x78, >>3) }
+	}
+	u8 rxgains2gelnagaina1 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x7) }
+		srom 	{ 0x10B (&0x7) }
+	}
+	u8 rxgains5ghtrelnabypa1 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x80, >>7) }
+		srom 	{ 0x108 (&0x80, >>7) }
+	}
+	u8 rxgains5ghtrisoa1 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x78, >>3) }
+		srom 	{ 0x108 (&0x78, >>3) }
+	}
+	u8 rxgains5ghelnagaina1 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x7) }
+		srom 	{ 0x108 (&0x7) }
+	}
+	u8 rxgains5gmtrelnabypa1 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x80, >>7) }
+		srom 	{ 0x109 (&0x80, >>7) }
+	}
+	u8 rxgains5gmtrisoa1 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x78, >>3) }
+		srom 	{ 0x109 (&0x78, >>3) }
+	}
+	u8 rxgains5gmelnagaina1 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x7) }
+		srom 	{ 0x109 (&0x7) }
+	}
+}
+
+# ACPHY rxgains: chain 2
+HNBU_ACRXGAINS_C2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C2
+	compat		>= 11
+	u8 rxgains5gtrelnabypa2 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x80, >>7) }
+		srom 	{ 0x132 (&0x80, >>7) }
+	}
+	u8 rxgains5gtrisoa2 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x78, >>3) }
+		srom 	{ 0x132 (&0x78, >>3) }
+	}
+	u8 rxgains5gelnagaina2 {
+		sfmt	sdec
+		cis	{ 0x1 (&0x7) }
+		srom 	{ 0x132 (&0x7) }
+	}
+	u8 rxgains2gtrelnabypa2 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x80, >>7) }
+		srom 	{ 0x133 (&0x80, >>7) }
+	}
+	u8 rxgains2gtrisoa2 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x78, >>3) }
+		srom 	{ 0x133 (&0x78, >>3) }
+	}
+	u8 rxgains2gelnagaina2 {
+		sfmt	sdec
+		cis	{ 0x0 (&0x7) }
+		srom 	{ 0x133 (&0x7) }
+	}
+	u8 rxgains5ghtrelnabypa2 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x80, >>7) }
+		srom 	{ 0x130 (&0x80, >>7) }
+	}
+	u8 rxgains5ghtrisoa2 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x78, >>3) }
+		srom 	{ 0x130 (&0x78, >>3) }
+	}
+	u8 rxgains5ghelnagaina2 {
+		sfmt	sdec
+		cis	{ 0x2 (&0x7) }
+		srom 	{ 0x130 (&0x7) }
+	}
+	u8 rxgains5gmtrelnabypa2 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x80, >>7) }
+		srom 	{ 0x131 (&0x80, >>7) }
+	}
+	u8 rxgains5gmtrisoa2 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x78, >>3) }
+		srom 	{ 0x131 (&0x78, >>3) }
+	}
+	u8 rxgains5gmelnagaina2 {
+		sfmt	sdec
+		cis	{ 0x3 (&0x7) }
+		srom 	{ 0x131 (&0x7) }
+	}
+}
+
+# Antenna gain
+HNBU_AG {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AG
+	compat		>= 0
+	u8 ag0 {
+		cis	{ 0x0 }
+		srom 1-3	{ 0x75 }
+		srom 4-7	{ 0x5F }
+		srom 8-10	{ 0x9F }
+	}
+	u8 ag1 {
+		cis	{ 0x1 }
+		srom 1-3	{ 0x74 }
+		srom 4-7	{ 0x5E }
+		srom 8-10	{ 0x9E }
+	}
+	u8 ag2 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x61 }
+		srom 8-10	{ 0xA1 }
+	}
+	u8 ag3 {
+		cis	{ 0x3 }
+		srom 4-7	{ 0x60 }
+		srom 8-10	{ 0xA0 }
+	}
+}
+
+HNBU_AGBGA {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AGBGA
+	compat		>= 11
+	u8 agbg0 {
+		cis	{ 0x0 }
+		srom 	{ 0xA2 }
+	}
+	u8 agbg1 {
+		cis	{ 0x1 }
+		srom 	{ 0xA3 }
+	}
+	u8 agbg2 {
+		cis	{ 0x2 }
+		srom 	{ 0xA4 }
+	}
+	u8 aga0 {
+		cis	{ 0x3 }
+		srom 	{ 0xA5 }
+	}
+	u8 aga1 {
+		cis	{ 0x4 }
+		srom 	{ 0xA6 }
+	}
+	u8 aga2 {
+		cis	{ 0x5 }
+		srom 	{ 0xA7 }
+	}
+}
+
+# 4328 5G antennas available/gain
+HNBU_ANT5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ANT5G
+	compat		>= 0
+	u8 aa5g {
+		cis	{ 0x0 }
+		srom 1-3	{ 0x5C (&0xC0, >>6) }
+		srom 4-7	{ 0x5C }
+		srom 8-10	{ 0x9C }
+		srom >= 11	{ 0xA0 }
+	}
+	u8 ag1 {
+		cis	{ 0x1 }
+		srom 1-3	{ 0x74 }
+		srom 4-7	{ 0x5E }
+		srom 8-10	{ 0x9E }
+	}
+}
+
+# board flags (2 or 4 bytes)
+HNBU_BOARDFLAGS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDFLAGS
+	compat		>= 0
+	u32 boardflags {
+		cis	{ 0x0 }
+		srom 1	{  u16 @ 0x72 }
+		srom 2	{  u16 @ 0x72 |  u16 @ 0x38 (<<16) }
+		srom 3	{  u16 @ 0x72 |  u16 @ 0x7A (<<16) }
+		srom 4	{ 0x44 }
+		srom 5-7	{ 0x4A }
+		srom >= 8	{ 0x84 }
+	}
+	u32 boardflags2 {
+		cis	{ 0x4 }
+		srom 4	{ 0x48 }
+		srom 5-7	{ 0x4E }
+		srom >= 8	{ 0x88 }
+	}
+	u32 boardflags3 {
+		cis	{ 0x8 }
+		srom >= 11	{ 0x8C }
+	}
+}
+
+# board serial number, independent of mac addr
+HNBU_BOARDNUM {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDNUM
+	compat		>= 0
+	u16 boardnum {
+		cis	{ 0x0 }
+		srom 1-2	{ 0x4C }
+		srom 3	{ 0x4E }
+		srom 4	{ 0x50 }
+		srom 5-7	{ 0x56 }
+		srom 8-10	{ 0x90 }
+		srom >= 11	{ 0x94 }
+	}
+}
+
+# One byte board revision
+HNBU_BOARDREV {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDREV
+	compat		>= 0
+	u16 boardrev {
+		cis	{ 0x0 }
+		srom 1-3	{  u8 @ 0x5D }
+		srom 4-7	{ 0x42 }
+		srom >= 8	{ 0x82 }
+	}
+}
+
+# 2 bytes; boardtype
+HNBU_BOARDTYPE {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDTYPE
+	compat		>= 0
+	u16 boardtype {
+		cis	{ 0x0 }
+		srom >= 2	{ 0x4 }
+	}
+}
+
+# Default country code (sromrev == 1)
+HNBU_CC {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CC
+	compat		1
+	u8 cc {
+		cis	{ 0x0 (&0xF) }
+		srom 	{ 0x5C (&0xF) }
+	}
+}
+
+# 2 bytes each
+# CCK Power offsets for 20 MHz rates (11, 5.5, 2, 1Mbps)
+# cckbw202gpo cckbw20ul2gpo
+# 
+HNBU_CCKBW202GPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKBW202GPO
+	compat		>= 0
+	u16 cckbw202gpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x140 }
+		srom >= 11	{ 0x150 }
+	}
+	u16 cckbw20ul2gpo {
+		cis	{ 0x2 }
+		srom 9-10	{ 0x142 }
+		srom >= 11	{ 0x152 }
+	}
+}
+
+# CCK digital filter selection options
+HNBU_CCKFILTTYPE {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKFILTTYPE
+	compat		>= 0
+	u8 cckdigfilttype {
+		sfmt	sdec
+		cis	{ 0x0 }
+	}
+}
+
+# 2 byte cck power offsets in rev 3
+HNBU_CCKPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKPO
+	compat		>= 0
+	u16 cckpo {
+		cis	{ 0x0 }
+	}
+}
+
+# Country code (2 bytes ascii + 1 byte cctl)
+# in rev 2
+# 
+HNBU_CCODE {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCODE
+	compat		>= 0
+	char ccode {
+		sfmt	ccode
+		cis	{ u16 @ 0x0 }
+		srom 0-3	{  char[2] @ 0x76 (&0xFFFF) }
+		srom 4	{  char[2] @ 0x52 (&0xFFFF) }
+		srom 5-7	{  char[2] @ 0x44 (&0xFFFF) }
+		srom 8-10	{  char[2] @ 0x92 (&0xFFFF) }
+		srom >= 11	{  char[2] @ 0x96 (&0xFFFF) }
+	}
+	u8 cctl {
+		cis	{ 0x2 }
+	}
+}
+
+# 2 byte; txchain, rxchain
+HNBU_CHAINSWITCH {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHAINSWITCH
+	compat		>= 0
+	u8 txchain {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x7B (&0xF) }
+		srom 8-10	{ 0xA3 (&0xF) }
+		srom >= 11	{ 0xA9 (&0xF) }
+	}
+	u8 rxchain {
+		cis	{ 0x1 }
+		srom 4-7	{ 0x7B (&0xF0, >>4) }
+		srom 8-10	{ 0xA3 (&0xF0, >>4) }
+		srom >= 11	{ 0xA9 (&0xF0, >>4) }
+	}
+	u16 antswitch {
+		cis	{ 0x2 }
+		srom 4-7	{  u8 @ 0x7A }
+		srom 8-10	{  u8 @ 0xA2 }
+		srom >= 11	{  u8 @ 0xA8 }
+	}
+}
+
+# Two 16bit values: PCI vendor & device id
+HNBU_CHIPID {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHIPID
+	compat		>= 0
+	u16 vendid {
+		cis	{ 0x0 }
+	}
+	u16 devid {
+		cis	{ 0x2 }
+		srom >= 8	{ 0x60 }
+	}
+	u16 chiprev {
+		sfmt	sdec
+		cis	{ 0x4 }
+	}
+	u16 subvendid {
+		cis	{ 0x6 }
+	}
+	u16 subdevid {
+		cis	{ 0x8 }
+	}
+}
+
+# 4 byte; For non-BRCM post-mfg additions
+HNBU_CUSTOM1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CUSTOM1
+	compat		>= 0
+	u32 customvar1 {
+		cis	{ 0x0 }
+	}
+}
+
+HNBU_ELNA2G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA2G
+	compat		>= 0
+	u8 elna2g {
+		cis	{ 0x0 }
+		srom 8-10	{ 0xBB }
+	}
+}
+
+HNBU_ELNA5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA5G
+	compat		>= 0
+	u8 elna5g {
+		cis	{ 0x0 }
+		srom 8-10	{ 0xBA }
+	}
+}
+
+# 2 or 4 byte: 11n frontend specification
+HNBU_FEM {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM
+	compat		1-10
+	u8 antswctl2g {
+		cis	{ 0x1 (&0xF8, >>3) }
+		srom 8-10	{ 0xAE (&0xF8, >>3) }
+	}
+	u8 triso2g {
+		cis	{ 0x1 (&0x7) }
+		srom 8-10	{ 0xAE (&0x7) }
+	}
+	u8 pdetrange2g {
+		cis	{ 0x0 (&0xF8, >>3) }
+		srom 8-10	{ 0xAF (&0xF8, >>3) }
+	}
+	u8 extpagain2g {
+		cis	{ 0x0 (&0x6, >>1) }
+		srom 8-10	{ 0xAF (&0x6, >>1) }
+	}
+	u8 tssipos2g {
+		cis	{ 0x0 (&0x1) }
+		srom 8-10	{ 0xAF (&0x1) }
+	}
+	u8 antswctl5g {
+		cis	{ 0x3 (&0xF8, >>3) }
+		srom 8-10	{ 0xB0 (&0xF8, >>3) }
+	}
+	u8 triso5g {
+		cis	{ 0x3 (&0x7) }
+		srom 8-10	{ 0xB0 (&0x7) }
+	}
+	u8 pdetrange5g {
+		cis	{ 0x2 (&0xF8, >>3) }
+		srom 8-10	{ 0xB1 (&0xF8, >>3) }
+	}
+	u8 extpagain5g {
+		cis	{ 0x2 (&0x6, >>1) }
+		srom 8-10	{ 0xB1 (&0x6, >>1) }
+	}
+	u8 tssipos5g {
+		cis	{ 0x2 (&0x1) }
+		srom 8-10	{ 0xB1 (&0x1) }
+	}
+}
+
+# FEM config
+HNBU_FEM_CFG {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM_CFG
+	compat		>= 11
+	u8 femctrl {
+		sfmt	sdec
+		cis	{ 0x1 (&0xF8, >>3) }
+		srom 	{ 0xAA (&0xF8, >>3) }
+	}
+	u8 papdcap2g {
+		sfmt	sdec
+		cis	{ 0x1 (&0x4, >>2) }
+		srom 	{ 0xAA (&0x4, >>2) }
+	}
+	u8 tworangetssi2g {
+		sfmt	sdec
+		cis	{ 0x1 (&0x2, >>1) }
+		srom 	{ 0xAA (&0x2, >>1) }
+	}
+	u16 pdgain2g {
+		sfmt	sdec
+		cis	{ 0x0 (&0x1F0, >>4) }
+		srom 	{ 0xAA (&0x1F0, >>4) }
+	}
+	u8 epagain2g {
+		sfmt	sdec
+		cis	{ 0x0 (&0xE, >>1) }
+		srom 	{ 0xAB (&0xE, >>1) }
+	}
+	u8 tssiposslope2g {
+		sfmt	sdec
+		cis	{ 0x0 (&0x1) }
+		srom 	{ 0xAB (&0x1) }
+	}
+	u8 gainctrlsph {
+		sfmt	sdec
+		cis	{ 0x3 (&0xF8, >>3) }
+		srom 	{ 0xAC (&0xF8, >>3) }
+	}
+	u8 papdcap5g {
+		sfmt	sdec
+		cis	{ 0x3 (&0x4, >>2) }
+		srom 	{ 0xAC (&0x4, >>2) }
+	}
+	u8 tworangetssi5g {
+		sfmt	sdec
+		cis	{ 0x3 (&0x2, >>1) }
+		srom 	{ 0xAC (&0x2, >>1) }
+	}
+	u16 pdgain5g {
+		sfmt	sdec
+		cis	{ 0x2 (&0x1F0, >>4) }
+		srom 	{ 0xAC (&0x1F0, >>4) }
+	}
+	u8 epagain5g {
+		sfmt	sdec
+		cis	{ 0x2 (&0xE, >>1) }
+		srom 	{ 0xAD (&0xE, >>1) }
+	}
+	u8 tssiposslope5g {
+		sfmt	sdec
+		cis	{ 0x2 (&0x1) }
+		srom 	{ 0xAD (&0x1) }
+	}
+}
+
+# 4 byte GPIO pull down mask
+HNBU_GPIO_PULL_DOWN {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_GPIO_PULL_DOWN
+	compat		>= 0
+	u32 gpdn {
+		cis	{ 0x0 }
+	}
+}
+
+# 2 bytes; LED duty cycle
+HNBU_LEDDC {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDDC
+	compat		>= 0
+	u16 leddc {
+		sfmt	leddc
+		cis	{ 0x0 }
+		srom 3	{  u8[2] @ 0x7C (&0xFFFF) }
+		srom 4	{  u8[2] @ 0x5A (&0xFFFF) }
+		srom 5-7	{  u8[2] @ 0x5A (&0xFFFF) }
+		srom 8-10	{  u8[2] @ 0x9A (&0xFFFF) }
+		srom >= 11	{  u8[2] @ 0x9E (&0xFFFF) }
+	}
+}
+
+# LED set
+HNBU_LEDS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDS
+	compat		>= 0
+	u8 ledbh0 {
+		cis	{ 0x0 }
+		srom 1-3	{ 0x65 }
+		srom 4	{ 0x57 }
+		srom 5-7	{ 0x77 }
+		srom 8-10	{ 0x97 }
+		srom >= 11	{ 0x9B }
+	}
+	u8 ledbh1 {
+		cis	{ 0x1 }
+		srom 1-3	{ 0x64 }
+		srom 4	{ 0x56 }
+		srom 5-7	{ 0x76 }
+		srom 8-10	{ 0x96 }
+		srom >= 11	{ 0x9A }
+	}
+	u8 ledbh2 {
+		cis	{ 0x2 }
+		srom 1-3	{ 0x67 }
+		srom 4	{ 0x59 }
+		srom 5-7	{ 0x79 }
+		srom 8-10	{ 0x99 }
+		srom >= 11	{ 0x9D }
+	}
+	u8 ledbh3 {
+		cis	{ 0x3 }
+		srom 1-3	{ 0x66 }
+		srom 4	{ 0x58 }
+		srom 5-7	{ 0x78 }
+		srom 8-10	{ 0x98 }
+		srom >= 11	{ 0x9C }
+	}
+	u8 ledbh4 {
+		cis	{ 0x4 }
+	}
+	u8 ledbh5 {
+		cis	{ 0x5 }
+	}
+	u8 ledbh6 {
+		cis	{ 0x6 }
+	}
+	u8 ledbh7 {
+		cis	{ 0x7 }
+	}
+	u8 ledbh8 {
+		cis	{ 0x8 }
+	}
+	u8 ledbh9 {
+		cis	{ 0x9 }
+	}
+	u8 ledbh10 {
+		cis	{ 0xA }
+	}
+	u8 ledbh11 {
+		cis	{ 0xB }
+	}
+	u8 ledbh12 {
+		cis	{ 0xC }
+	}
+	u8 ledbh13 {
+		cis	{ 0xD }
+	}
+	u8 ledbh14 {
+		cis	{ 0xE }
+	}
+	u8 ledbh15 {
+		cis	{ 0xF }
+	}
+}
+
+# 2 bytes total
+# Additional power offset for Legacy Dup40 transmissions.
+# Applied in addition to legofdmbw20ulXpo, X=2g, 5gl, 5gm, or 5gh.
+# LSB nibble: 2G band, MSB nibble: 5G band high subband.
+# leg40dup5ghpo, leg40dup5gmpo, leg40dup5glpo, leg40dup2gpo
+# 
+HNBU_LEG40DUPPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEG40DUPPO
+	compat		>= 0
+	u16 legofdm40duppo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x196 }
+	}
+}
+
+# 4 bytes each
+# OFDM power offsets for 20 MHz Legacy rates
+# (54, 48, 36, 24, 18, 12, 9, 6 Mbps)
+# legofdmbw202gpo  legofdmbw20ul2gpo
+# 
+HNBU_LEGOFDMBW202GPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW202GPO
+	compat		>= 0
+	u32 legofdmbw202gpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x144 }
+	}
+	u32 legofdmbw20ul2gpo {
+		cis	{ 0x4 }
+		srom 9-10	{ 0x148 }
+	}
+}
+
+# 4 bytes each
+# 5G band: OFDM power offsets for 20 MHz Legacy rates
+# (54, 48, 36, 24, 18, 12, 9, 6 Mbps)
+# low subband : legofdmbw205glpo  legofdmbw20ul2glpo
+# mid subband :legofdmbw205gmpo  legofdmbw20ul2gmpo
+# high subband :legofdmbw205ghpo  legofdmbw20ul2ghpo
+# 
+HNBU_LEGOFDMBW205GPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW205GPO
+	compat		>= 0
+	u32 legofdmbw205glpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x14C }
+	}
+	u32 legofdmbw20ul5glpo {
+		cis	{ 0x4 }
+		srom 9-10	{ 0x150 }
+	}
+	u32 legofdmbw205gmpo {
+		cis	{ 0x8 }
+		srom 9-10	{ 0x154 }
+	}
+	u32 legofdmbw20ul5gmpo {
+		cis	{ 0xC }
+		srom 9-10	{ 0x158 }
+	}
+	u32 legofdmbw205ghpo {
+		cis	{ 0x10 }
+		srom 9-10	{ 0x15C }
+	}
+	u32 legofdmbw20ul5ghpo {
+		cis	{ 0x14 }
+		srom 9-10	{ 0x160 }
+	}
+}
+
+# mac addr override for the standard CIS LAN_NID
+HNBU_MACADDR {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MACADDR
+	compat		>= 0
+	u8[48] macaddr {
+		sfmt	macaddr
+		cis	{ 0x0 }
+		srom 3	{ 0x4A (&0xFFFF) }
+		srom 4	{ 0x4C (&0xFFFF) }
+		srom 5-7	{ 0x52 (&0xFFFF) }
+		srom 8-10	{ 0x8C (&0xFFFF) }
+		srom >= 11	{ 0x90 (&0xFFFF) }
+	}
+}
+
+# 4 bytes each
+# mcs 0-7  power-offset. LSB nibble: m0, MSB nibble: m7
+# mcsbw202gpo  mcsbw20ul2gpo mcsbw402gpo
+# 
+HNBU_MCS2GPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS2GPO
+	compat		>= 0
+	u32 mcsbw202gpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x164 }
+		srom >= 11	{ 0x154 }
+	}
+	u32 mcsbw20ul2gpo {
+		cis	{ 0x4 }
+		srom 9-10	{ 0x168 }
+	}
+	u32 mcsbw402gpo {
+		cis	{ 0x8 }
+		srom 9-10	{ 0x16C }
+		srom >= 11	{ 0x158 }
+	}
+}
+
+# 4 bytes each
+# 5G high subband mcs 0-7 power-offset.
+# LSB nibble: m0, MSB nibble: m7
+# mcsbw205ghpo  mcsbw20ul5ghpo mcsbw405ghpo
+# 
+HNBU_MCS5GHPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GHPO
+	compat		>= 0
+	u32 mcsbw205ghpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x188 }
+		srom >= 11	{ 0x180 }
+	}
+	u32 mcsbw20ul5ghpo {
+		cis	{ 0x4 }
+		srom 9-10	{ 0x18C }
+	}
+	u32 mcsbw405ghpo {
+		cis	{ 0x8 }
+		srom 9-10	{ 0x190 }
+		srom >= 11	{ 0x184 }
+	}
+}
+
+# 4 bytes each
+# 5G low subband mcs 0-7 power-offset.
+# LSB nibble: m0, MSB nibble: m7
+# mcsbw205glpo  mcsbw20ul5glpo mcsbw405glpo
+# 
+HNBU_MCS5GLPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GLPO
+	compat		>= 0
+	u32 mcsbw205glpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x170 }
+		srom >= 11	{ 0x160 }
+	}
+	u32 mcsbw20ul5glpo {
+		cis	{ 0x4 }
+		srom 9-10	{ 0x174 }
+	}
+	u32 mcsbw405glpo {
+		cis	{ 0x8 }
+		srom 9-10	{ 0x178 }
+		srom >= 11	{ 0x164 }
+	}
+}
+
+# 4 bytes each
+# 5G mid subband mcs 0-7 power-offset.
+# LSB nibble: m0, MSB nibble: m7
+# mcsbw205gmpo  mcsbw20ul5gmpo mcsbw405gmpo
+# 
+HNBU_MCS5GMPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GMPO
+	compat		>= 0
+	u32 mcsbw205gmpo {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x17C }
+		srom >= 11	{ 0x170 }
+	}
+	u32 mcsbw20ul5gmpo {
+		cis	{ 0x4 }
+		srom 9-10	{ 0x180 }
+	}
+	u32 mcsbw405gmpo {
+		cis	{ 0x8 }
+		srom 9-10	{ 0x184 }
+		srom >= 11	{ 0x174 }
+	}
+}
+
+# 2 bytes total
+# mcs-32 power offset for each band/subband.
+# LSB nibble: 2G band, MSB nibble:
+# mcs322ghpo, mcs325gmpo, mcs325glpo, mcs322gpo
+# 
+HNBU_MCS32PO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS32PO
+	compat		>= 0
+	u16 mcs32po {
+		cis	{ 0x0 }
+		srom 9-10	{ 0x194 }
+	}
+}
+
+HNBU_MEAS_PWR {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MEAS_PWR
+	compat		>= 11
+	u8 measpower {
+		cis	{ 0x0 }
+		srom 8-10	{ 0xB4 (&0xFE, >>1) }
+		srom >= 11	{ 0xB0 (&0xFE, >>1) }
+	}
+	u8 measpower1 {
+		cis	{ 0x1 }
+		srom 8-10	{ 0xBF (&0x7F) }
+		srom >= 11	{ 0xBB (&0x7F) }
+	}
+	u16 measpower2 {
+		cis	{ u8 @ 0x2 }
+		srom 8-10	{ 0xBE (&0x3F80, >>7) }
+		srom >= 11	{ 0xBA (&0x3F80, >>7) }
+	}
+	u16 rawtempsense {
+		cis	{ 0x3 }
+		srom 8-10	{ 0xB4 (&0x1FF) }
+		srom >= 11	{ 0xB0 (&0x1FF) }
+	}
+}
+
+# 1 byte to enable mux options
+HNBU_MUXENAB {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MUXENAB
+	compat		>= 0
+	u8 muxenab {
+		cis	{ 0x0 }
+	}
+}
+
+HNBU_NOISELVL {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_NOISELVL
+	compat		>= 11
+	u8 noiselvl2ga0 {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom 8-10	{ 0x1AB (&0x1F) }
+		srom >= 11	{ 0x1BD (&0x1F) }
+	}
+	u16 noiselvl2ga1 {
+		sfmt	sdec
+		cis	{ u8 @ 0x1 }
+		srom 8-10	{ 0x1AA (&0x3E0, >>5) }
+		srom >= 11	{ 0x1BC (&0x3E0, >>5) }
+	}
+	u8 noiselvl2ga2 {
+		sfmt	sdec
+		cis	{ 0x2 }
+		srom 8-10	{ 0x1AA (&0x7C, >>2) }
+		srom >= 11	{ 0x1BC (&0x7C, >>2) }
+	}
+	u8[4] noiselvl5ga0 {
+		sfmt	sdec
+		cis	{ 0x3 }
+		srom 	{  u8 @ 0x1BF (&0x1F),  u8 @ 0x1C1 (&0x1F),  u8 @ 0x1C3 (&0x1F),  u8 @ 0x1C5 (&0x1F) }
+	}
+	u16[4] noiselvl5ga1 {
+		sfmt	sdec
+		cis	{ u8[4] @ 0x7 }
+		srom 	{ 0x1BE (&0x3E0, >>5) }
+	}
+	u8[4] noiselvl5ga2 {
+		sfmt	sdec
+		cis	{ 0xB }
+		srom 	{  u8 @ 0x1BE (&0x7C, >>2),  u8 @ 0x1C0 (&0x7C, >>2),  u8 @ 0x1C2 (&0x7C, >>2),  u8 @ 0x1C4 (&0x7C, >>2) }
+	}
+}
+
+# Eight bytes OEM data (sromrev == 1)
+HNBU_OEM {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OEM
+	compat		1
+	u8[8] oem {
+		sfmt	hexbin
+		cis	{ 0x0 (&0xF) }
+	}
+}
+
+# 4 byte 11g ofdm power offsets in rev 3
+HNBU_OFDMPO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO
+	compat		>= 0
+	u32 ofdmpo {
+		cis	{ 0x0 }
+	}
+}
+
+# 4
+# 3 = 12 byte 11a ofdm power offsets in rev 3
+HNBU_OFDMPO5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO5G
+	compat		>= 0
+	u32 ofdm5gpo {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x13E }
+		srom 8	{ 0x146 }
+	}
+	u32 ofdm5glpo {
+		cis	{ 0x4 }
+		srom 4-7	{ 0x142 }
+		srom 8	{ 0x14A }
+	}
+	u32 ofdm5ghpo {
+		cis	{ 0x8 }
+		srom 4-7	{ 0x146 }
+		srom 8	{ 0x14E }
+	}
+}
+
+# paparambwver
+HNBU_PAPARAMBWVER {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARAMBWVER
+	compat		>= 11
+	u8 paparambwver {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom 	{ 0x190 (&0xF0, >>4) }
+	}
+}
+
+# PA parameters: 8 (sromrev == 1)
+# or 9 (sromrev > 1) bytes
+# 
+HNBU_PAPARMS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS
+	compat		>= 0
+	u16 pa0b0 {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom 1-3	{ 0x5E }
+		srom 8-10	{ 0xC2 }
+	}
+	u16 pa0b1 {
+		sfmt	sdec
+		cis	{ 0x2 }
+		srom 1-3	{ 0x60 }
+		srom 8-10	{ 0xC4 }
+	}
+	u16 pa0b2 {
+		sfmt	sdec
+		cis	{ 0x4 }
+		srom 1-3	{ 0x62 }
+		srom 8-10	{ 0xC6 }
+	}
+	u8 pa0itssit {
+		sfmt	sdec
+		cis	{ 0x6 }
+		srom 1-3	{ 0x71 }
+		srom 8-10	{ 0xC0 }
+	}
+	u8 pa0maxpwr {
+		sfmt	sdec
+		cis	{ 0x7 }
+		srom 1-3	{ 0x69 }
+		srom 8-10	{ 0xC1 }
+	}
+	u8 opo {
+		cis	{ 0x8 }
+		srom 2-3	{ 0x79 }
+		srom 8-10	{ 0x143 }
+	}
+}
+
+# 5G PA params
+HNBU_PAPARMS5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS5G
+	compat		>= 0
+	u16 pa1b0 {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom 1-3	{ 0x6A }
+		srom 8-10	{ 0xCC }
+	}
+	u16 pa1b1 {
+		sfmt	sdec
+		cis	{ 0x2 }
+		srom 1-3	{ 0x6C }
+		srom 8-10	{ 0xCE }
+	}
+	u16 pa1b2 {
+		sfmt	sdec
+		cis	{ 0x4 }
+		srom 1-3	{ 0x6E }
+		srom 8-10	{ 0xD0 }
+	}
+	u16 pa1lob0 {
+		sfmt	sdec
+		cis	{ 0x6 }
+		srom 2-3	{ 0x3C }
+		srom 8-10	{ 0xD2 }
+	}
+	u16 pa1lob1 {
+		sfmt	sdec
+		cis	{ 0x8 }
+		srom 2-3	{ 0x3E }
+		srom 8-10	{ 0xD4 }
+	}
+	u16 pa1lob2 {
+		sfmt	sdec
+		cis	{ 0xA }
+		srom 2-3	{ 0x40 }
+		srom 8-10	{ 0xD6 }
+	}
+	u16 pa1hib0 {
+		sfmt	sdec
+		cis	{ 0xC }
+		srom 2-3	{ 0x42 }
+		srom 8-10	{ 0xD8 }
+	}
+	u16 pa1hib1 {
+		sfmt	sdec
+		cis	{ 0xE }
+		srom 2-3	{ 0x44 }
+		srom 8-10	{ 0xDA }
+	}
+	u16 pa1hib2 {
+		sfmt	sdec
+		cis	{ 0x10 }
+		srom 2-3	{ 0x46 }
+		srom 8-10	{ 0xDC }
+	}
+	u8 pa1itssit {
+		sfmt	sdec
+		cis	{ 0x12 }
+		srom 1-3	{ 0x70 }
+		srom 8-10	{ 0xC8 }
+	}
+	u8 pa1maxpwr {
+		sfmt	sdec
+		cis	{ 0x13 }
+		srom 1-3	{ 0x68 }
+		srom 8-10	{ 0xC9 }
+	}
+	u8 pa1lomaxpwr {
+		sfmt	sdec
+		cis	{ 0x14 }
+		srom 2-3	{ 0x3A }
+		srom 8-10	{ 0xCA }
+	}
+	u8 pa1himaxpwr {
+		sfmt	sdec
+		cis	{ 0x15 }
+		srom 2-3	{ 0x3B }
+		srom 8-10	{ 0xCB }
+	}
+}
+
+# 8 or 30 bytes: 11n pa paramater for chain 0
+HNBU_PAPARMS_C0 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C0
+	compat		1-10
+	u8 maxp2ga0 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x81 }
+		srom 8-10	{ 0xC1 }
+		srom >= 11	{ 0xD9 }
+	}
+	u8 itt2ga0 {
+		cis	{ 0x1 }
+		srom 4-7	{ 0x80 }
+		srom 8-10	{ 0xC0 }
+	}
+	u16 pa2gw0a0 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x82 }
+		srom 8-10	{ 0xC2 }
+	}
+	u16 pa2gw1a0 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0x84 }
+		srom 8-10	{ 0xC4 }
+	}
+	u16 pa2gw2a0 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0x86 }
+		srom 8-10	{ 0xC6 }
+	}
+	u8[4] maxp5ga0 {
+		cis	{ u8 @ 0x8 }
+		srom 4-7	{  u8 @ 0x8B }
+		srom 8-10	{  u8 @ 0xC9 }
+		srom >= 11	{  u8 @ 0xE5,  u8 @ 0xE4,  u8 @ 0xE7,  u8 @ 0xE6 }
+	}
+	u8 itt5ga0 {
+		cis	{ 0x9 }
+		srom 4-7	{ 0x8A }
+		srom 8-10	{ 0xC8 }
+	}
+	u8 maxp5gha0 {
+		cis	{ 0xA }
+		srom 4-7	{ 0x8D }
+		srom 8-10	{ 0xCB }
+	}
+	u8 maxp5gla0 {
+		cis	{ 0xB }
+		srom 4-7	{ 0x8C }
+		srom 8-10	{ 0xCA }
+	}
+	u16 pa5gw0a0 {
+		cis	{ 0xC }
+		srom 4-7	{ 0x8E }
+		srom 8-10	{ 0xCC }
+	}
+	u16 pa5gw1a0 {
+		cis	{ 0xE }
+		srom 4-7	{ 0x90 }
+		srom 8-10	{ 0xCE }
+	}
+	u16 pa5gw2a0 {
+		cis	{ 0x10 }
+		srom 4-7	{ 0x92 }
+		srom 8-10	{ 0xD0 }
+	}
+	u16 pa5glw0a0 {
+		cis	{ 0x12 }
+		srom 4-7	{ 0x96 }
+		srom 8-10	{ 0xD2 }
+	}
+	u16 pa5glw1a0 {
+		cis	{ 0x14 }
+		srom 4-7	{ 0x98 }
+		srom 8-10	{ 0xD4 }
+	}
+	u16 pa5glw2a0 {
+		cis	{ 0x16 }
+		srom 4-7	{ 0x9A }
+		srom 8-10	{ 0xD6 }
+	}
+	u16 pa5ghw0a0 {
+		cis	{ 0x18 }
+		srom 4-7	{ 0x9E }
+		srom 8-10	{ 0xD8 }
+	}
+	u16 pa5ghw1a0 {
+		cis	{ 0x1A }
+		srom 4-7	{ 0xA0 }
+		srom 8-10	{ 0xDA }
+	}
+	u16 pa5ghw2a0 {
+		cis	{ 0x1C }
+		srom 4-7	{ 0xA2 }
+		srom 8-10	{ 0xDC }
+	}
+	u16 pa2gw3a0 {
+		srom 4-7	{ 0x88 }
+	}
+	u16 pa5ghw3a0 {
+		srom 4-7	{ 0xA4 }
+	}
+	u16 pa5glw3a0 {
+		srom 4-7	{ 0x9C }
+	}
+	u16 pa5gw3a0 {
+		srom 4-7	{ 0x94 }
+	}
+}
+
+# 8 or 30 bytes: 11n pa paramater for chain 1
+HNBU_PAPARMS_C1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C1
+	compat		1-10
+	u8 maxp2ga1 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0xAF }
+		srom 8-10	{ 0xE1 }
+		srom >= 11	{ 0x101 }
+	}
+	u8 itt2ga1 {
+		cis	{ 0x1 }
+		srom 4-7	{ 0xAE }
+		srom 8-10	{ 0xE0 }
+	}
+	u16 pa2gw0a1 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0xB0 }
+		srom 8-10	{ 0xE2 }
+	}
+	u16 pa2gw1a1 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0xB2 }
+		srom 8-10	{ 0xE4 }
+	}
+	u16 pa2gw2a1 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0xB4 }
+		srom 8-10	{ 0xE6 }
+	}
+	u8[4] maxp5ga1 {
+		cis	{ u8 @ 0x8 }
+		srom 4-7	{  u8 @ 0xB9 }
+		srom 8-10	{  u8 @ 0xE9 }
+		srom >= 11	{  u8 @ 0x10D,  u8 @ 0x10C,  u8 @ 0x10F,  u8 @ 0x10E }
+	}
+	u8 itt5ga1 {
+		cis	{ 0x9 }
+		srom 4-7	{ 0xB8 }
+		srom 8-10	{ 0xE8 }
+	}
+	u8 maxp5gha1 {
+		cis	{ 0xA }
+		srom 4-7	{ 0xBB }
+		srom 8-10	{ 0xEB }
+	}
+	u8 maxp5gla1 {
+		cis	{ 0xB }
+		srom 4-7	{ 0xBA }
+		srom 8-10	{ 0xEA }
+	}
+	u16 pa5gw0a1 {
+		cis	{ 0xC }
+		srom 4-7	{ 0xBC }
+		srom 8-10	{ 0xEC }
+	}
+	u16 pa5gw1a1 {
+		cis	{ 0xE }
+		srom 4-7	{ 0xBE }
+		srom 8-10	{ 0xEE }
+	}
+	u16 pa5gw2a1 {
+		cis	{ 0x10 }
+		srom 4-7	{ 0xC0 }
+		srom 8-10	{ 0xF0 }
+	}
+	u16 pa5glw0a1 {
+		cis	{ 0x12 }
+		srom 4-7	{ 0xC4 }
+		srom 8-10	{ 0xF2 }
+	}
+	u16 pa5glw1a1 {
+		cis	{ 0x14 }
+		srom 4-7	{ 0xC6 }
+		srom 8-10	{ 0xF4 }
+	}
+	u16 pa5glw2a1 {
+		cis	{ 0x16 }
+		srom 4-7	{ 0xC8 }
+		srom 8-10	{ 0xF6 }
+	}
+	u16 pa5ghw0a1 {
+		cis	{ 0x18 }
+		srom 4-7	{ 0xCC }
+		srom 8-10	{ 0xF8 }
+	}
+	u16 pa5ghw1a1 {
+		cis	{ 0x1A }
+		srom 4-7	{ 0xCE }
+		srom 8-10	{ 0xFA }
+	}
+	u16 pa5ghw2a1 {
+		cis	{ 0x1C }
+		srom 4-7	{ 0xD0 }
+		srom 8-10	{ 0xFC }
+	}
+	u16 pa2gw3a1 {
+		srom 4-7	{ 0xB6 }
+	}
+	u16 pa5ghw3a1 {
+		srom 4-7	{ 0xD2 }
+	}
+	u16 pa5glw3a1 {
+		srom 4-7	{ 0xCA }
+	}
+	u16 pa5gw3a1 {
+		srom 4-7	{ 0xC2 }
+	}
+}
+
+# 8 or 30 bytes: 11n pa paramater for chain 2
+HNBU_PAPARMS_C2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C2
+	compat		1-10
+	u8 maxp2ga2 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0xDD }
+		srom 8-10	{ 0x101 }
+		srom >= 11	{ 0x129 }
+	}
+	u8 itt2ga2 {
+		cis	{ 0x1 }
+		srom 4-7	{ 0xDC }
+		srom 8-10	{ 0x100 }
+	}
+	u16 pa2gw0a2 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0xDE }
+		srom 8-10	{ 0x102 }
+	}
+	u16 pa2gw1a2 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0xE0 }
+		srom 8-10	{ 0x104 }
+	}
+	u16 pa2gw2a2 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0xE2 }
+		srom 8-10	{ 0x106 }
+	}
+	u8[4] maxp5ga2 {
+		cis	{ u8 @ 0x8 }
+		srom 4-7	{  u8 @ 0xE7 }
+		srom 8-10	{  u8 @ 0x109 }
+		srom >= 11	{  u8 @ 0x135,  u8 @ 0x134,  u8 @ 0x137,  u8 @ 0x136 }
+	}
+	u8 itt5ga2 {
+		cis	{ 0x9 }
+		srom 4-7	{ 0xE6 }
+		srom 8-10	{ 0x108 }
+	}
+	u8 maxp5gha2 {
+		cis	{ 0xA }
+		srom 4-7	{ 0xE9 }
+		srom 8-10	{ 0x10B }
+	}
+	u8 maxp5gla2 {
+		cis	{ 0xB }
+		srom 4-7	{ 0xE8 }
+		srom 8-10	{ 0x10A }
+	}
+	u16 pa5gw0a2 {
+		cis	{ 0xC }
+		srom 4-7	{ 0xEA }
+		srom 8-10	{ 0x10C }
+	}
+	u16 pa5gw1a2 {
+		cis	{ 0xE }
+		srom 4-7	{ 0xEC }
+		srom 8-10	{ 0x10E }
+	}
+	u16 pa5gw2a2 {
+		cis	{ 0x10 }
+		srom 4-7	{ 0xEE }
+		srom 8-10	{ 0x110 }
+	}
+	u16 pa5glw0a2 {
+		cis	{ 0x12 }
+		srom 4-7	{ 0xF2 }
+		srom 8-10	{ 0x112 }
+	}
+	u16 pa5glw1a2 {
+		cis	{ 0x14 }
+		srom 4-7	{ 0xF4 }
+		srom 8-10	{ 0x114 }
+	}
+	u16 pa5glw2a2 {
+		cis	{ 0x16 }
+		srom 4-7	{ 0xF6 }
+		srom 8-10	{ 0x116 }
+	}
+	u16 pa5ghw0a2 {
+		cis	{ 0x18 }
+		srom 4-7	{ 0xFA }
+		srom 8-10	{ 0x118 }
+	}
+	u16 pa5ghw1a2 {
+		cis	{ 0x1A }
+		srom 4-7	{ 0xFC }
+		srom 8-10	{ 0x11A }
+	}
+	u16 pa5ghw2a2 {
+		cis	{ 0x1C }
+		srom 4-7	{ 0xFE }
+		srom 8-10	{ 0x11C }
+	}
+	u16 pa2gw3a2 {
+		srom 4-7	{ 0xE4 }
+	}
+	u16 pa5ghw3a2 {
+		srom 4-7	{ 0x100 }
+	}
+	u16 pa5glw3a2 {
+		srom 4-7	{ 0xF8 }
+	}
+	u16 pa5gw3a2 {
+		srom 4-7	{ 0xF0 }
+	}
+}
+
+# 8 or 30 bytes: 11n pa paramater for chain 3
+HNBU_PAPARMS_C3 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C3
+	compat		1-10
+	u8 maxp2ga3 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x10B }
+		srom 8-10	{ 0x121 }
+	}
+	u8 itt2ga3 {
+		cis	{ 0x1 }
+		srom 4-7	{ 0x10A }
+		srom 8-10	{ 0x120 }
+	}
+	u16 pa2gw0a3 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x10C }
+		srom 8-10	{ 0x122 }
+	}
+	u16 pa2gw1a3 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0x10E }
+		srom 8-10	{ 0x124 }
+	}
+	u16 pa2gw2a3 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0x110 }
+		srom 8-10	{ 0x126 }
+	}
+	u8 maxp5ga3 {
+		cis	{ 0x8 }
+		srom 4-7	{ 0x115 }
+		srom 8-10	{ 0x129 }
+	}
+	u8 itt5ga3 {
+		cis	{ 0x9 }
+		srom 4-7	{ 0x114 }
+		srom 8-10	{ 0x128 }
+	}
+	u8 maxp5gha3 {
+		cis	{ 0xA }
+		srom 4-7	{ 0x117 }
+		srom 8-10	{ 0x12B }
+	}
+	u8 maxp5gla3 {
+		cis	{ 0xB }
+		srom 4-7	{ 0x116 }
+		srom 8-10	{ 0x12A }
+	}
+	u16 pa5gw0a3 {
+		cis	{ 0xC }
+		srom 4-7	{ 0x118 }
+		srom 8-10	{ 0x12C }
+	}
+	u16 pa5gw1a3 {
+		cis	{ 0xE }
+		srom 4-7	{ 0x11A }
+		srom 8-10	{ 0x12E }
+	}
+	u16 pa5gw2a3 {
+		cis	{ 0x10 }
+		srom 4-7	{ 0x11C }
+		srom 8-10	{ 0x130 }
+	}
+	u16 pa5glw0a3 {
+		cis	{ 0x12 }
+		srom 4-7	{ 0x120 }
+		srom 8-10	{ 0x132 }
+	}
+	u16 pa5glw1a3 {
+		cis	{ 0x14 }
+		srom 4-7	{ 0x122 }
+		srom 8-10	{ 0x134 }
+	}
+	u16 pa5glw2a3 {
+		cis	{ 0x16 }
+		srom 4-7	{ 0x124 }
+		srom 8-10	{ 0x136 }
+	}
+	u16 pa5ghw0a3 {
+		cis	{ 0x18 }
+		srom 4-7	{ 0x128 }
+		srom 8-10	{ 0x138 }
+	}
+	u16 pa5ghw1a3 {
+		cis	{ 0x1A }
+		srom 4-7	{ 0x12A }
+		srom 8-10	{ 0x13A }
+	}
+	u16 pa5ghw2a3 {
+		cis	{ 0x1C }
+		srom 4-7	{ 0x12C }
+		srom 8-10	{ 0x13C }
+	}
+	u16 pa2gw3a3 {
+		srom 4-7	{ 0x112 }
+	}
+	u16 pa5ghw3a3 {
+		srom 4-7	{ 0x12E }
+	}
+	u16 pa5glw3a3 {
+		srom 4-7	{ 0x126 }
+	}
+	u16 pa5gw3a3 {
+		srom 4-7	{ 0x11E }
+	}
+}
+
+HNBU_PDOFF {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF
+	compat		>= 11
+	u16 pdoffset40ma0 {
+		cis	{ 0x0 }
+		srom 	{ 0xCA }
+	}
+	u16 pdoffset40ma1 {
+		cis	{ 0x2 }
+		srom 	{ 0xCC }
+	}
+	u16 pdoffset40ma2 {
+		cis	{ 0x4 }
+		srom 	{ 0xCE }
+	}
+	u16 pdoffset80ma0 {
+		cis	{ 0x6 }
+		srom 	{ 0xD0 }
+	}
+	u16 pdoffset80ma1 {
+		cis	{ 0x8 }
+		srom 	{ 0xD2 }
+	}
+	u16 pdoffset80ma2 {
+		cis	{ 0xA }
+		srom 	{ 0xD4 }
+	}
+}
+
+HNBU_PDOFF_2G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF_2G
+	compat		>= 11
+	u8 pdoffset2g40ma0 {
+		cis	{ 0x0 (&0xF) }
+		srom 	{ 0xC9 (&0xF) }
+	}
+	u8 pdoffset2g40ma1 {
+		cis	{ 0x0 (&0xF0, >>4) }
+		srom 	{ 0xC9 (&0xF0, >>4) }
+	}
+	u8 pdoffset2g40ma2 {
+		cis	{ 0x1 (&0xF) }
+		srom 	{ 0xC8 (&0xF) }
+	}
+	u8 pdoffset2g40mvalid {
+		cis	{ 0x1 (&0x80, >>7) }
+		srom 	{ 0xC8 (&0x80, >>7) }
+	}
+}
+
+# 2 bytes: 40Mhz channel 2g/5g power offset
+HNBU_PO_40M {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40M
+	compat		>= 0
+	u16 bw40po {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x18E }
+		srom 8	{ 0x196 }
+	}
+}
+
+# 2 bytes: 40Mhz channel dup 2g/5g power offset
+HNBU_PO_40MDUP {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40MDUP
+	compat		>= 0
+	u16 bwduppo {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x190 }
+		srom 8	{ 0x198 }
+	}
+}
+
+# 6 or 18 bytes: cck2g/ofdm2g/ofdm5g power offset
+HNBU_PO_CCKOFDM {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CCKOFDM
+	compat		>= 0
+	u16 cck2gpo {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x138 }
+		srom 8	{ 0x140 }
+	}
+	u32 ofdm2gpo {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x13A }
+		srom 8	{ 0x142 }
+	}
+	u32 ofdm5gpo {
+		cis	{ 0x6 }
+		srom 4-7	{ 0x13E }
+		srom 8	{ 0x146 }
+	}
+	u32 ofdm5glpo {
+		cis	{ 0xA }
+		srom 4-7	{ 0x142 }
+		srom 8	{ 0x14A }
+	}
+	u32 ofdm5ghpo {
+		cis	{ 0xE }
+		srom 4-7	{ 0x146 }
+		srom 8	{ 0x14E }
+	}
+}
+
+# 2 bytes: cdd2g/5g power offset
+HNBU_PO_CDD {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CDD
+	compat		>= 0
+	u16 cddpo {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x18A }
+		srom 8	{ 0x192 }
+	}
+}
+
+# 8 bytes: mcs2g power offset
+HNBU_PO_MCS2G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS2G
+	compat		>= 0
+	u16 mcs2gpo0 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x14A }
+		srom 8	{ 0x152 }
+	}
+	u16 mcs2gpo1 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x14C }
+		srom 8	{ 0x154 }
+	}
+	u16 mcs2gpo2 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0x14E }
+		srom 8	{ 0x156 }
+	}
+	u16 mcs2gpo3 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0x150 }
+		srom 8	{ 0x158 }
+	}
+	u16 mcs2gpo4 {
+		cis	{ 0x8 }
+		srom 4-7	{ 0x152 }
+		srom 8	{ 0x15A }
+	}
+	u16 mcs2gpo5 {
+		cis	{ 0xA }
+		srom 4-7	{ 0x154 }
+		srom 8	{ 0x15C }
+	}
+	u16 mcs2gpo6 {
+		cis	{ 0xC }
+		srom 4-7	{ 0x156 }
+		srom 8	{ 0x15E }
+	}
+	u16 mcs2gpo7 {
+		cis	{ 0xE }
+		srom 4-7	{ 0x158 }
+		srom 8	{ 0x160 }
+	}
+}
+
+# 16 bytes: mcs5g low-high band power offset
+HNBU_PO_MCS5GLH {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GLH
+	compat		>= 0
+	u16 mcs5glpo0 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x16A }
+		srom 8	{ 0x172 }
+	}
+	u16 mcs5glpo1 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x16C }
+		srom 8	{ 0x174 }
+	}
+	u16 mcs5glpo2 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0x16E }
+		srom 8	{ 0x176 }
+	}
+	u16 mcs5glpo3 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0x170 }
+		srom 8	{ 0x178 }
+	}
+	u16 mcs5glpo4 {
+		cis	{ 0x8 }
+		srom 4-7	{ 0x172 }
+		srom 8	{ 0x17A }
+	}
+	u16 mcs5glpo5 {
+		cis	{ 0xA }
+		srom 4-7	{ 0x174 }
+		srom 8	{ 0x17C }
+	}
+	u16 mcs5glpo6 {
+		cis	{ 0xC }
+		srom 4-7	{ 0x176 }
+		srom 8	{ 0x17E }
+	}
+	u16 mcs5glpo7 {
+		cis	{ 0xE }
+		srom 4-7	{ 0x178 }
+		srom 8	{ 0x180 }
+	}
+	u16 mcs5ghpo0 {
+		cis	{ 0x10 }
+		srom 4-7	{ 0x17A }
+		srom 8	{ 0x182 }
+	}
+	u16 mcs5ghpo1 {
+		cis	{ 0x12 }
+		srom 4-7	{ 0x17C }
+		srom 8	{ 0x184 }
+	}
+	u16 mcs5ghpo2 {
+		cis	{ 0x14 }
+		srom 4-7	{ 0x17E }
+		srom 8	{ 0x186 }
+	}
+	u16 mcs5ghpo3 {
+		cis	{ 0x16 }
+		srom 4-7	{ 0x180 }
+		srom 8	{ 0x188 }
+	}
+	u16 mcs5ghpo4 {
+		cis	{ 0x18 }
+		srom 4-7	{ 0x182 }
+		srom 8	{ 0x18A }
+	}
+	u16 mcs5ghpo5 {
+		cis	{ 0x1A }
+		srom 4-7	{ 0x184 }
+		srom 8	{ 0x18C }
+	}
+	u16 mcs5ghpo6 {
+		cis	{ 0x1C }
+		srom 4-7	{ 0x186 }
+		srom 8	{ 0x18E }
+	}
+	u16 mcs5ghpo7 {
+		cis	{ 0x1E }
+		srom 4-7	{ 0x188 }
+		srom 8	{ 0x190 }
+	}
+}
+
+# 8 bytes: mcs5g mid band power offset
+HNBU_PO_MCS5GM {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GM
+	compat		>= 0
+	u16 mcs5gpo0 {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x15A }
+		srom 8	{ 0x162 }
+	}
+	u16 mcs5gpo1 {
+		cis	{ 0x2 }
+		srom 4-7	{ 0x15C }
+		srom 8	{ 0x164 }
+	}
+	u16 mcs5gpo2 {
+		cis	{ 0x4 }
+		srom 4-7	{ 0x15E }
+		srom 8	{ 0x166 }
+	}
+	u16 mcs5gpo3 {
+		cis	{ 0x6 }
+		srom 4-7	{ 0x160 }
+		srom 8	{ 0x168 }
+	}
+	u16 mcs5gpo4 {
+		cis	{ 0x8 }
+		srom 4-7	{ 0x162 }
+		srom 8	{ 0x16A }
+	}
+	u16 mcs5gpo5 {
+		cis	{ 0xA }
+		srom 4-7	{ 0x164 }
+		srom 8	{ 0x16C }
+	}
+	u16 mcs5gpo6 {
+		cis	{ 0xC }
+		srom 4-7	{ 0x166 }
+		srom 8	{ 0x16E }
+	}
+	u16 mcs5gpo7 {
+		cis	{ 0xE }
+		srom 4-7	{ 0x168 }
+		srom 8	{ 0x170 }
+	}
+}
+
+# 2 bytes: stbc2g/5g power offset
+HNBU_PO_STBC {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_STBC
+	compat		>= 0
+	u16 stbcpo {
+		cis	{ 0x0 }
+		srom 4-7	{ 0x18C }
+		srom 8	{ 0x194 }
+	}
+}
+
+# 2 byte USB remote downloader (RDL) product Id
+HNBU_RDLID {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RDLID
+	compat		>= 0
+	u16 rdlid {
+		cis	{ 0x0 }
+	}
+}
+
+# 1 byte;
+HNBU_REGREV {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_REGREV
+	compat		>= 0
+	u8 regrev {
+		cis	{ 0x0 }
+		srom 3	{ 0x78 }
+		srom 4	{ 0x55 }
+		srom 5-7	{ 0x47 }
+		srom 8-10	{ 0x95 }
+		srom >= 11	{ 0x99 }
+	}
+}
+
+# 4328 2G RSSI mid pt sel & board switch arch,
+# 2 bytes, rev 3.
+# 
+HNBU_RSSISMBXA2G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA2G
+	compat		>= 0
+	u8 rssismf2g {
+		cis	{ 0x0 (&0xF) }
+		srom 3	{ 0x51 (&0xF) }
+		srom 8-10	{ 0xA5 (&0xF) }
+	}
+	u8 rssismc2g {
+		cis	{ 0x0 (&0xF0, >>4) }
+		srom 3	{ 0x51 (&0xF0, >>4) }
+		srom 8-10	{ 0xA5 (&0xF0, >>4) }
+	}
+	u8 rssisav2g {
+		cis	{ 0x1 (&0x7) }
+		srom 3	{ 0x50 (&0x7) }
+		srom 8-10	{ 0xA4 (&0x7) }
+	}
+	u8 bxa2g {
+		cis	{ 0x1 (&0x18, >>3) }
+		srom 3	{ 0x50 (&0x18, >>3) }
+		srom 8-10	{ 0xA4 (&0x18, >>3) }
+	}
+}
+
+# 4328 5G RSSI mid pt sel & board switch arch,
+# 2 bytes, rev 3.
+# 
+HNBU_RSSISMBXA5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA5G
+	compat		>= 0
+	u8 rssismf5g {
+		cis	{ 0x0 (&0xF) }
+		srom 3	{ 0x53 (&0xF) }
+		srom 8-10	{ 0xA7 (&0xF) }
+	}
+	u8 rssismc5g {
+		cis	{ 0x0 (&0xF0, >>4) }
+		srom 3	{ 0x53 (&0xF0, >>4) }
+		srom 8-10	{ 0xA7 (&0xF0, >>4) }
+	}
+	u8 rssisav5g {
+		cis	{ 0x1 (&0x7) }
+		srom 3	{ 0x52 (&0x7) }
+		srom 8-10	{ 0xA6 (&0x7) }
+	}
+	u8 bxa5g {
+		cis	{ 0x1 (&0x18, >>3) }
+		srom 3	{ 0x52 (&0x18, >>3) }
+		srom 8-10	{ 0xA6 (&0x18, >>3) }
+	}
+}
+
+HNBU_RXGAIN_ERR {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXGAIN_ERR
+	compat		>= 11
+	u8 rxgainerr2ga0 {
+		cis	{ 0x0 }
+		srom 8-10	{ 0x19B (&0x3F) }
+		srom >= 11	{ 0x1C7 (&0x3F) }
+	}
+	u16 rxgainerr2ga1 {
+		cis	{ u8 @ 0x1 }
+		srom 8-10	{ 0x19A (&0x7C0, >>6) }
+		srom >= 11	{ 0x1C6 (&0x7C0, >>6) }
+	}
+	u8 rxgainerr2ga2 {
+		cis	{ 0x2 }
+		srom 8-10	{ 0x19A (&0xF8, >>3) }
+		srom >= 11	{ 0x1C6 (&0xF8, >>3) }
+	}
+	u8[4] rxgainerr5ga0 {
+		cis	{ 0x3 }
+		srom 	{  u8 @ 0x1C9 (&0x3F),  u8 @ 0x1CB (&0x3F),  u8 @ 0x1CD (&0x3F),  u8 @ 0x1CF (&0x3F) }
+	}
+	u16[4] rxgainerr5ga1 {
+		cis	{ u8[4] @ 0x7 }
+		srom 	{ 0x1C8 (&0x7C0, >>6) }
+	}
+	u8[4] rxgainerr5ga2 {
+		cis	{ 0xB }
+		srom 	{  u8 @ 0x1C8 (&0xF8, >>3),  u8 @ 0x1CA (&0xF8, >>3),  u8 @ 0x1CC (&0xF8, >>3),  u8 @ 0x1CE (&0xF8, >>3) }
+	}
+	u8 rxgainerr5gha0 {
+		srom 8-10	{ 0x1A1 (&0x3F) }
+	}
+	u16 rxgainerr5gha1 {
+		srom 8-10	{ 0x1A0 (&0x7C0, >>6) }
+	}
+	u8 rxgainerr5gha2 {
+		srom 8-10	{ 0x1A0 (&0xF8, >>3) }
+	}
+	u8 rxgainerr5gla0 {
+		srom 8-10	{ 0x19D (&0x3F) }
+	}
+	u16 rxgainerr5gla1 {
+		srom 8-10	{ 0x19C (&0x7C0, >>6) }
+	}
+	u8 rxgainerr5gla2 {
+		srom 8-10	{ 0x19C (&0xF8, >>3) }
+	}
+	u8 rxgainerr5gma0 {
+		srom 8-10	{ 0x19F (&0x3F) }
+	}
+	u16 rxgainerr5gma1 {
+		srom 8-10	{ 0x19E (&0x7C0, >>6) }
+	}
+	u8 rxgainerr5gma2 {
+		srom 8-10	{ 0x19E (&0xF8, >>3) }
+	}
+	u8 rxgainerr5gua0 {
+		srom 8-10	{ 0x1A3 (&0x3F) }
+	}
+	u16 rxgainerr5gua1 {
+		srom 8-10	{ 0x1A2 (&0x7C0, >>6) }
+	}
+	u8 rxgainerr5gua2 {
+		srom 8-10	{ 0x1A2 (&0xF8, >>3) }
+	}
+}
+
+# 4328 2G RX power offset, 1 byte
+HNBU_RXPO2G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO2G
+	compat		>= 0
+	i8 rxpo2g {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom 3	{ 0x5B }
+		srom 8-10	{ 0xAD }
+	}
+}
+
+# 4328 5G RX power offset, 1 byte
+HNBU_RXPO5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO5G
+	compat		>= 0
+	i8 rxpo5g {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom 3	{ 0x5A }
+		srom 8-10	{ 0xAC }
+	}
+}
+
+# A byte with sromrev, 1 if not present
+HNBU_SROMREV {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SROMREV
+	compat		>= 0
+	u8 sromrev {
+		sfmt	sdec
+		cis	{ 0x0 }
+	}
+}
+
+# subband5gver
+HNBU_SUBBAND5GVER {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SUBBAND5GVER
+	compat		>= 11
+	u16 subband5gver {
+		cis	{ 0x0 }
+		srom 8-10	{  u8 @ 0x1A5 (&0x7) }
+		srom >= 11	{ 0xD6 }
+	}
+}
+
+# 2 bytes
+# byte1 tempthresh
+# byte2 period(msb 4 bits) | hysterisis(lsb 4 bits)
+# 
+HNBU_TEMPTHRESH {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TEMPTHRESH
+	compat		>= 0
+	u8 tempthresh {
+		cis	{ 0x0 }
+		srom 8-10	{ 0xB2 }
+		srom >= 11	{ 0xAE }
+	}
+	u8 temps_period {
+		sfmt	sdec
+		cis	{ 0x1 (&0xF0, >>4) }
+		srom 8-10	{ 0xBC (&0xF) }
+		srom >= 11	{ 0xB8 (&0xF) }
+	}
+	u8 temps_hysteresis {
+		sfmt	sdec
+		cis	{ 0x1 (&0xF) }
+		srom 8-10	{ 0xBC (&0xF0, >>4) }
+		srom >= 11	{ 0xB8 (&0xF0, >>4) }
+	}
+	u8 tempoffset {
+		sfmt	sdec
+		cis	{ 0x3 }
+		srom 8-10	{ 0xB3 }
+		srom >= 11	{ 0xAF }
+	}
+	u8 tempsense_slope {
+		cis	{ 0x4 }
+		srom 8-10	{ 0xB7 }
+		srom >= 11	{ 0xB3 }
+	}
+	u8 tempcorrx {
+		cis	{ 0x4 (&0xFC, >>2) }
+		srom 8-10	{ 0xB6 (&0xFC, >>2) }
+		srom >= 11	{ 0xB2 (&0xFC, >>2) }
+	}
+	u8 tempsense_option {
+		cis	{ 0x4 (&0x3) }
+		srom 8-10	{ 0xB6 (&0x3) }
+		srom >= 11	{ 0xB2 (&0x3) }
+	}
+	u8 phycal_tempdelta {
+		sfmt	sdec
+		cis	{ 0x7 }
+		srom 8-10	{ 0xBD }
+		srom >= 11	{ 0xB9 }
+	}
+}
+
+# 4328 2G TR isolation, 1 byte
+HNBU_TRI2G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI2G
+	compat		>= 0
+	u8 tri2g {
+		cis	{ 0x0 }
+		srom 3	{ 0x55 }
+		srom 8-10	{ 0xA9 }
+	}
+}
+
+# 4328 5G TR isolation, 3 bytes
+HNBU_TRI5G {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI5G
+	compat		>= 0
+	u8 tri5gl {
+		cis	{ 0x0 }
+		srom 3	{ 0x57 }
+		srom 8-10	{ 0xAB }
+	}
+	u8 tri5g {
+		cis	{ 0x1 }
+		srom 3	{ 0x54 }
+		srom 8-10	{ 0xA8 }
+	}
+	u8 tri5gh {
+		cis	{ 0x2 }
+		srom 3	{ 0x56 }
+		srom 8-10	{ 0xAA }
+	}
+}
+
+# phy txbf rpcalvars
+HNBU_TXBFRPCALS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXBFRPCALS
+	compat		>= 11
+	u16 rpcal2g {
+		cis	{ 0x0 }
+		srom 	{ 0x16C }
+	}
+	u16 rpcal5gb0 {
+		cis	{ 0x2 }
+		srom 	{ 0x16E }
+	}
+	u16 rpcal5gb1 {
+		cis	{ 0x4 }
+		srom 	{ 0x17C }
+	}
+	u16 rpcal5gb2 {
+		cis	{ 0x6 }
+		srom 	{ 0x17E }
+	}
+	u16 rpcal5gb3 {
+		cis	{ 0x8 }
+		srom 	{ 0x18C }
+	}
+}
+
+# Tx duty cycle for ACPHY 5g 40/80 Mhz
+HNBU_TXDUTY {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXDUTY
+	compat		>= 11
+	u16 tx_duty_cycle_ofdm_40_5g {
+		sfmt	sdec
+		cis	{ 0x0 }
+	}
+	u16 tx_duty_cycle_thresh_40_5g {
+		sfmt	sdec
+		cis	{ 0x2 }
+	}
+	u16 tx_duty_cycle_ofdm_80_5g {
+		sfmt	sdec
+		cis	{ 0x4 }
+	}
+	u16 tx_duty_cycle_thresh_80_5g {
+		sfmt	sdec
+		cis	{ 0x6 }
+	}
+}
+
+HNBU_UMANFID {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UMANFID
+	compat		>= 0
+	u32 usbmanfid {
+		cis	{ 0x0 }
+	}
+}
+
+# USB30 NO Super Speed
+HNBU_USB30PHY_NOSS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_NOSS
+	compat		>= 0
+	u8 usbnoss {
+		cis	{ 0x0 }
+	}
+}
+
+# USB30 PHY REGs update
+HNBU_USB30PHY_REGS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_REGS
+	compat		>= 0
+	u32[4] usb30regs0 {
+		cis	{ 0x0 }
+	}
+	u32[4] usb30regs1 {
+		cis	{ 0x10 }
+	}
+}
+
+# USB30 PHY U1U2 Enable
+HNBU_USB30PHY_U1U2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_U1U2
+	compat		>= 0
+	u8 usb30u1u2 {
+		cis	{ 0x0 }
+	}
+}
+
+# usb30regs0
+HNBU_USB30REGS0 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS0
+	compat		>= 11
+	u32[10] usb30regs0 {
+		cis	{ 0x0 }
+	}
+}
+
+# usb30regs1
+HNBU_USB30REGS1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS1
+	compat		>= 11
+	u32[10] usb30regs1 {
+		cis	{ 0x0 }
+	}
+}
+
+# usb30u1u2
+HNBU_USB30U1U2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30U1U2
+	compat		>= 11
+	u16 usb30u1u2 {
+		cis	{ 0x0 }
+	}
+}
+
+# USB WLAN/BT composite descriptor
+HNBU_USBDESC_COMPOSITE {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBDESC_COMPOSITE
+	compat		>= 0
+	u16 usbdesc_composite {
+		cis	{ 0x0 }
+	}
+}
+
+# USB endpoint numbers
+HNBU_USBEPNUM {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBEPNUM
+	compat		>= 0
+	u16 usbepnum {
+		cis	{ 0x0 }
+	}
+}
+
+HNBU_USBFLAGS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFLAGS
+	compat		>= 0
+	u32 usbflags {
+		cis	{ 0x0 }
+	}
+}
+
+# 1 byte; 1 = USB advertises FS mode only
+HNBU_USBFS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFS
+	compat		>= 0
+	u8 usbfs {
+		sfmt	sdec
+		cis	{ 0x0 }
+	}
+}
+
+# USB SSPHY INIT regs setting
+HNBU_USBSSPHY_MDIO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_MDIO
+	compat		>= 0
+	u32[4] usbssmdio {
+		cis	{ 0x0 (&0xFFFFFF) }
+	}
+}
+
+# 2 byte USB SSPHY sleep
+HNBU_USBSSPHY_SLEEP0 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP0
+	compat		>= 0
+	u16 usbssphy_sleep0 {
+		cis	{ 0x0 }
+	}
+}
+
+# 2 byte USB SSPHY sleep
+HNBU_USBSSPHY_SLEEP1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP1
+	compat		>= 0
+	u16 usbssphy_sleep1 {
+		cis	{ 0x0 }
+	}
+}
+
+# 2 byte USB SSPHY sleep
+HNBU_USBSSPHY_SLEEP2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP2
+	compat		>= 0
+	u16 usbssphy_sleep2 {
+		cis	{ 0x0 }
+	}
+}
+
+# 2 byte USB SSPHY sleep
+HNBU_USBSSPHY_SLEEP3 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP3
+	compat		>= 0
+	u16 usbssphy_sleep3 {
+		cis	{ 0x0 }
+	}
+}
+
+# 4 byte USB SSPHY UTMI Control
+HNBU_USBSSPHY_UTMI_CTL0 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL0
+	compat		>= 0
+	u32 usbssphy_utmi_ctl0 {
+		cis	{ 0x0 }
+	}
+}
+
+# 4 byte USB SSPHY UTMI Control
+HNBU_USBSSPHY_UTMI_CTL1 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL1
+	compat		>= 0
+	u32 usbssphy_utmi_ctl1 {
+		cis	{ 0x0 }
+	}
+}
+
+# 4 byte USB SSPHY UTMI Control
+HNBU_USBSSPHY_UTMI_CTL2 {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL2
+	compat		>= 0
+	u32 usbssphy_utmi_ctl2 {
+		cis	{ 0x0 }
+	}
+}
+
+# 2 byte USB UTMI/LDO Control
+HNBU_USBUTMI_CTL {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBUTMI_CTL
+	compat		>= 0
+	u16 usbutmi_ctl {
+		cis	{ 0x0 }
+	}
+}
+
+# 16 Bytes Hex
+HNBU_UUID {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UUID
+	compat		>= 0
+	u8[16] uuid {
+		sfmt	ascii
+		cis	{ 0x0 }
+	}
+}
+
+# 1 byte bit 7 initial polarity, bit 6..0 gpio pin
+HNBU_WOWLGPIO {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WOWLGPIO
+	compat		>= 0
+	u8 wowl_gpio {
+		sfmt	sdec
+		cis	{ 0x0 (&0x7F) }
+	}
+	u8 wowl_gpiopol {
+		sfmt	sdec
+		cis	{ 0x0 (&0x80, >>7) }
+	}
+}
+
+# 1 byte; GPIO pin for WPS button
+HNBU_WPS {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WPS
+	compat		>= 0
+	u8 wpsgpio {
+		sfmt	sdec
+		cis	{ 0x0 }
+	}
+	u8 wpsled {
+		sfmt	sdec
+		cis	{ 0x1 }
+	}
+}
+
+# 4 byte Crystal frequency in kilohertz
+HNBU_XTALFREQ {
+	cis_tuple	CISTPL_BRCM_HNBU,HNBU_XTALFREQ
+	compat		>= 0
+	u32 xtalfreq {
+		sfmt	sdec
+		cis	{ 0x0 }
+		srom >= 11	{  u16 @ 0xB4 }
+	}
+}
+
 # SROM variables not supported by CIS
 srom_misc {
 	u16 cckPwrOffset {
@@ -159,2731 +2884,6 @@ srom_misc {
 	}
 	u8 txpid5gla3 {
 		srom 4-7	{ 0x6C }
-	}
-}
-
-# phy txbf rpcalvars
-HNBU_TXBFRPCALS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXBFRPCALS
-	compat		>= 11
-	u16 rpcal2g {
-		cis	{ 0x0 }
-		srom 	{ 0x16C }
-	}
-	u16 rpcal5gb0 {
-		cis	{ 0x2 }
-		srom 	{ 0x16E }
-	}
-	u16 rpcal5gb1 {
-		cis	{ 0x4 }
-		srom 	{ 0x17C }
-	}
-	u16 rpcal5gb2 {
-		cis	{ 0x6 }
-		srom 	{ 0x17E }
-	}
-	u16 rpcal5gb3 {
-		cis	{ 0x8 }
-		srom 	{ 0x18C }
-	}
-}
-
-# usb30regs1
-HNBU_USB30REGS1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS1
-	compat		>= 11
-	u32[10] usb30regs1 {
-		cis	{ 0x0 }
-	}
-}
-
-# usb30regs0
-HNBU_USB30REGS0 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS0
-	compat		>= 11
-	u32[10] usb30regs0 {
-		cis	{ 0x0 }
-	}
-}
-
-# paparambwver
-HNBU_PAPARAMBWVER {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARAMBWVER
-	compat		>= 11
-	u8 paparambwver {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom 	{ 0x190 (&0xF0, >>4) }
-	}
-}
-
-# ACPHY PA trimming parameters: 40
-HNBU_ACPA_40 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_40
-	compat		>= 11
-	u16[12] pa5gbw40a0 {
-		cis	{ 0x0 }
-		srom 	{ 0x110 }
-	}
-}
-
-# CISTPL_MANFID
-CISTPL_MANFID {
-	cis_tuple	CISTPL_MANFID
-	compat		>= 0
-	u16 manfid {
-		cis	{ 0x0 }
-	}
-	u16 prodid {
-		cis	{ 0x2 }
-	}
-}
-
-# 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP0 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP0
-	compat		>= 0
-	u16 usbssphy_sleep0 {
-		cis	{ 0x0 }
-	}
-}
-
-# ACPHY PA trimming parameters: CCK
-HNBU_ACPA_CCK {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_CCK
-	compat		>= 11
-	u16[3] pa2gccka0 {
-		cis	{ 0x0 }
-		srom 	{ 0x102 }
-	}
-}
-
-# 2 byte cck power offsets in rev 3
-HNBU_CCKPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKPO
-	compat		>= 0
-	u16 cckpo {
-		cis	{ 0x0 }
-	}
-}
-
-# USB30 PHY REGs update
-HNBU_USB30PHY_REGS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_REGS
-	compat		>= 0
-	u32[4] usb30regs0 {
-		cis	{ 0x0 }
-	}
-	u32[4] usb30regs1 {
-		cis	{ 0x10 }
-	}
-}
-
-# 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP2
-	compat		>= 0
-	u16 usbssphy_sleep2 {
-		cis	{ 0x0 }
-	}
-}
-
-# 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP1
-	compat		>= 0
-	u16 usbssphy_sleep1 {
-		cis	{ 0x0 }
-	}
-}
-
-# 4 byte USB SSPHY UTMI Control
-HNBU_USBSSPHY_UTMI_CTL1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL1
-	compat		>= 0
-	u32 usbssphy_utmi_ctl1 {
-		cis	{ 0x0 }
-	}
-}
-
-# ACPHY PA trimming parameters: 40/80
-HNBU_ACPA_4080 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_4080
-	compat		>= 11
-	u16[12] pa5gbw4080a0 {
-		cis	{ 0x0 }
-		srom 	{ 0x138 }
-	}
-	u16[12] pa5gbw4080a1 {
-		cis	{ 0x18 }
-		srom 	{  u16 @ 0xB6,  u16 @ 0xBC,  u16 @ 0xCE,  u16 @ 0xD4,  u16[8] @ 0x128 }
-	}
-}
-
-# ACPHY rxgains: chain 2
-HNBU_ACRXGAINS_C2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C2
-	compat		>= 11
-	u8 rxgains5gtrelnabypa2 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x80, >>7) }
-		srom 	{ 0x132 (&0x80, >>7) }
-	}
-	u8 rxgains5gtrisoa2 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x78, >>3) }
-		srom 	{ 0x132 (&0x78, >>3) }
-	}
-	u8 rxgains5gelnagaina2 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x7) }
-		srom 	{ 0x132 (&0x7) }
-	}
-	u8 rxgains2gtrelnabypa2 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x80, >>7) }
-		srom 	{ 0x133 (&0x80, >>7) }
-	}
-	u8 rxgains2gtrisoa2 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x78, >>3) }
-		srom 	{ 0x133 (&0x78, >>3) }
-	}
-	u8 rxgains2gelnagaina2 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x7) }
-		srom 	{ 0x133 (&0x7) }
-	}
-	u8 rxgains5ghtrelnabypa2 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x80, >>7) }
-		srom 	{ 0x130 (&0x80, >>7) }
-	}
-	u8 rxgains5ghtrisoa2 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x78, >>3) }
-		srom 	{ 0x130 (&0x78, >>3) }
-	}
-	u8 rxgains5ghelnagaina2 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x7) }
-		srom 	{ 0x130 (&0x7) }
-	}
-	u8 rxgains5gmtrelnabypa2 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x80, >>7) }
-		srom 	{ 0x131 (&0x80, >>7) }
-	}
-	u8 rxgains5gmtrisoa2 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x78, >>3) }
-		srom 	{ 0x131 (&0x78, >>3) }
-	}
-	u8 rxgains5gmelnagaina2 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x7) }
-		srom 	{ 0x131 (&0x7) }
-	}
-}
-
-HNBU_AGBGA {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AGBGA
-	compat		>= 11
-	u8 agbg0 {
-		cis	{ 0x0 }
-		srom 	{ 0xA2 }
-	}
-	u8 agbg1 {
-		cis	{ 0x1 }
-		srom 	{ 0xA3 }
-	}
-	u8 agbg2 {
-		cis	{ 0x2 }
-		srom 	{ 0xA4 }
-	}
-	u8 aga0 {
-		cis	{ 0x3 }
-		srom 	{ 0xA5 }
-	}
-	u8 aga1 {
-		cis	{ 0x4 }
-		srom 	{ 0xA6 }
-	}
-	u8 aga2 {
-		cis	{ 0x5 }
-		srom 	{ 0xA7 }
-	}
-}
-
-# 2 bytes: 40Mhz channel dup 2g/5g power offset
-HNBU_PO_40MDUP {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40MDUP
-	compat		>= 0
-	u16 bwduppo {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x190 }
-		srom 8	{ 0x198 }
-	}
-}
-
-# USB30 NO Super Speed
-HNBU_USB30PHY_NOSS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_NOSS
-	compat		>= 0
-	u8 usbnoss {
-		cis	{ 0x0 }
-	}
-}
-
-HNBU_RXGAIN_ERR {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXGAIN_ERR
-	compat		>= 11
-	u8 rxgainerr2ga0 {
-		cis	{ 0x0 }
-		srom 8-10	{ 0x19B (&0x3F) }
-		srom >= 11	{ 0x1C7 (&0x3F) }
-	}
-	u16 rxgainerr2ga1 {
-		cis	{ u8 @ 0x1 }
-		srom 8-10	{ 0x19A (&0x7C0, >>6) }
-		srom >= 11	{ 0x1C6 (&0x7C0, >>6) }
-	}
-	u8 rxgainerr2ga2 {
-		cis	{ 0x2 }
-		srom 8-10	{ 0x19A (&0xF8, >>3) }
-		srom >= 11	{ 0x1C6 (&0xF8, >>3) }
-	}
-	u8[4] rxgainerr5ga0 {
-		cis	{ 0x3 }
-		srom 	{  u8 @ 0x1C9 (&0x3F),  u8 @ 0x1CB (&0x3F),  u8 @ 0x1CD (&0x3F),  u8 @ 0x1CF (&0x3F) }
-	}
-	u16[4] rxgainerr5ga1 {
-		cis	{ u8[4] @ 0x7 }
-		srom 	{ 0x1C8 (&0x7C0, >>6) }
-	}
-	u8[4] rxgainerr5ga2 {
-		cis	{ 0xB }
-		srom 	{  u8 @ 0x1C8 (&0xF8, >>3),  u8 @ 0x1CA (&0xF8, >>3),  u8 @ 0x1CC (&0xF8, >>3),  u8 @ 0x1CE (&0xF8, >>3) }
-	}
-	u8 rxgainerr5gha0 {
-		srom 8-10	{ 0x1A1 (&0x3F) }
-	}
-	u16 rxgainerr5gha1 {
-		srom 8-10	{ 0x1A0 (&0x7C0, >>6) }
-	}
-	u8 rxgainerr5gha2 {
-		srom 8-10	{ 0x1A0 (&0xF8, >>3) }
-	}
-	u8 rxgainerr5gla0 {
-		srom 8-10	{ 0x19D (&0x3F) }
-	}
-	u16 rxgainerr5gla1 {
-		srom 8-10	{ 0x19C (&0x7C0, >>6) }
-	}
-	u8 rxgainerr5gla2 {
-		srom 8-10	{ 0x19C (&0xF8, >>3) }
-	}
-	u8 rxgainerr5gma0 {
-		srom 8-10	{ 0x19F (&0x3F) }
-	}
-	u16 rxgainerr5gma1 {
-		srom 8-10	{ 0x19E (&0x7C0, >>6) }
-	}
-	u8 rxgainerr5gma2 {
-		srom 8-10	{ 0x19E (&0xF8, >>3) }
-	}
-	u8 rxgainerr5gua0 {
-		srom 8-10	{ 0x1A3 (&0x3F) }
-	}
-	u16 rxgainerr5gua1 {
-		srom 8-10	{ 0x1A2 (&0x7C0, >>6) }
-	}
-	u8 rxgainerr5gua2 {
-		srom 8-10	{ 0x1A2 (&0xF8, >>3) }
-	}
-}
-
-# 4 byte USB SSPHY UTMI Control
-HNBU_USBSSPHY_UTMI_CTL0 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL0
-	compat		>= 0
-	u32 usbssphy_utmi_ctl0 {
-		cis	{ 0x0 }
-	}
-}
-
-# 2 bytes: cdd2g/5g power offset
-HNBU_PO_CDD {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CDD
-	compat		>= 0
-	u16 cddpo {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x18A }
-		srom 8	{ 0x192 }
-	}
-}
-
-# ACPHY Power-per-rate sbpo
-HNBU_ACPPR_SBPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_SBPO
-	compat		>= 11
-	u16 sb20in40hrpo {
-		cis	{ 0x0 }
-		srom 	{ 0x196 }
-	}
-	u16 sb20in80and160hr5glpo {
-		cis	{ 0x2 }
-		srom 	{ 0x198 }
-	}
-	u16 sb40and80hr5glpo {
-		cis	{ 0x4 }
-		srom 	{ 0x19A }
-	}
-	u16 sb20in80and160hr5gmpo {
-		cis	{ 0x6 }
-		srom 	{ 0x19C }
-	}
-	u16 sb40and80hr5gmpo {
-		cis	{ 0x8 }
-		srom 	{ 0x19E }
-	}
-	u16 sb20in80and160hr5ghpo {
-		cis	{ 0xA }
-		srom 	{ 0x1A0 }
-	}
-	u16 sb40and80hr5ghpo {
-		cis	{ 0xC }
-		srom 	{ 0x1A2 }
-	}
-	u16 sb20in40lrpo {
-		cis	{ 0xE }
-		srom 	{ 0x1A4 }
-	}
-	u16 sb20in80and160lr5glpo {
-		cis	{ 0x10 }
-		srom 	{ 0x1A6 }
-	}
-	u16 sb40and80lr5glpo {
-		cis	{ 0x12 }
-		srom 	{ 0x1A8 }
-	}
-	u16 sb20in80and160lr5gmpo {
-		cis	{ 0x14 }
-		srom 	{ 0x1AA }
-	}
-	u16 sb40and80lr5gmpo {
-		cis	{ 0x16 }
-		srom 	{ 0x1AC }
-	}
-	u16 sb20in80and160lr5ghpo {
-		cis	{ 0x18 }
-		srom 	{ 0x1AE }
-	}
-	u16 sb40and80lr5ghpo {
-		cis	{ 0x1A }
-		srom 	{ 0x1B0 }
-	}
-	u16 dot11agduphrpo {
-		cis	{ 0x1C }
-		srom 	{ 0x1B2 }
-	}
-	u16 dot11agduplrpo {
-		cis	{ 0x1E }
-		srom 	{ 0x1B4 }
-	}
-}
-
-# ACPHY Power-per-rate 5gpo
-HNBU_ACPPR_5GPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_5GPO
-	compat		>= 11
-	u32 mcsbw805glpo {
-		cis	{ 0x0 }
-		srom 	{ 0x168 }
-	}
-	u32 mcsbw1605glpo {
-		cis	{ 0x4 }
-	}
-	u32 mcsbw805gmpo {
-		cis	{ 0x8 }
-		srom 	{ 0x178 }
-	}
-	u32 mcsbw1605gmpo {
-		cis	{ 0xC }
-	}
-	u32 mcsbw805ghpo {
-		cis	{ 0x10 }
-		srom 	{ 0x188 }
-	}
-	u32 mcsbw1605ghpo {
-		cis	{ 0x14 }
-	}
-	u16 mcslr5glpo {
-		cis	{ 0x18 }
-		srom 	{ 0x190 (&0xFFF) }
-	}
-	u16 mcslr5gmpo {
-		cis	{ 0x1A }
-		srom 	{ 0x192 }
-	}
-	u16 mcslr5ghpo {
-		cis	{ 0x1C }
-		srom 	{ 0x194 }
-	}
-}
-
-# 4 byte; For non-BRCM post-mfg additions
-HNBU_CUSTOM1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CUSTOM1
-	compat		>= 0
-	u32 customvar1 {
-		cis	{ 0x0 }
-	}
-}
-
-# USB SSPHY INIT regs setting
-HNBU_USBSSPHY_MDIO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_MDIO
-	compat		>= 0
-	u32[4] usbssmdio {
-		cis	{ 0x0 (&0xFFFFFF) }
-	}
-}
-
-# ACPHY PA parameters: chain 2
-HNBU_ACPA_C2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C2
-	compat		>= 11
-	u16 maxp2ga2 {
-		cis	{ 0x0 }
-		srom 4-7	{  u8 @ 0xDD }
-		srom 8-10	{  u8 @ 0x101 }
-		srom >= 11	{  u8 @ 0x129 }
-	}
-	u16[3] pa2ga2 {
-		cis	{ 0x2 }
-		srom 	{ 0x12A }
-	}
-	u8[4] maxp5ga2 {
-		cis	{ 0x8 }
-		srom 4-7	{  u8 @ 0xE7 }
-		srom 8-10	{  u8 @ 0x109 }
-		srom >= 11	{  u8 @ 0x135,  u8 @ 0x134,  u8 @ 0x137,  u8 @ 0x136 }
-	}
-	u16[12] pa5ga2 {
-		cis	{ 0xC }
-		srom 	{ 0x138 }
-	}
-}
-
-# ACPHY PA parameters: chain 1
-HNBU_ACPA_C1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C1
-	compat		>= 11
-	u16 maxp2ga1 {
-		cis	{ 0x0 }
-		srom 4-7	{  u8 @ 0xAF }
-		srom 8-10	{  u8 @ 0xE1 }
-		srom >= 11	{  u8 @ 0x101 }
-	}
-	u16[3] pa2ga1 {
-		cis	{ 0x2 }
-		srom 	{ 0x102 }
-	}
-	u8[4] maxp5ga1 {
-		cis	{ 0x8 }
-		srom 4-7	{  u8 @ 0xB9 }
-		srom 8-10	{  u8 @ 0xE9 }
-		srom >= 11	{  u8 @ 0x10D,  u8 @ 0x10C,  u8 @ 0x10F,  u8 @ 0x10E }
-	}
-	u16[12] pa5ga1 {
-		cis	{ 0xC }
-		srom 	{ 0x110 }
-	}
-}
-
-# 1 byte bit 7 initial polarity, bit 6..0 gpio pin
-HNBU_WOWLGPIO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WOWLGPIO
-	compat		>= 0
-	u8 wowl_gpio {
-		sfmt	sdec
-		cis	{ 0x0 (&0x7F) }
-	}
-	u8 wowl_gpiopol {
-		sfmt	sdec
-		cis	{ 0x0 (&0x80, >>7) }
-	}
-}
-
-# 1 byte to enable mux options
-HNBU_MUXENAB {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MUXENAB
-	compat		>= 0
-	u8 muxenab {
-		cis	{ 0x0 }
-	}
-}
-
-# 4 byte GPIO pull down mask
-HNBU_GPIO_PULL_DOWN {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_GPIO_PULL_DOWN
-	compat		>= 0
-	u32 gpdn {
-		cis	{ 0x0 }
-	}
-}
-
-HNBU_UMANFID {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UMANFID
-	compat		>= 0
-	u32 usbmanfid {
-		cis	{ 0x0 }
-	}
-}
-
-HNBU_NOISELVL {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_NOISELVL
-	compat		>= 11
-	u8 noiselvl2ga0 {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom 8-10	{ 0x1AB (&0x1F) }
-		srom >= 11	{ 0x1BD (&0x1F) }
-	}
-	u16 noiselvl2ga1 {
-		sfmt	sdec
-		cis	{ u8 @ 0x1 }
-		srom 8-10	{ 0x1AA (&0x3E0, >>5) }
-		srom >= 11	{ 0x1BC (&0x3E0, >>5) }
-	}
-	u8 noiselvl2ga2 {
-		sfmt	sdec
-		cis	{ 0x2 }
-		srom 8-10	{ 0x1AA (&0x7C, >>2) }
-		srom >= 11	{ 0x1BC (&0x7C, >>2) }
-	}
-	u8[4] noiselvl5ga0 {
-		sfmt	sdec
-		cis	{ 0x3 }
-		srom 	{  u8 @ 0x1BF (&0x1F),  u8 @ 0x1C1 (&0x1F),  u8 @ 0x1C3 (&0x1F),  u8 @ 0x1C5 (&0x1F) }
-	}
-	u16[4] noiselvl5ga1 {
-		sfmt	sdec
-		cis	{ u8[4] @ 0x7 }
-		srom 	{ 0x1BE (&0x3E0, >>5) }
-	}
-	u8[4] noiselvl5ga2 {
-		sfmt	sdec
-		cis	{ 0xB }
-		srom 	{  u8 @ 0x1BE (&0x7C, >>2),  u8 @ 0x1C0 (&0x7C, >>2),  u8 @ 0x1C2 (&0x7C, >>2),  u8 @ 0x1C4 (&0x7C, >>2) }
-	}
-}
-
-HNBU_USBFLAGS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFLAGS
-	compat		>= 0
-	u32 usbflags {
-		cis	{ 0x0 }
-	}
-}
-
-# 2 bytes total
-# mcs-32 power offset for each band/subband.
-# LSB nibble: 2G band, MSB nibble:
-# mcs322ghpo, mcs325gmpo, mcs325glpo, mcs322gpo
-# 
-HNBU_MCS32PO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS32PO
-	compat		>= 0
-	u16 mcs32po {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x194 }
-	}
-}
-
-# Country code (2 bytes ascii + 1 byte cctl)
-# in rev 2
-# 
-HNBU_CCODE {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCODE
-	compat		>= 0
-	char ccode {
-		sfmt	ccode
-		cis	{ u16 @ 0x0 }
-		srom 0-3	{  char[2] @ 0x76 (&0xFFFF) }
-		srom 4	{  char[2] @ 0x52 (&0xFFFF) }
-		srom 5-7	{  char[2] @ 0x44 (&0xFFFF) }
-		srom 8-10	{  char[2] @ 0x92 (&0xFFFF) }
-		srom >= 11	{  char[2] @ 0x96 (&0xFFFF) }
-	}
-	u8 cctl {
-		cis	{ 0x2 }
-	}
-}
-
-# 4 bytes each
-# 5G mid subband mcs 0-7 power-offset.
-# LSB nibble: m0, MSB nibble: m7
-# mcsbw205gmpo  mcsbw20ul5gmpo mcsbw405gmpo
-# 
-HNBU_MCS5GMPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GMPO
-	compat		>= 0
-	u32 mcsbw205gmpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x17C }
-		srom >= 11	{ 0x170 }
-	}
-	u32 mcsbw20ul5gmpo {
-		cis	{ 0x4 }
-		srom 9-10	{ 0x180 }
-	}
-	u32 mcsbw405gmpo {
-		cis	{ 0x8 }
-		srom 9-10	{ 0x184 }
-		srom >= 11	{ 0x174 }
-	}
-}
-
-# A byte with sromrev, 1 if not present
-HNBU_SROMREV {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SROMREV
-	compat		>= 0
-	u8 sromrev {
-		sfmt	sdec
-		cis	{ 0x0 }
-	}
-}
-
-# ACPHY rxgains: chain 1
-HNBU_ACRXGAINS_C1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C1
-	compat		>= 11
-	u8 rxgains5gtrelnabypa1 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x80, >>7) }
-		srom 	{ 0x10A (&0x80, >>7) }
-	}
-	u8 rxgains5gtrisoa1 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x78, >>3) }
-		srom 	{ 0x10A (&0x78, >>3) }
-	}
-	u8 rxgains5gelnagaina1 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x7) }
-		srom 	{ 0x10A (&0x7) }
-	}
-	u8 rxgains2gtrelnabypa1 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x80, >>7) }
-		srom 	{ 0x10B (&0x80, >>7) }
-	}
-	u8 rxgains2gtrisoa1 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x78, >>3) }
-		srom 	{ 0x10B (&0x78, >>3) }
-	}
-	u8 rxgains2gelnagaina1 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x7) }
-		srom 	{ 0x10B (&0x7) }
-	}
-	u8 rxgains5ghtrelnabypa1 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x80, >>7) }
-		srom 	{ 0x108 (&0x80, >>7) }
-	}
-	u8 rxgains5ghtrisoa1 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x78, >>3) }
-		srom 	{ 0x108 (&0x78, >>3) }
-	}
-	u8 rxgains5ghelnagaina1 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x7) }
-		srom 	{ 0x108 (&0x7) }
-	}
-	u8 rxgains5gmtrelnabypa1 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x80, >>7) }
-		srom 	{ 0x109 (&0x80, >>7) }
-	}
-	u8 rxgains5gmtrisoa1 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x78, >>3) }
-		srom 	{ 0x109 (&0x78, >>3) }
-	}
-	u8 rxgains5gmelnagaina1 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x7) }
-		srom 	{ 0x109 (&0x7) }
-	}
-}
-
-# 4 bytes each
-# 5G low subband mcs 0-7 power-offset.
-# LSB nibble: m0, MSB nibble: m7
-# mcsbw205glpo  mcsbw20ul5glpo mcsbw405glpo
-# 
-HNBU_MCS5GLPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GLPO
-	compat		>= 0
-	u32 mcsbw205glpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x170 }
-		srom >= 11	{ 0x160 }
-	}
-	u32 mcsbw20ul5glpo {
-		cis	{ 0x4 }
-		srom 9-10	{ 0x174 }
-	}
-	u32 mcsbw405glpo {
-		cis	{ 0x8 }
-		srom 9-10	{ 0x178 }
-		srom >= 11	{ 0x164 }
-	}
-}
-
-# 4 bytes each
-# mcs 0-7  power-offset. LSB nibble: m0, MSB nibble: m7
-# mcsbw202gpo  mcsbw20ul2gpo mcsbw402gpo
-# 
-HNBU_MCS2GPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS2GPO
-	compat		>= 0
-	u32 mcsbw202gpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x164 }
-		srom >= 11	{ 0x154 }
-	}
-	u32 mcsbw20ul2gpo {
-		cis	{ 0x4 }
-		srom 9-10	{ 0x168 }
-	}
-	u32 mcsbw402gpo {
-		cis	{ 0x8 }
-		srom 9-10	{ 0x16C }
-		srom >= 11	{ 0x158 }
-	}
-}
-
-# 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP3 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP3
-	compat		>= 0
-	u16 usbssphy_sleep3 {
-		cis	{ 0x0 }
-	}
-}
-
-# 2 bytes: stbc2g/5g power offset
-HNBU_PO_STBC {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_STBC
-	compat		>= 0
-	u16 stbcpo {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x18C }
-		srom 8	{ 0x194 }
-	}
-}
-
-# 2 byte USB UTMI/LDO Control
-HNBU_USBUTMI_CTL {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBUTMI_CTL
-	compat		>= 0
-	u16 usbutmi_ctl {
-		cis	{ 0x0 }
-	}
-}
-
-# 4 bytes each
-# 5G high subband mcs 0-7 power-offset.
-# LSB nibble: m0, MSB nibble: m7
-# mcsbw205ghpo  mcsbw20ul5ghpo mcsbw405ghpo
-# 
-HNBU_MCS5GHPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GHPO
-	compat		>= 0
-	u32 mcsbw205ghpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x188 }
-		srom >= 11	{ 0x180 }
-	}
-	u32 mcsbw20ul5ghpo {
-		cis	{ 0x4 }
-		srom 9-10	{ 0x18C }
-	}
-	u32 mcsbw405ghpo {
-		cis	{ 0x8 }
-		srom 9-10	{ 0x190 }
-		srom >= 11	{ 0x184 }
-	}
-}
-
-# 4 bytes each
-# 5G band: OFDM power offsets for 20 MHz Legacy rates
-# (54, 48, 36, 24, 18, 12, 9, 6 Mbps)
-# low subband : legofdmbw205glpo  legofdmbw20ul2glpo
-# mid subband :legofdmbw205gmpo  legofdmbw20ul2gmpo
-# high subband :legofdmbw205ghpo  legofdmbw20ul2ghpo
-# 
-HNBU_LEGOFDMBW205GPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW205GPO
-	compat		>= 0
-	u32 legofdmbw205glpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x14C }
-	}
-	u32 legofdmbw20ul5glpo {
-		cis	{ 0x4 }
-		srom 9-10	{ 0x150 }
-	}
-	u32 legofdmbw205gmpo {
-		cis	{ 0x8 }
-		srom 9-10	{ 0x154 }
-	}
-	u32 legofdmbw20ul5gmpo {
-		cis	{ 0xC }
-		srom 9-10	{ 0x158 }
-	}
-	u32 legofdmbw205ghpo {
-		cis	{ 0x10 }
-		srom 9-10	{ 0x15C }
-	}
-	u32 legofdmbw20ul5ghpo {
-		cis	{ 0x14 }
-		srom 9-10	{ 0x160 }
-	}
-}
-
-# 2 bytes each
-# CCK Power offsets for 20 MHz rates (11, 5.5, 2, 1Mbps)
-# cckbw202gpo cckbw20ul2gpo
-# 
-HNBU_CCKBW202GPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKBW202GPO
-	compat		>= 0
-	u16 cckbw202gpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x140 }
-		srom >= 11	{ 0x150 }
-	}
-	u16 cckbw20ul2gpo {
-		cis	{ 0x2 }
-		srom 9-10	{ 0x142 }
-		srom >= 11	{ 0x152 }
-	}
-}
-
-# CISTPL_VERS_1
-CISTPL_VERS_1 {
-	cis_tuple	CISTPL_VERS_1
-	compat		>= 0
-	cstr manf {
-		sfmt	ascii
-		cis	{ 0x0 }
-	}
-	cstr productname {
-		sfmt	ascii
-		cis	{ 0x0 }
-	}
-}
-
-# 16 Bytes Hex
-HNBU_UUID {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UUID
-	compat		>= 0
-	u8[16] uuid {
-		sfmt	ascii
-		cis	{ 0x0 }
-	}
-}
-
-# ACPHY rxgains: chain 0
-HNBU_ACRXGAINS_C0 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C0
-	compat		>= 11
-	u8 rxgains5gtrelnabypa0 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x80, >>7) }
-		srom 	{ 0xE2 (&0x80, >>7) }
-	}
-	u8 rxgains5gtrisoa0 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x78, >>3) }
-		srom 	{ 0xE2 (&0x78, >>3) }
-	}
-	u8 rxgains5gelnagaina0 {
-		sfmt	sdec
-		cis	{ 0x1 (&0x7) }
-		srom 	{ 0xE2 (&0x7) }
-	}
-	u8 rxgains2gtrelnabypa0 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x80, >>7) }
-		srom 	{ 0xE3 (&0x80, >>7) }
-	}
-	u8 rxgains2gtrisoa0 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x78, >>3) }
-		srom 	{ 0xE3 (&0x78, >>3) }
-	}
-	u8 rxgains2gelnagaina0 {
-		sfmt	sdec
-		cis	{ 0x0 (&0x7) }
-		srom 	{ 0xE3 (&0x7) }
-	}
-	u8 rxgains5ghtrelnabypa0 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x80, >>7) }
-		srom 	{ 0xE0 (&0x80, >>7) }
-	}
-	u8 rxgains5ghtrisoa0 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x78, >>3) }
-		srom 	{ 0xE0 (&0x78, >>3) }
-	}
-	u8 rxgains5ghelnagaina0 {
-		sfmt	sdec
-		cis	{ 0x2 (&0x7) }
-		srom 	{ 0xE0 (&0x7) }
-	}
-	u8 rxgains5gmtrelnabypa0 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x80, >>7) }
-		srom 	{ 0xE1 (&0x80, >>7) }
-	}
-	u8 rxgains5gmtrisoa0 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x78, >>3) }
-		srom 	{ 0xE1 (&0x78, >>3) }
-	}
-	u8 rxgains5gmelnagaina0 {
-		sfmt	sdec
-		cis	{ 0x3 (&0x7) }
-		srom 	{ 0xE1 (&0x7) }
-	}
-}
-
-# 2 bytes
-# byte1 tempthresh
-# byte2 period(msb 4 bits) | hysterisis(lsb 4 bits)
-# 
-HNBU_TEMPTHRESH {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TEMPTHRESH
-	compat		>= 0
-	u8 tempthresh {
-		cis	{ 0x0 }
-		srom 8-10	{ 0xB2 }
-		srom >= 11	{ 0xAE }
-	}
-	u8 temps_period {
-		sfmt	sdec
-		cis	{ 0x1 (&0xF0, >>4) }
-		srom 8-10	{ 0xBC (&0xF) }
-		srom >= 11	{ 0xB8 (&0xF) }
-	}
-	u8 temps_hysteresis {
-		sfmt	sdec
-		cis	{ 0x1 (&0xF) }
-		srom 8-10	{ 0xBC (&0xF0, >>4) }
-		srom >= 11	{ 0xB8 (&0xF0, >>4) }
-	}
-	u8 tempoffset {
-		sfmt	sdec
-		cis	{ 0x3 }
-		srom 8-10	{ 0xB3 }
-		srom >= 11	{ 0xAF }
-	}
-	u8 tempsense_slope {
-		cis	{ 0x4 }
-		srom 8-10	{ 0xB7 }
-		srom >= 11	{ 0xB3 }
-	}
-	u8 tempcorrx {
-		cis	{ 0x4 (&0xFC, >>2) }
-		srom 8-10	{ 0xB6 (&0xFC, >>2) }
-		srom >= 11	{ 0xB2 (&0xFC, >>2) }
-	}
-	u8 tempsense_option {
-		cis	{ 0x4 (&0x3) }
-		srom 8-10	{ 0xB6 (&0x3) }
-		srom >= 11	{ 0xB2 (&0x3) }
-	}
-	u8 phycal_tempdelta {
-		sfmt	sdec
-		cis	{ 0x7 }
-		srom 8-10	{ 0xBD }
-		srom >= 11	{ 0xB9 }
-	}
-}
-
-# USB WLAN/BT composite descriptor
-HNBU_USBDESC_COMPOSITE {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBDESC_COMPOSITE
-	compat		>= 0
-	u16 usbdesc_composite {
-		cis	{ 0x0 }
-	}
-}
-
-HNBU_ELNA5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA5G
-	compat		>= 0
-	u8 elna5g {
-		cis	{ 0x0 }
-		srom 8-10	{ 0xBA }
-	}
-}
-
-HNBU_ELNA2G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA2G
-	compat		>= 0
-	u8 elna2g {
-		cis	{ 0x0 }
-		srom 8-10	{ 0xBB }
-	}
-}
-
-# 2 bytes total
-# Additional power offset for Legacy Dup40 transmissions.
-# Applied in addition to legofdmbw20ulXpo, X=2g, 5gl, 5gm, or 5gh.
-# LSB nibble: 2G band, MSB nibble: 5G band high subband.
-# leg40dup5ghpo, leg40dup5gmpo, leg40dup5glpo, leg40dup2gpo
-# 
-HNBU_LEG40DUPPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEG40DUPPO
-	compat		>= 0
-	u16 legofdm40duppo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x196 }
-	}
-}
-
-# ACPHY Power-per-rate 2gpo
-HNBU_ACPPR_2GPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_2GPO
-	compat		>= 11
-	u16 dot11agofdmhrbw202gpo {
-		cis	{ 0x0 }
-		srom 	{ 0x15C }
-	}
-	u16 ofdmlrbw202gpo {
-		cis	{ 0x2 }
-		srom 	{ 0x15E }
-	}
-}
-
-# 1 byte; 1 = USB advertises FS mode only
-HNBU_USBFS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFS
-	compat		>= 0
-	u8 usbfs {
-		sfmt	sdec
-		cis	{ 0x0 }
-	}
-}
-
-# 2 bytes; boardtype
-HNBU_BOARDTYPE {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDTYPE
-	compat		>= 0
-	u16 boardtype {
-		cis	{ 0x0 }
-		srom >= 2	{ 0x4 }
-	}
-}
-
-# 1 byte; GPIO pin for WPS button
-HNBU_WPS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WPS
-	compat		>= 0
-	u8 wpsgpio {
-		sfmt	sdec
-		cis	{ 0x0 }
-	}
-	u8 wpsled {
-		sfmt	sdec
-		cis	{ 0x1 }
-	}
-}
-
-# USB30 PHY U1U2 Enable
-HNBU_USB30PHY_U1U2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_U1U2
-	compat		>= 0
-	u8 usb30u1u2 {
-		cis	{ 0x0 }
-	}
-}
-
-# LED set
-HNBU_LEDS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDS
-	compat		>= 0
-	u8 ledbh0 {
-		cis	{ 0x0 }
-		srom 1-3	{ 0x65 }
-		srom 4	{ 0x57 }
-		srom 5-7	{ 0x77 }
-		srom 8-10	{ 0x97 }
-		srom >= 11	{ 0x9B }
-	}
-	u8 ledbh1 {
-		cis	{ 0x1 }
-		srom 1-3	{ 0x64 }
-		srom 4	{ 0x56 }
-		srom 5-7	{ 0x76 }
-		srom 8-10	{ 0x96 }
-		srom >= 11	{ 0x9A }
-	}
-	u8 ledbh2 {
-		cis	{ 0x2 }
-		srom 1-3	{ 0x67 }
-		srom 4	{ 0x59 }
-		srom 5-7	{ 0x79 }
-		srom 8-10	{ 0x99 }
-		srom >= 11	{ 0x9D }
-	}
-	u8 ledbh3 {
-		cis	{ 0x3 }
-		srom 1-3	{ 0x66 }
-		srom 4	{ 0x58 }
-		srom 5-7	{ 0x78 }
-		srom 8-10	{ 0x98 }
-		srom >= 11	{ 0x9C }
-	}
-	u8 ledbh4 {
-		cis	{ 0x4 }
-	}
-	u8 ledbh5 {
-		cis	{ 0x5 }
-	}
-	u8 ledbh6 {
-		cis	{ 0x6 }
-	}
-	u8 ledbh7 {
-		cis	{ 0x7 }
-	}
-	u8 ledbh8 {
-		cis	{ 0x8 }
-	}
-	u8 ledbh9 {
-		cis	{ 0x9 }
-	}
-	u8 ledbh10 {
-		cis	{ 0xA }
-	}
-	u8 ledbh11 {
-		cis	{ 0xB }
-	}
-	u8 ledbh12 {
-		cis	{ 0xC }
-	}
-	u8 ledbh13 {
-		cis	{ 0xD }
-	}
-	u8 ledbh14 {
-		cis	{ 0xE }
-	}
-	u8 ledbh15 {
-		cis	{ 0xF }
-	}
-}
-
-# usb30u1u2
-HNBU_USB30U1U2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30U1U2
-	compat		>= 11
-	u16 usb30u1u2 {
-		cis	{ 0x0 }
-	}
-}
-
-# 16 bytes: mcs5g low-high band power offset
-HNBU_PO_MCS5GLH {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GLH
-	compat		>= 0
-	u16 mcs5glpo0 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x16A }
-		srom 8	{ 0x172 }
-	}
-	u16 mcs5glpo1 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x16C }
-		srom 8	{ 0x174 }
-	}
-	u16 mcs5glpo2 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0x16E }
-		srom 8	{ 0x176 }
-	}
-	u16 mcs5glpo3 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0x170 }
-		srom 8	{ 0x178 }
-	}
-	u16 mcs5glpo4 {
-		cis	{ 0x8 }
-		srom 4-7	{ 0x172 }
-		srom 8	{ 0x17A }
-	}
-	u16 mcs5glpo5 {
-		cis	{ 0xA }
-		srom 4-7	{ 0x174 }
-		srom 8	{ 0x17C }
-	}
-	u16 mcs5glpo6 {
-		cis	{ 0xC }
-		srom 4-7	{ 0x176 }
-		srom 8	{ 0x17E }
-	}
-	u16 mcs5glpo7 {
-		cis	{ 0xE }
-		srom 4-7	{ 0x178 }
-		srom 8	{ 0x180 }
-	}
-	u16 mcs5ghpo0 {
-		cis	{ 0x10 }
-		srom 4-7	{ 0x17A }
-		srom 8	{ 0x182 }
-	}
-	u16 mcs5ghpo1 {
-		cis	{ 0x12 }
-		srom 4-7	{ 0x17C }
-		srom 8	{ 0x184 }
-	}
-	u16 mcs5ghpo2 {
-		cis	{ 0x14 }
-		srom 4-7	{ 0x17E }
-		srom 8	{ 0x186 }
-	}
-	u16 mcs5ghpo3 {
-		cis	{ 0x16 }
-		srom 4-7	{ 0x180 }
-		srom 8	{ 0x188 }
-	}
-	u16 mcs5ghpo4 {
-		cis	{ 0x18 }
-		srom 4-7	{ 0x182 }
-		srom 8	{ 0x18A }
-	}
-	u16 mcs5ghpo5 {
-		cis	{ 0x1A }
-		srom 4-7	{ 0x184 }
-		srom 8	{ 0x18C }
-	}
-	u16 mcs5ghpo6 {
-		cis	{ 0x1C }
-		srom 4-7	{ 0x186 }
-		srom 8	{ 0x18E }
-	}
-	u16 mcs5ghpo7 {
-		cis	{ 0x1E }
-		srom 4-7	{ 0x188 }
-		srom 8	{ 0x190 }
-	}
-}
-
-# ACPHY PA parameters: chain 0
-HNBU_ACPA_C0 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C0
-	compat		>= 11
-	u16 subband5gver {
-		cis	{ 0x0 }
-		srom 8-10	{  u8 @ 0x1A5 (&0x7) }
-		srom >= 11	{ 0xD6 }
-	}
-	u16 maxp2ga0 {
-		cis	{ 0x2 }
-		srom 4-7	{  u8 @ 0x81 }
-		srom 8-10	{  u8 @ 0xC1 }
-		srom >= 11	{  u8 @ 0xD9 }
-	}
-	u16[3] pa2ga0 {
-		cis	{ 0x4 }
-		srom 	{ 0xDA }
-	}
-	u8[4] maxp5ga0 {
-		cis	{ 0xA }
-		srom 4-7	{  u8 @ 0x8B }
-		srom 8-10	{  u8 @ 0xC9 }
-		srom >= 11	{  u8 @ 0xE5,  u8 @ 0xE4,  u8 @ 0xE7,  u8 @ 0xE6 }
-	}
-	u16[12] pa5ga0 {
-		cis	{ 0xE }
-		srom 	{ 0xE8 }
-	}
-}
-
-# USB endpoint numbers
-HNBU_USBEPNUM {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBEPNUM
-	compat		>= 0
-	u16 usbepnum {
-		cis	{ 0x0 }
-	}
-}
-
-# 8 or 30 bytes: 11n pa paramater for chain 2
-HNBU_PAPARMS_C2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C2
-	compat		1-10
-	u8 maxp2ga2 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0xDD }
-		srom 8-10	{ 0x101 }
-		srom >= 11	{ 0x129 }
-	}
-	u8 itt2ga2 {
-		cis	{ 0x1 }
-		srom 4-7	{ 0xDC }
-		srom 8-10	{ 0x100 }
-	}
-	u16 pa2gw0a2 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0xDE }
-		srom 8-10	{ 0x102 }
-	}
-	u16 pa2gw1a2 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0xE0 }
-		srom 8-10	{ 0x104 }
-	}
-	u16 pa2gw2a2 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0xE2 }
-		srom 8-10	{ 0x106 }
-	}
-	u8[4] maxp5ga2 {
-		cis	{ u8 @ 0x8 }
-		srom 4-7	{  u8 @ 0xE7 }
-		srom 8-10	{  u8 @ 0x109 }
-		srom >= 11	{  u8 @ 0x135,  u8 @ 0x134,  u8 @ 0x137,  u8 @ 0x136 }
-	}
-	u8 itt5ga2 {
-		cis	{ 0x9 }
-		srom 4-7	{ 0xE6 }
-		srom 8-10	{ 0x108 }
-	}
-	u8 maxp5gha2 {
-		cis	{ 0xA }
-		srom 4-7	{ 0xE9 }
-		srom 8-10	{ 0x10B }
-	}
-	u8 maxp5gla2 {
-		cis	{ 0xB }
-		srom 4-7	{ 0xE8 }
-		srom 8-10	{ 0x10A }
-	}
-	u16 pa5gw0a2 {
-		cis	{ 0xC }
-		srom 4-7	{ 0xEA }
-		srom 8-10	{ 0x10C }
-	}
-	u16 pa5gw1a2 {
-		cis	{ 0xE }
-		srom 4-7	{ 0xEC }
-		srom 8-10	{ 0x10E }
-	}
-	u16 pa5gw2a2 {
-		cis	{ 0x10 }
-		srom 4-7	{ 0xEE }
-		srom 8-10	{ 0x110 }
-	}
-	u16 pa5glw0a2 {
-		cis	{ 0x12 }
-		srom 4-7	{ 0xF2 }
-		srom 8-10	{ 0x112 }
-	}
-	u16 pa5glw1a2 {
-		cis	{ 0x14 }
-		srom 4-7	{ 0xF4 }
-		srom 8-10	{ 0x114 }
-	}
-	u16 pa5glw2a2 {
-		cis	{ 0x16 }
-		srom 4-7	{ 0xF6 }
-		srom 8-10	{ 0x116 }
-	}
-	u16 pa5ghw0a2 {
-		cis	{ 0x18 }
-		srom 4-7	{ 0xFA }
-		srom 8-10	{ 0x118 }
-	}
-	u16 pa5ghw1a2 {
-		cis	{ 0x1A }
-		srom 4-7	{ 0xFC }
-		srom 8-10	{ 0x11A }
-	}
-	u16 pa5ghw2a2 {
-		cis	{ 0x1C }
-		srom 4-7	{ 0xFE }
-		srom 8-10	{ 0x11C }
-	}
-	u16 pa2gw3a2 {
-		srom 4-7	{ 0xE4 }
-	}
-	u16 pa5ghw3a2 {
-		srom 4-7	{ 0x100 }
-	}
-	u16 pa5glw3a2 {
-		srom 4-7	{ 0xF8 }
-	}
-	u16 pa5gw3a2 {
-		srom 4-7	{ 0xF0 }
-	}
-}
-
-# 4 byte 11g ofdm power offsets in rev 3
-HNBU_OFDMPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO
-	compat		>= 0
-	u32 ofdmpo {
-		cis	{ 0x0 }
-	}
-}
-
-# 8 or 30 bytes: 11n pa paramater for chain 0
-HNBU_PAPARMS_C0 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C0
-	compat		1-10
-	u8 maxp2ga0 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x81 }
-		srom 8-10	{ 0xC1 }
-		srom >= 11	{ 0xD9 }
-	}
-	u8 itt2ga0 {
-		cis	{ 0x1 }
-		srom 4-7	{ 0x80 }
-		srom 8-10	{ 0xC0 }
-	}
-	u16 pa2gw0a0 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x82 }
-		srom 8-10	{ 0xC2 }
-	}
-	u16 pa2gw1a0 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0x84 }
-		srom 8-10	{ 0xC4 }
-	}
-	u16 pa2gw2a0 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0x86 }
-		srom 8-10	{ 0xC6 }
-	}
-	u8[4] maxp5ga0 {
-		cis	{ u8 @ 0x8 }
-		srom 4-7	{  u8 @ 0x8B }
-		srom 8-10	{  u8 @ 0xC9 }
-		srom >= 11	{  u8 @ 0xE5,  u8 @ 0xE4,  u8 @ 0xE7,  u8 @ 0xE6 }
-	}
-	u8 itt5ga0 {
-		cis	{ 0x9 }
-		srom 4-7	{ 0x8A }
-		srom 8-10	{ 0xC8 }
-	}
-	u8 maxp5gha0 {
-		cis	{ 0xA }
-		srom 4-7	{ 0x8D }
-		srom 8-10	{ 0xCB }
-	}
-	u8 maxp5gla0 {
-		cis	{ 0xB }
-		srom 4-7	{ 0x8C }
-		srom 8-10	{ 0xCA }
-	}
-	u16 pa5gw0a0 {
-		cis	{ 0xC }
-		srom 4-7	{ 0x8E }
-		srom 8-10	{ 0xCC }
-	}
-	u16 pa5gw1a0 {
-		cis	{ 0xE }
-		srom 4-7	{ 0x90 }
-		srom 8-10	{ 0xCE }
-	}
-	u16 pa5gw2a0 {
-		cis	{ 0x10 }
-		srom 4-7	{ 0x92 }
-		srom 8-10	{ 0xD0 }
-	}
-	u16 pa5glw0a0 {
-		cis	{ 0x12 }
-		srom 4-7	{ 0x96 }
-		srom 8-10	{ 0xD2 }
-	}
-	u16 pa5glw1a0 {
-		cis	{ 0x14 }
-		srom 4-7	{ 0x98 }
-		srom 8-10	{ 0xD4 }
-	}
-	u16 pa5glw2a0 {
-		cis	{ 0x16 }
-		srom 4-7	{ 0x9A }
-		srom 8-10	{ 0xD6 }
-	}
-	u16 pa5ghw0a0 {
-		cis	{ 0x18 }
-		srom 4-7	{ 0x9E }
-		srom 8-10	{ 0xD8 }
-	}
-	u16 pa5ghw1a0 {
-		cis	{ 0x1A }
-		srom 4-7	{ 0xA0 }
-		srom 8-10	{ 0xDA }
-	}
-	u16 pa5ghw2a0 {
-		cis	{ 0x1C }
-		srom 4-7	{ 0xA2 }
-		srom 8-10	{ 0xDC }
-	}
-	u16 pa2gw3a0 {
-		srom 4-7	{ 0x88 }
-	}
-	u16 pa5ghw3a0 {
-		srom 4-7	{ 0xA4 }
-	}
-	u16 pa5glw3a0 {
-		srom 4-7	{ 0x9C }
-	}
-	u16 pa5gw3a0 {
-		srom 4-7	{ 0x94 }
-	}
-}
-
-# subband5gver
-HNBU_SUBBAND5GVER {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SUBBAND5GVER
-	compat		>= 11
-	u16 subband5gver {
-		cis	{ 0x0 }
-		srom 8-10	{  u8 @ 0x1A5 (&0x7) }
-		srom >= 11	{ 0xD6 }
-	}
-}
-
-# ACPHY PA trimming parameters: 80
-HNBU_ACPA_80 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_80
-	compat		>= 11
-	u16[12] pa5gbw80a0 {
-		cis	{ 0x0 }
-		srom 	{ 0x138 }
-	}
-}
-
-# Tx duty cycle for ACPHY 5g 40/80 Mhz
-HNBU_TXDUTY {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXDUTY
-	compat		>= 11
-	u16 tx_duty_cycle_ofdm_40_5g {
-		sfmt	sdec
-		cis	{ 0x0 }
-	}
-	u16 tx_duty_cycle_thresh_40_5g {
-		sfmt	sdec
-		cis	{ 0x2 }
-	}
-	u16 tx_duty_cycle_ofdm_80_5g {
-		sfmt	sdec
-		cis	{ 0x4 }
-	}
-	u16 tx_duty_cycle_thresh_80_5g {
-		sfmt	sdec
-		cis	{ 0x6 }
-	}
-}
-
-# 1 byte;
-HNBU_REGREV {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_REGREV
-	compat		>= 0
-	u8 regrev {
-		cis	{ 0x0 }
-		srom 3	{ 0x78 }
-		srom 4	{ 0x55 }
-		srom 5-7	{ 0x47 }
-		srom 8-10	{ 0x95 }
-		srom >= 11	{ 0x99 }
-	}
-}
-
-# mac addr override for the standard CIS LAN_NID
-HNBU_MACADDR {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MACADDR
-	compat		>= 0
-	u8[48] macaddr {
-		sfmt	macaddr
-		cis	{ 0x0 }
-		srom 3	{ 0x4A (&0xFFFF) }
-		srom 4	{ 0x4C (&0xFFFF) }
-		srom 5-7	{ 0x52 (&0xFFFF) }
-		srom 8-10	{ 0x8C (&0xFFFF) }
-		srom >= 11	{ 0x90 (&0xFFFF) }
-	}
-}
-
-# 8 bytes: mcs2g power offset
-HNBU_PO_MCS2G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS2G
-	compat		>= 0
-	u16 mcs2gpo0 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x14A }
-		srom 8	{ 0x152 }
-	}
-	u16 mcs2gpo1 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x14C }
-		srom 8	{ 0x154 }
-	}
-	u16 mcs2gpo2 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0x14E }
-		srom 8	{ 0x156 }
-	}
-	u16 mcs2gpo3 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0x150 }
-		srom 8	{ 0x158 }
-	}
-	u16 mcs2gpo4 {
-		cis	{ 0x8 }
-		srom 4-7	{ 0x152 }
-		srom 8	{ 0x15A }
-	}
-	u16 mcs2gpo5 {
-		cis	{ 0xA }
-		srom 4-7	{ 0x154 }
-		srom 8	{ 0x15C }
-	}
-	u16 mcs2gpo6 {
-		cis	{ 0xC }
-		srom 4-7	{ 0x156 }
-		srom 8	{ 0x15E }
-	}
-	u16 mcs2gpo7 {
-		cis	{ 0xE }
-		srom 4-7	{ 0x158 }
-		srom 8	{ 0x160 }
-	}
-}
-
-# PA parameters: 8 (sromrev == 1)
-# or 9 (sromrev > 1) bytes
-# 
-HNBU_PAPARMS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS
-	compat		>= 0
-	u16 pa0b0 {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom 1-3	{ 0x5E }
-		srom 8-10	{ 0xC2 }
-	}
-	u16 pa0b1 {
-		sfmt	sdec
-		cis	{ 0x2 }
-		srom 1-3	{ 0x60 }
-		srom 8-10	{ 0xC4 }
-	}
-	u16 pa0b2 {
-		sfmt	sdec
-		cis	{ 0x4 }
-		srom 1-3	{ 0x62 }
-		srom 8-10	{ 0xC6 }
-	}
-	u8 pa0itssit {
-		sfmt	sdec
-		cis	{ 0x6 }
-		srom 1-3	{ 0x71 }
-		srom 8-10	{ 0xC0 }
-	}
-	u8 pa0maxpwr {
-		sfmt	sdec
-		cis	{ 0x7 }
-		srom 1-3	{ 0x69 }
-		srom 8-10	{ 0xC1 }
-	}
-	u8 opo {
-		cis	{ 0x8 }
-		srom 2-3	{ 0x79 }
-		srom 8-10	{ 0x143 }
-	}
-}
-
-# 4328 5G TR isolation, 3 bytes
-HNBU_TRI5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI5G
-	compat		>= 0
-	u8 tri5gl {
-		cis	{ 0x0 }
-		srom 3	{ 0x57 }
-		srom 8-10	{ 0xAB }
-	}
-	u8 tri5g {
-		cis	{ 0x1 }
-		srom 3	{ 0x54 }
-		srom 8-10	{ 0xA8 }
-	}
-	u8 tri5gh {
-		cis	{ 0x2 }
-		srom 3	{ 0x56 }
-		srom 8-10	{ 0xAA }
-	}
-}
-
-# 4328 5G RX power offset, 1 byte
-HNBU_RXPO5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO5G
-	compat		>= 0
-	i8 rxpo5g {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom 3	{ 0x5A }
-		srom 8-10	{ 0xAC }
-	}
-}
-
-# 4 byte USB SSPHY UTMI Control
-HNBU_USBSSPHY_UTMI_CTL2 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL2
-	compat		>= 0
-	u32 usbssphy_utmi_ctl2 {
-		cis	{ 0x0 }
-	}
-}
-
-# 4328 2G RSSI mid pt sel & board switch arch,
-# 2 bytes, rev 3.
-# 
-HNBU_RSSISMBXA2G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA2G
-	compat		>= 0
-	u8 rssismf2g {
-		cis	{ 0x0 (&0xF) }
-		srom 3	{ 0x51 (&0xF) }
-		srom 8-10	{ 0xA5 (&0xF) }
-	}
-	u8 rssismc2g {
-		cis	{ 0x0 (&0xF0, >>4) }
-		srom 3	{ 0x51 (&0xF0, >>4) }
-		srom 8-10	{ 0xA5 (&0xF0, >>4) }
-	}
-	u8 rssisav2g {
-		cis	{ 0x1 (&0x7) }
-		srom 3	{ 0x50 (&0x7) }
-		srom 8-10	{ 0xA4 (&0x7) }
-	}
-	u8 bxa2g {
-		cis	{ 0x1 (&0x18, >>3) }
-		srom 3	{ 0x50 (&0x18, >>3) }
-		srom 8-10	{ 0xA4 (&0x18, >>3) }
-	}
-}
-
-# 4328 2G RX power offset, 1 byte
-HNBU_RXPO2G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO2G
-	compat		>= 0
-	i8 rxpo2g {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom 3	{ 0x5B }
-		srom 8-10	{ 0xAD }
-	}
-}
-
-# 4 byte Crystal frequency in kilohertz
-HNBU_XTALFREQ {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_XTALFREQ
-	compat		>= 0
-	u32 xtalfreq {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom >= 11	{  u16 @ 0xB4 }
-	}
-}
-
-# CCK digital filter selection options
-HNBU_CCKFILTTYPE {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKFILTTYPE
-	compat		>= 0
-	u8 cckdigfilttype {
-		sfmt	sdec
-		cis	{ 0x0 }
-	}
-}
-
-# 8 or 30 bytes: 11n pa paramater for chain 3
-HNBU_PAPARMS_C3 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C3
-	compat		1-10
-	u8 maxp2ga3 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x10B }
-		srom 8-10	{ 0x121 }
-	}
-	u8 itt2ga3 {
-		cis	{ 0x1 }
-		srom 4-7	{ 0x10A }
-		srom 8-10	{ 0x120 }
-	}
-	u16 pa2gw0a3 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x10C }
-		srom 8-10	{ 0x122 }
-	}
-	u16 pa2gw1a3 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0x10E }
-		srom 8-10	{ 0x124 }
-	}
-	u16 pa2gw2a3 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0x110 }
-		srom 8-10	{ 0x126 }
-	}
-	u8 maxp5ga3 {
-		cis	{ 0x8 }
-		srom 4-7	{ 0x115 }
-		srom 8-10	{ 0x129 }
-	}
-	u8 itt5ga3 {
-		cis	{ 0x9 }
-		srom 4-7	{ 0x114 }
-		srom 8-10	{ 0x128 }
-	}
-	u8 maxp5gha3 {
-		cis	{ 0xA }
-		srom 4-7	{ 0x117 }
-		srom 8-10	{ 0x12B }
-	}
-	u8 maxp5gla3 {
-		cis	{ 0xB }
-		srom 4-7	{ 0x116 }
-		srom 8-10	{ 0x12A }
-	}
-	u16 pa5gw0a3 {
-		cis	{ 0xC }
-		srom 4-7	{ 0x118 }
-		srom 8-10	{ 0x12C }
-	}
-	u16 pa5gw1a3 {
-		cis	{ 0xE }
-		srom 4-7	{ 0x11A }
-		srom 8-10	{ 0x12E }
-	}
-	u16 pa5gw2a3 {
-		cis	{ 0x10 }
-		srom 4-7	{ 0x11C }
-		srom 8-10	{ 0x130 }
-	}
-	u16 pa5glw0a3 {
-		cis	{ 0x12 }
-		srom 4-7	{ 0x120 }
-		srom 8-10	{ 0x132 }
-	}
-	u16 pa5glw1a3 {
-		cis	{ 0x14 }
-		srom 4-7	{ 0x122 }
-		srom 8-10	{ 0x134 }
-	}
-	u16 pa5glw2a3 {
-		cis	{ 0x16 }
-		srom 4-7	{ 0x124 }
-		srom 8-10	{ 0x136 }
-	}
-	u16 pa5ghw0a3 {
-		cis	{ 0x18 }
-		srom 4-7	{ 0x128 }
-		srom 8-10	{ 0x138 }
-	}
-	u16 pa5ghw1a3 {
-		cis	{ 0x1A }
-		srom 4-7	{ 0x12A }
-		srom 8-10	{ 0x13A }
-	}
-	u16 pa5ghw2a3 {
-		cis	{ 0x1C }
-		srom 4-7	{ 0x12C }
-		srom 8-10	{ 0x13C }
-	}
-	u16 pa2gw3a3 {
-		srom 4-7	{ 0x112 }
-	}
-	u16 pa5ghw3a3 {
-		srom 4-7	{ 0x12E }
-	}
-	u16 pa5glw3a3 {
-		srom 4-7	{ 0x126 }
-	}
-	u16 pa5gw3a3 {
-		srom 4-7	{ 0x11E }
-	}
-}
-
-# 5G PA params
-HNBU_PAPARMS5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS5G
-	compat		>= 0
-	u16 pa1b0 {
-		sfmt	sdec
-		cis	{ 0x0 }
-		srom 1-3	{ 0x6A }
-		srom 8-10	{ 0xCC }
-	}
-	u16 pa1b1 {
-		sfmt	sdec
-		cis	{ 0x2 }
-		srom 1-3	{ 0x6C }
-		srom 8-10	{ 0xCE }
-	}
-	u16 pa1b2 {
-		sfmt	sdec
-		cis	{ 0x4 }
-		srom 1-3	{ 0x6E }
-		srom 8-10	{ 0xD0 }
-	}
-	u16 pa1lob0 {
-		sfmt	sdec
-		cis	{ 0x6 }
-		srom 2-3	{ 0x3C }
-		srom 8-10	{ 0xD2 }
-	}
-	u16 pa1lob1 {
-		sfmt	sdec
-		cis	{ 0x8 }
-		srom 2-3	{ 0x3E }
-		srom 8-10	{ 0xD4 }
-	}
-	u16 pa1lob2 {
-		sfmt	sdec
-		cis	{ 0xA }
-		srom 2-3	{ 0x40 }
-		srom 8-10	{ 0xD6 }
-	}
-	u16 pa1hib0 {
-		sfmt	sdec
-		cis	{ 0xC }
-		srom 2-3	{ 0x42 }
-		srom 8-10	{ 0xD8 }
-	}
-	u16 pa1hib1 {
-		sfmt	sdec
-		cis	{ 0xE }
-		srom 2-3	{ 0x44 }
-		srom 8-10	{ 0xDA }
-	}
-	u16 pa1hib2 {
-		sfmt	sdec
-		cis	{ 0x10 }
-		srom 2-3	{ 0x46 }
-		srom 8-10	{ 0xDC }
-	}
-	u8 pa1itssit {
-		sfmt	sdec
-		cis	{ 0x12 }
-		srom 1-3	{ 0x70 }
-		srom 8-10	{ 0xC8 }
-	}
-	u8 pa1maxpwr {
-		sfmt	sdec
-		cis	{ 0x13 }
-		srom 1-3	{ 0x68 }
-		srom 8-10	{ 0xC9 }
-	}
-	u8 pa1lomaxpwr {
-		sfmt	sdec
-		cis	{ 0x14 }
-		srom 2-3	{ 0x3A }
-		srom 8-10	{ 0xCA }
-	}
-	u8 pa1himaxpwr {
-		sfmt	sdec
-		cis	{ 0x15 }
-		srom 2-3	{ 0x3B }
-		srom 8-10	{ 0xCB }
-	}
-}
-
-# 2 bytes; LED duty cycle
-HNBU_LEDDC {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDDC
-	compat		>= 0
-	u16 leddc {
-		sfmt	leddc
-		cis	{ 0x0 }
-		srom 3	{  u8[2] @ 0x7C (&0xFFFF) }
-		srom 4	{  u8[2] @ 0x5A (&0xFFFF) }
-		srom 5-7	{  u8[2] @ 0x5A (&0xFFFF) }
-		srom 8-10	{  u8[2] @ 0x9A (&0xFFFF) }
-		srom >= 11	{  u8[2] @ 0x9E (&0xFFFF) }
-	}
-}
-
-# 2 byte USB remote downloader (RDL) product Id
-HNBU_RDLID {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RDLID
-	compat		>= 0
-	u16 rdlid {
-		cis	{ 0x0 }
-	}
-}
-
-HNBU_MEAS_PWR {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MEAS_PWR
-	compat		>= 11
-	u8 measpower {
-		cis	{ 0x0 }
-		srom 8-10	{ 0xB4 (&0xFE, >>1) }
-		srom >= 11	{ 0xB0 (&0xFE, >>1) }
-	}
-	u8 measpower1 {
-		cis	{ 0x1 }
-		srom 8-10	{ 0xBF (&0x7F) }
-		srom >= 11	{ 0xBB (&0x7F) }
-	}
-	u16 measpower2 {
-		cis	{ u8 @ 0x2 }
-		srom 8-10	{ 0xBE (&0x3F80, >>7) }
-		srom >= 11	{ 0xBA (&0x3F80, >>7) }
-	}
-	u16 rawtempsense {
-		cis	{ 0x3 }
-		srom 8-10	{ 0xB4 (&0x1FF) }
-		srom >= 11	{ 0xB0 (&0x1FF) }
-	}
-}
-
-# FEM config
-HNBU_FEM_CFG {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM_CFG
-	compat		>= 11
-	u8 femctrl {
-		sfmt	sdec
-		cis	{ 0x1 (&0xF8, >>3) }
-		srom 	{ 0xAA (&0xF8, >>3) }
-	}
-	u8 papdcap2g {
-		sfmt	sdec
-		cis	{ 0x1 (&0x4, >>2) }
-		srom 	{ 0xAA (&0x4, >>2) }
-	}
-	u8 tworangetssi2g {
-		sfmt	sdec
-		cis	{ 0x1 (&0x2, >>1) }
-		srom 	{ 0xAA (&0x2, >>1) }
-	}
-	u16 pdgain2g {
-		sfmt	sdec
-		cis	{ 0x0 (&0x1F0, >>4) }
-		srom 	{ 0xAA (&0x1F0, >>4) }
-	}
-	u8 epagain2g {
-		sfmt	sdec
-		cis	{ 0x0 (&0xE, >>1) }
-		srom 	{ 0xAB (&0xE, >>1) }
-	}
-	u8 tssiposslope2g {
-		sfmt	sdec
-		cis	{ 0x0 (&0x1) }
-		srom 	{ 0xAB (&0x1) }
-	}
-	u8 gainctrlsph {
-		sfmt	sdec
-		cis	{ 0x3 (&0xF8, >>3) }
-		srom 	{ 0xAC (&0xF8, >>3) }
-	}
-	u8 papdcap5g {
-		sfmt	sdec
-		cis	{ 0x3 (&0x4, >>2) }
-		srom 	{ 0xAC (&0x4, >>2) }
-	}
-	u8 tworangetssi5g {
-		sfmt	sdec
-		cis	{ 0x3 (&0x2, >>1) }
-		srom 	{ 0xAC (&0x2, >>1) }
-	}
-	u16 pdgain5g {
-		sfmt	sdec
-		cis	{ 0x2 (&0x1F0, >>4) }
-		srom 	{ 0xAC (&0x1F0, >>4) }
-	}
-	u8 epagain5g {
-		sfmt	sdec
-		cis	{ 0x2 (&0xE, >>1) }
-		srom 	{ 0xAD (&0xE, >>1) }
-	}
-	u8 tssiposslope5g {
-		sfmt	sdec
-		cis	{ 0x2 (&0x1) }
-		srom 	{ 0xAD (&0x1) }
-	}
-}
-
-# Default country code (sromrev == 1)
-HNBU_CC {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CC
-	compat		1
-	u8 cc {
-		cis	{ 0x0 (&0xF) }
-		srom 	{ 0x5C (&0xF) }
-	}
-}
-
-# 4328 2G TR isolation, 1 byte
-HNBU_TRI2G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI2G
-	compat		>= 0
-	u8 tri2g {
-		cis	{ 0x0 }
-		srom 3	{ 0x55 }
-		srom 8-10	{ 0xA9 }
-	}
-}
-
-# 4 bytes each
-# OFDM power offsets for 20 MHz Legacy rates
-# (54, 48, 36, 24, 18, 12, 9, 6 Mbps)
-# legofdmbw202gpo  legofdmbw20ul2gpo
-# 
-HNBU_LEGOFDMBW202GPO {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW202GPO
-	compat		>= 0
-	u32 legofdmbw202gpo {
-		cis	{ 0x0 }
-		srom 9-10	{ 0x144 }
-	}
-	u32 legofdmbw20ul2gpo {
-		cis	{ 0x4 }
-		srom 9-10	{ 0x148 }
-	}
-}
-
-# 4
-# 3 = 12 byte 11a ofdm power offsets in rev 3
-HNBU_OFDMPO5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO5G
-	compat		>= 0
-	u32 ofdm5gpo {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x13E }
-		srom 8	{ 0x146 }
-	}
-	u32 ofdm5glpo {
-		cis	{ 0x4 }
-		srom 4-7	{ 0x142 }
-		srom 8	{ 0x14A }
-	}
-	u32 ofdm5ghpo {
-		cis	{ 0x8 }
-		srom 4-7	{ 0x146 }
-		srom 8	{ 0x14E }
-	}
-}
-
-# board serial number, independent of mac addr
-HNBU_BOARDNUM {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDNUM
-	compat		>= 0
-	u16 boardnum {
-		cis	{ 0x0 }
-		srom 1-2	{ 0x4C }
-		srom 3	{ 0x4E }
-		srom 4	{ 0x50 }
-		srom 5-7	{ 0x56 }
-		srom 8-10	{ 0x90 }
-		srom >= 11	{ 0x94 }
-	}
-}
-
-# 8 or 30 bytes: 11n pa paramater for chain 1
-HNBU_PAPARMS_C1 {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C1
-	compat		1-10
-	u8 maxp2ga1 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0xAF }
-		srom 8-10	{ 0xE1 }
-		srom >= 11	{ 0x101 }
-	}
-	u8 itt2ga1 {
-		cis	{ 0x1 }
-		srom 4-7	{ 0xAE }
-		srom 8-10	{ 0xE0 }
-	}
-	u16 pa2gw0a1 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0xB0 }
-		srom 8-10	{ 0xE2 }
-	}
-	u16 pa2gw1a1 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0xB2 }
-		srom 8-10	{ 0xE4 }
-	}
-	u16 pa2gw2a1 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0xB4 }
-		srom 8-10	{ 0xE6 }
-	}
-	u8[4] maxp5ga1 {
-		cis	{ u8 @ 0x8 }
-		srom 4-7	{  u8 @ 0xB9 }
-		srom 8-10	{  u8 @ 0xE9 }
-		srom >= 11	{  u8 @ 0x10D,  u8 @ 0x10C,  u8 @ 0x10F,  u8 @ 0x10E }
-	}
-	u8 itt5ga1 {
-		cis	{ 0x9 }
-		srom 4-7	{ 0xB8 }
-		srom 8-10	{ 0xE8 }
-	}
-	u8 maxp5gha1 {
-		cis	{ 0xA }
-		srom 4-7	{ 0xBB }
-		srom 8-10	{ 0xEB }
-	}
-	u8 maxp5gla1 {
-		cis	{ 0xB }
-		srom 4-7	{ 0xBA }
-		srom 8-10	{ 0xEA }
-	}
-	u16 pa5gw0a1 {
-		cis	{ 0xC }
-		srom 4-7	{ 0xBC }
-		srom 8-10	{ 0xEC }
-	}
-	u16 pa5gw1a1 {
-		cis	{ 0xE }
-		srom 4-7	{ 0xBE }
-		srom 8-10	{ 0xEE }
-	}
-	u16 pa5gw2a1 {
-		cis	{ 0x10 }
-		srom 4-7	{ 0xC0 }
-		srom 8-10	{ 0xF0 }
-	}
-	u16 pa5glw0a1 {
-		cis	{ 0x12 }
-		srom 4-7	{ 0xC4 }
-		srom 8-10	{ 0xF2 }
-	}
-	u16 pa5glw1a1 {
-		cis	{ 0x14 }
-		srom 4-7	{ 0xC6 }
-		srom 8-10	{ 0xF4 }
-	}
-	u16 pa5glw2a1 {
-		cis	{ 0x16 }
-		srom 4-7	{ 0xC8 }
-		srom 8-10	{ 0xF6 }
-	}
-	u16 pa5ghw0a1 {
-		cis	{ 0x18 }
-		srom 4-7	{ 0xCC }
-		srom 8-10	{ 0xF8 }
-	}
-	u16 pa5ghw1a1 {
-		cis	{ 0x1A }
-		srom 4-7	{ 0xCE }
-		srom 8-10	{ 0xFA }
-	}
-	u16 pa5ghw2a1 {
-		cis	{ 0x1C }
-		srom 4-7	{ 0xD0 }
-		srom 8-10	{ 0xFC }
-	}
-	u16 pa2gw3a1 {
-		srom 4-7	{ 0xB6 }
-	}
-	u16 pa5ghw3a1 {
-		srom 4-7	{ 0xD2 }
-	}
-	u16 pa5glw3a1 {
-		srom 4-7	{ 0xCA }
-	}
-	u16 pa5gw3a1 {
-		srom 4-7	{ 0xC2 }
-	}
-}
-
-# 2 or 4 byte: 11n frontend specification
-HNBU_FEM {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM
-	compat		1-10
-	u8 antswctl2g {
-		cis	{ 0x1 (&0xF8, >>3) }
-		srom 8-10	{ 0xAE (&0xF8, >>3) }
-	}
-	u8 triso2g {
-		cis	{ 0x1 (&0x7) }
-		srom 8-10	{ 0xAE (&0x7) }
-	}
-	u8 pdetrange2g {
-		cis	{ 0x0 (&0xF8, >>3) }
-		srom 8-10	{ 0xAF (&0xF8, >>3) }
-	}
-	u8 extpagain2g {
-		cis	{ 0x0 (&0x6, >>1) }
-		srom 8-10	{ 0xAF (&0x6, >>1) }
-	}
-	u8 tssipos2g {
-		cis	{ 0x0 (&0x1) }
-		srom 8-10	{ 0xAF (&0x1) }
-	}
-	u8 antswctl5g {
-		cis	{ 0x3 (&0xF8, >>3) }
-		srom 8-10	{ 0xB0 (&0xF8, >>3) }
-	}
-	u8 triso5g {
-		cis	{ 0x3 (&0x7) }
-		srom 8-10	{ 0xB0 (&0x7) }
-	}
-	u8 pdetrange5g {
-		cis	{ 0x2 (&0xF8, >>3) }
-		srom 8-10	{ 0xB1 (&0xF8, >>3) }
-	}
-	u8 extpagain5g {
-		cis	{ 0x2 (&0x6, >>1) }
-		srom 8-10	{ 0xB1 (&0x6, >>1) }
-	}
-	u8 tssipos5g {
-		cis	{ 0x2 (&0x1) }
-		srom 8-10	{ 0xB1 (&0x1) }
-	}
-}
-
-# Antennas available
-HNBU_AA {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AA
-	compat		>= 0
-	u8 aa2g {
-		cis	{ 0x0 }
-		srom 1-3	{ 0x5C (&0x30, >>4) }
-		srom 4-7	{ 0x5D }
-		srom 8-10	{ 0x9D }
-		srom >= 11	{ 0xA1 }
-	}
-	u8 aa5g {
-		cis	{ 0x1 }
-		srom 1-3	{ 0x5C (&0xC0, >>6) }
-		srom 4-7	{ 0x5C }
-		srom 8-10	{ 0x9C }
-		srom >= 11	{ 0xA0 }
-	}
-}
-
-# 4328 5G antennas available/gain
-HNBU_ANT5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ANT5G
-	compat		>= 0
-	u8 aa5g {
-		cis	{ 0x0 }
-		srom 1-3	{ 0x5C (&0xC0, >>6) }
-		srom 4-7	{ 0x5C }
-		srom 8-10	{ 0x9C }
-		srom >= 11	{ 0xA0 }
-	}
-	u8 ag1 {
-		cis	{ 0x1 }
-		srom 1-3	{ 0x74 }
-		srom 4-7	{ 0x5E }
-		srom 8-10	{ 0x9E }
-	}
-}
-
-# 2 bytes: 40Mhz channel 2g/5g power offset
-HNBU_PO_40M {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40M
-	compat		>= 0
-	u16 bw40po {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x18E }
-		srom 8	{ 0x196 }
-	}
-}
-
-HNBU_PDOFF_2G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF_2G
-	compat		>= 11
-	u8 pdoffset2g40ma0 {
-		cis	{ 0x0 (&0xF) }
-		srom 	{ 0xC9 (&0xF) }
-	}
-	u8 pdoffset2g40ma1 {
-		cis	{ 0x0 (&0xF0, >>4) }
-		srom 	{ 0xC9 (&0xF0, >>4) }
-	}
-	u8 pdoffset2g40ma2 {
-		cis	{ 0x1 (&0xF) }
-		srom 	{ 0xC8 (&0xF) }
-	}
-	u8 pdoffset2g40mvalid {
-		cis	{ 0x1 (&0x80, >>7) }
-		srom 	{ 0xC8 (&0x80, >>7) }
-	}
-}
-
-# Antenna gain
-HNBU_AG {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AG
-	compat		>= 0
-	u8 ag0 {
-		cis	{ 0x0 }
-		srom 1-3	{ 0x75 }
-		srom 4-7	{ 0x5F }
-		srom 8-10	{ 0x9F }
-	}
-	u8 ag1 {
-		cis	{ 0x1 }
-		srom 1-3	{ 0x74 }
-		srom 4-7	{ 0x5E }
-		srom 8-10	{ 0x9E }
-	}
-	u8 ag2 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x61 }
-		srom 8-10	{ 0xA1 }
-	}
-	u8 ag3 {
-		cis	{ 0x3 }
-		srom 4-7	{ 0x60 }
-		srom 8-10	{ 0xA0 }
-	}
-}
-
-# board flags (2 or 4 bytes)
-HNBU_BOARDFLAGS {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDFLAGS
-	compat		>= 0
-	u32 boardflags {
-		cis	{ 0x0 }
-		srom 1	{  u16 @ 0x72 }
-		srom 2	{  u16 @ 0x72 |  u16 @ 0x38 (<<16) }
-		srom 3	{  u16 @ 0x72 |  u16 @ 0x7A (<<16) }
-		srom 4	{ 0x44 }
-		srom 5-7	{ 0x4A }
-		srom >= 8	{ 0x84 }
-	}
-	u32 boardflags2 {
-		cis	{ 0x4 }
-		srom 4	{ 0x48 }
-		srom 5-7	{ 0x4E }
-		srom >= 8	{ 0x88 }
-	}
-	u32 boardflags3 {
-		cis	{ 0x8 }
-		srom >= 11	{ 0x8C }
-	}
-}
-
-# 4328 5G RSSI mid pt sel & board switch arch,
-# 2 bytes, rev 3.
-# 
-HNBU_RSSISMBXA5G {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA5G
-	compat		>= 0
-	u8 rssismf5g {
-		cis	{ 0x0 (&0xF) }
-		srom 3	{ 0x53 (&0xF) }
-		srom 8-10	{ 0xA7 (&0xF) }
-	}
-	u8 rssismc5g {
-		cis	{ 0x0 (&0xF0, >>4) }
-		srom 3	{ 0x53 (&0xF0, >>4) }
-		srom 8-10	{ 0xA7 (&0xF0, >>4) }
-	}
-	u8 rssisav5g {
-		cis	{ 0x1 (&0x7) }
-		srom 3	{ 0x52 (&0x7) }
-		srom 8-10	{ 0xA6 (&0x7) }
-	}
-	u8 bxa5g {
-		cis	{ 0x1 (&0x18, >>3) }
-		srom 3	{ 0x52 (&0x18, >>3) }
-		srom 8-10	{ 0xA6 (&0x18, >>3) }
-	}
-}
-
-# One byte board revision
-HNBU_BOARDREV {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDREV
-	compat		>= 0
-	u16 boardrev {
-		cis	{ 0x0 }
-		srom 1-3	{  u8 @ 0x5D }
-		srom 4-7	{ 0x42 }
-		srom >= 8	{ 0x82 }
-	}
-}
-
-# 6 or 18 bytes: cck2g/ofdm2g/ofdm5g power offset
-HNBU_PO_CCKOFDM {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CCKOFDM
-	compat		>= 0
-	u16 cck2gpo {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x138 }
-		srom 8	{ 0x140 }
-	}
-	u32 ofdm2gpo {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x13A }
-		srom 8	{ 0x142 }
-	}
-	u32 ofdm5gpo {
-		cis	{ 0x6 }
-		srom 4-7	{ 0x13E }
-		srom 8	{ 0x146 }
-	}
-	u32 ofdm5glpo {
-		cis	{ 0xA }
-		srom 4-7	{ 0x142 }
-		srom 8	{ 0x14A }
-	}
-	u32 ofdm5ghpo {
-		cis	{ 0xE }
-		srom 4-7	{ 0x146 }
-		srom 8	{ 0x14E }
-	}
-}
-
-# Eight bytes OEM data (sromrev == 1)
-HNBU_OEM {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OEM
-	compat		1
-	u8[8] oem {
-		sfmt	hexbin
-		cis	{ 0x0 (&0xF) }
-	}
-}
-
-# 8 bytes: mcs5g mid band power offset
-HNBU_PO_MCS5GM {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GM
-	compat		>= 0
-	u16 mcs5gpo0 {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x15A }
-		srom 8	{ 0x162 }
-	}
-	u16 mcs5gpo1 {
-		cis	{ 0x2 }
-		srom 4-7	{ 0x15C }
-		srom 8	{ 0x164 }
-	}
-	u16 mcs5gpo2 {
-		cis	{ 0x4 }
-		srom 4-7	{ 0x15E }
-		srom 8	{ 0x166 }
-	}
-	u16 mcs5gpo3 {
-		cis	{ 0x6 }
-		srom 4-7	{ 0x160 }
-		srom 8	{ 0x168 }
-	}
-	u16 mcs5gpo4 {
-		cis	{ 0x8 }
-		srom 4-7	{ 0x162 }
-		srom 8	{ 0x16A }
-	}
-	u16 mcs5gpo5 {
-		cis	{ 0xA }
-		srom 4-7	{ 0x164 }
-		srom 8	{ 0x16C }
-	}
-	u16 mcs5gpo6 {
-		cis	{ 0xC }
-		srom 4-7	{ 0x166 }
-		srom 8	{ 0x16E }
-	}
-	u16 mcs5gpo7 {
-		cis	{ 0xE }
-		srom 4-7	{ 0x168 }
-		srom 8	{ 0x170 }
-	}
-}
-
-# 2 byte; txchain, rxchain
-HNBU_CHAINSWITCH {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHAINSWITCH
-	compat		>= 0
-	u8 txchain {
-		cis	{ 0x0 }
-		srom 4-7	{ 0x7B (&0xF) }
-		srom 8-10	{ 0xA3 (&0xF) }
-		srom >= 11	{ 0xA9 (&0xF) }
-	}
-	u8 rxchain {
-		cis	{ 0x1 }
-		srom 4-7	{ 0x7B (&0xF0, >>4) }
-		srom 8-10	{ 0xA3 (&0xF0, >>4) }
-		srom >= 11	{ 0xA9 (&0xF0, >>4) }
-	}
-	u16 antswitch {
-		cis	{ 0x2 }
-		srom 4-7	{  u8 @ 0x7A }
-		srom 8-10	{  u8 @ 0xA2 }
-		srom >= 11	{  u8 @ 0xA8 }
-	}
-}
-
-HNBU_PDOFF {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF
-	compat		>= 11
-	u16 pdoffset40ma0 {
-		cis	{ 0x0 }
-		srom 	{ 0xCA }
-	}
-	u16 pdoffset40ma1 {
-		cis	{ 0x2 }
-		srom 	{ 0xCC }
-	}
-	u16 pdoffset40ma2 {
-		cis	{ 0x4 }
-		srom 	{ 0xCE }
-	}
-	u16 pdoffset80ma0 {
-		cis	{ 0x6 }
-		srom 	{ 0xD0 }
-	}
-	u16 pdoffset80ma1 {
-		cis	{ 0x8 }
-		srom 	{ 0xD2 }
-	}
-	u16 pdoffset80ma2 {
-		cis	{ 0xA }
-		srom 	{ 0xD4 }
-	}
-}
-
-# Two 16bit values: PCI vendor & device id
-HNBU_CHIPID {
-	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHIPID
-	compat		>= 0
-	u16 vendid {
-		cis	{ 0x0 }
-	}
-	u16 devid {
-		cis	{ 0x2 }
-		srom >= 8	{ 0x60 }
-	}
-	u16 chiprev {
-		sfmt	sdec
-		cis	{ 0x4 }
-	}
-	u16 subvendid {
-		cis	{ 0x6 }
-	}
-	u16 subdevid {
-		cis	{ 0x8 }
 	}
 }
 

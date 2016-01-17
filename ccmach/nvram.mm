@@ -739,6 +739,11 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
         fprintf(stderr, "\n");
     }
     
+    /* alpha sort the list */
+    sort(result.begin(), result.end(), [](const shared_ptr<var_set> &lhs, shared_ptr<var_set> &rhs) {
+        return ([@(lhs->name().c_str()) compare: @(rhs->name().c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
+    });
+    
     return result;
 }
 
