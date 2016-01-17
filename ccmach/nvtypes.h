@@ -190,7 +190,7 @@ public:
             
             if (!has_default_shift()) {
                 if (shift() < 0) {
-                    [ret appendFormat: @"<<%zd", shift()];
+                    [ret appendFormat: @"<<%zd", -shift()];
                 } else {
                     [ret appendFormat: @">>%zd", shift()];
                 }
