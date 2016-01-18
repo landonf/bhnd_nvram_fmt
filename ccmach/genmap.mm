@@ -86,6 +86,9 @@ void genmap::generate() {
                 string vtype = to_string(v->type());
                 if (v->count() > 1)
                     vtype += "[" + to_string(v->count()) + "]";
+                
+                if (v->flags() & nvram::FLAG_MFGINT)
+                    vtype = "private " + vtype;
 
                 prints("%s %s", vtype.c_str(), v->name().c_str(), ^{
                     if (v->sfmt() != SFMT_HEX)

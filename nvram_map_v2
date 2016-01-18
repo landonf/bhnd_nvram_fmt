@@ -701,18 +701,21 @@ chainswitch {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHAINSWITCH
 	compat		>= 0
 	u8 txchain {
+		all1	ignore
 		cis	{ 0x0 }
 		srom 4-7	{ 0x7B (&0xF) }
 		srom 8-10	{ 0xA3 (&0xF) }
 		srom >= 11	{ 0xA9 (&0xF) }
 	}
 	u8 rxchain {
+		all1	ignore
 		cis	{ 0x1 }
 		srom 4-7	{ 0x7B (&0xF0, >>4) }
 		srom 8-10	{ 0xA3 (&0xF0, >>4) }
 		srom >= 11	{ 0xA9 (&0xF0, >>4) }
 	}
 	u16 antswitch {
+		all1	ignore
 		cis	{ 0x2 }
 		srom 4-7	{  u8 @ 0x7A }
 		srom 8-10	{  u8 @ 0xA2 }
@@ -727,9 +730,9 @@ chipid {
 	u16 vendid {
 		cis	{ 0x0 }
 	}
-	u16 devid {
-		cis	{ 0x2 }
-		srom >= 8	{ 0x60 }
+	private u16 devid {
+		cis	{ u16 @ 0x2 }
+		srom >= 8	{  u16 @ 0x60 }
 	}
 	u16 chiprev {
 		sfmt	sdec
@@ -897,6 +900,7 @@ leddc {
 	compat		>= 0
 	u8[2] leddc {
 		sfmt	leddc
+		all1	ignore
 		cis	{ 0x0 }
 		srom 3	{ 0x7C }
 		srom 4	{ 0x5A }
@@ -911,6 +915,7 @@ leds {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDS
 	compat		>= 0
 	u8 ledbh0 {
+		all1	ignore
 		cis	{ 0x0 }
 		srom 1-3	{ 0x65 }
 		srom 4	{ 0x57 }
@@ -919,6 +924,7 @@ leds {
 		srom >= 11	{ 0x9B }
 	}
 	u8 ledbh1 {
+		all1	ignore
 		cis	{ 0x1 }
 		srom 1-3	{ 0x64 }
 		srom 4	{ 0x56 }
@@ -927,6 +933,7 @@ leds {
 		srom >= 11	{ 0x9A }
 	}
 	u8 ledbh2 {
+		all1	ignore
 		cis	{ 0x2 }
 		srom 1-3	{ 0x67 }
 		srom 4	{ 0x59 }
@@ -935,6 +942,7 @@ leds {
 		srom >= 11	{ 0x9D }
 	}
 	u8 ledbh3 {
+		all1	ignore
 		cis	{ 0x3 }
 		srom 1-3	{ 0x66 }
 		srom 4	{ 0x58 }
