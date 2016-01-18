@@ -1,4 +1,3 @@
-# CISTPL_MANFID
 CISTPL_MANFID {
 	cis_tuple	CISTPL_MANFID
 	compat		>= 0
@@ -10,7 +9,6 @@ CISTPL_MANFID {
 	}
 }
 
-# CISTPL_VERS_1
 CISTPL_VERS_1 {
 	cis_tuple	CISTPL_VERS_1
 	compat		>= 0

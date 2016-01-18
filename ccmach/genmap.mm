@@ -62,7 +62,7 @@ int genmap::prints(const char *fmt, ...) {
 void genmap::generate() {
     auto vsets = _nv.var_sets();
     for (const auto &vs : vsets) {
-        if (vs->comment().size() > 0)
+        if (vs->comment().size() > 0 && vs->comment() != vs->name())
             println("# %s", [@(vs->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);
     
         prints("%s", vs->name().c_str(), ^{
