@@ -346,6 +346,9 @@ static unordered_map<string, str_fmt> sfmt_overrides = {
 namespace nvram {
 
 unordered_map<string, value_seg> cis_subst_layout = {
+    // HNBU_LEDDC
+    { "leddc",  { 0, BHND_T_UINT8, 2, 0xFF, 0 }},
+
     // HNBU_RSSISMBXA2G
     { "rssismf2g",  { 0, BHND_T_UINT8, 1, 0x0F, 0 }},
     { "rssismc2g",  { 0, BHND_T_UINT8, 1, 0xF0, 4 }},

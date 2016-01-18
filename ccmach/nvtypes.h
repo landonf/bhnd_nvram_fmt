@@ -160,10 +160,10 @@ public:
             case BHND_T_INT8:
             case BHND_T_CHAR:
             case BHND_T_CSTR:
-                return (mask() == 0xFF);
+                return ((mask() & 0xFF) == 0xFF);
             case BHND_T_UINT16:
             case BHND_T_INT16:
-                return (mask() == 0xFFFF);
+                return ((mask() & 0xFFFF) == 0xFFFF);
             case BHND_T_UINT32:
             case BHND_T_INT32:
                 return (mask() == 0xFFFFFFFF);

@@ -956,7 +956,7 @@ static const cis_tuple_t cis_hnbuvars[] = {
 	{HNBU_MACADDR,		0xffffffff, 7, "6macaddr"},	/* special case */
 	//{HNBU_RDLSN,		0xffffffff, 3, "2rdlsn"},
 	{HNBU_BOARDTYPE,	0xffffffff, 3, "2boardtype"},
-	{HNBU_LEDDC,		0xffffffff, 3, "2leddc"},
+	{HNBU_LEDDC,		0xffffffff, 3, "0leddc"},
 	//{HNBU_RDLRNDIS,		0xffffffff, 2, "1rdlndis"},
 	{HNBU_CHAINSWITCH,	0xffffffff, 5, "1txchain 1rxchain 2antswitch"},
 	{HNBU_REGREV,		0xffffffff, 2, "1regrev"},
