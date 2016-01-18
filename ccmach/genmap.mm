@@ -91,6 +91,9 @@ void genmap::generate() {
                     if (v->sfmt() != SFMT_HEX)
                         println("sfmt\t%s", to_string(v->sfmt()).c_str());
                     
+                    if (v->flags() & FLAG_NOALL1)
+                        println("all1\tignore");
+                    
                     for (const auto &cis : *v->cis_offsets()) {
                         const auto &value = cis.value();
                         string type = to_string(value.type());
