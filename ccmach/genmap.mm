@@ -64,8 +64,12 @@ void genmap::generate() {
     for (const auto &vs : vsets) {
         if (vs->comment().size() > 0 && vs->comment() != vs->name())
             println("# %s", [@(vs->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);
+        
+        NSString *sectName = @(vs->name().c_str());
+        if ([sectName hasPrefix: @"HNBU_"])
+            sectName = [[sectName substringFromIndex: 5] lowercaseString];
     
-        prints("%s", vs->name().c_str(), ^{
+        prints("%s", sectName.UTF8String, ^{
             if (vs->cis().is<var_set_cis>()) {
                 auto cis = ftl::get<var_set_cis>(vs->cis());
                 

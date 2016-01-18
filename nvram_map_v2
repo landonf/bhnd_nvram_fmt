@@ -23,7 +23,7 @@ CISTPL_VERS_1 {
 }
 
 # Antennas available
-HNBU_AA {
+aa {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AA
 	compat		>= 0
 	u8 aa2g {
@@ -43,7 +43,7 @@ HNBU_AA {
 }
 
 # ACPHY PA trimming parameters: 40
-HNBU_ACPA_40 {
+acpa_40 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_40
 	compat		>= 11
 	u16[12] pa5gbw40a0 {
@@ -53,7 +53,7 @@ HNBU_ACPA_40 {
 }
 
 # ACPHY PA trimming parameters: 80
-HNBU_ACPA_80 {
+acpa_80 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_80
 	compat		>= 11
 	u16[12] pa5gbw80a0 {
@@ -63,7 +63,7 @@ HNBU_ACPA_80 {
 }
 
 # ACPHY PA trimming parameters: 40/80
-HNBU_ACPA_4080 {
+acpa_4080 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_4080
 	compat		>= 11
 	u16[12] pa5gbw4080a0 {
@@ -77,7 +77,7 @@ HNBU_ACPA_4080 {
 }
 
 # ACPHY PA parameters: chain 0
-HNBU_ACPA_C0 {
+acpa_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C0
 	compat		>= 11
 	u16 subband5gver {
@@ -108,7 +108,7 @@ HNBU_ACPA_C0 {
 }
 
 # ACPHY PA parameters: chain 1
-HNBU_ACPA_C1 {
+acpa_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C1
 	compat		>= 11
 	u16 maxp2ga1 {
@@ -134,7 +134,7 @@ HNBU_ACPA_C1 {
 }
 
 # ACPHY PA parameters: chain 2
-HNBU_ACPA_C2 {
+acpa_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C2
 	compat		>= 11
 	u16 maxp2ga2 {
@@ -160,7 +160,7 @@ HNBU_ACPA_C2 {
 }
 
 # ACPHY PA trimming parameters: CCK
-HNBU_ACPA_CCK {
+acpa_cck {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_CCK
 	compat		>= 11
 	u16[3] pa2gccka0 {
@@ -170,7 +170,7 @@ HNBU_ACPA_CCK {
 }
 
 # ACPHY Power-per-rate 2gpo
-HNBU_ACPPR_2GPO {
+acppr_2gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_2GPO
 	compat		>= 11
 	u16 dot11agofdmhrbw202gpo {
@@ -184,7 +184,7 @@ HNBU_ACPPR_2GPO {
 }
 
 # ACPHY Power-per-rate 5gpo
-HNBU_ACPPR_5GPO {
+acppr_5gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_5GPO
 	compat		>= 11
 	u32 mcsbw805glpo {
@@ -223,7 +223,7 @@ HNBU_ACPPR_5GPO {
 }
 
 # ACPHY Power-per-rate sbpo
-HNBU_ACPPR_SBPO {
+acppr_sbpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_SBPO
 	compat		>= 11
 	u16 sb20in40hrpo {
@@ -293,7 +293,7 @@ HNBU_ACPPR_SBPO {
 }
 
 # ACPHY rxgains: chain 0
-HNBU_ACRXGAINS_C0 {
+acrxgains_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C0
 	compat		>= 11
 	u8 rxgains5gtrelnabypa0 {
@@ -359,7 +359,7 @@ HNBU_ACRXGAINS_C0 {
 }
 
 # ACPHY rxgains: chain 1
-HNBU_ACRXGAINS_C1 {
+acrxgains_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C1
 	compat		>= 11
 	u8 rxgains5gtrelnabypa1 {
@@ -425,7 +425,7 @@ HNBU_ACRXGAINS_C1 {
 }
 
 # ACPHY rxgains: chain 2
-HNBU_ACRXGAINS_C2 {
+acrxgains_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C2
 	compat		>= 11
 	u8 rxgains5gtrelnabypa2 {
@@ -491,7 +491,7 @@ HNBU_ACRXGAINS_C2 {
 }
 
 # Antenna gain
-HNBU_AG {
+ag {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AG
 	compat		>= 0
 	u8 ag0 {
@@ -518,7 +518,7 @@ HNBU_AG {
 	}
 }
 
-HNBU_AGBGA {
+agbga {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AGBGA
 	compat		>= 11
 	u8 agbg0 {
@@ -548,7 +548,7 @@ HNBU_AGBGA {
 }
 
 # 4328 5G antennas available/gain
-HNBU_ANT5G {
+ant5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ANT5G
 	compat		>= 0
 	u8 aa5g {
@@ -567,7 +567,7 @@ HNBU_ANT5G {
 }
 
 # board flags (2 or 4 bytes)
-HNBU_BOARDFLAGS {
+boardflags {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDFLAGS
 	compat		>= 0
 	u32 boardflags {
@@ -592,7 +592,7 @@ HNBU_BOARDFLAGS {
 }
 
 # board serial number, independent of mac addr
-HNBU_BOARDNUM {
+boardnum {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDNUM
 	compat		>= 0
 	u16 boardnum {
@@ -607,7 +607,7 @@ HNBU_BOARDNUM {
 }
 
 # One byte board revision
-HNBU_BOARDREV {
+boardrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDREV
 	compat		>= 0
 	u16 boardrev {
@@ -619,7 +619,7 @@ HNBU_BOARDREV {
 }
 
 # 2 bytes; boardtype
-HNBU_BOARDTYPE {
+boardtype {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDTYPE
 	compat		>= 0
 	u16 boardtype {
@@ -629,7 +629,7 @@ HNBU_BOARDTYPE {
 }
 
 # Default country code (sromrev == 1)
-HNBU_CC {
+cc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CC
 	compat		1
 	u8 cc {
@@ -642,7 +642,7 @@ HNBU_CC {
 # CCK Power offsets for 20 MHz rates (11, 5.5, 2, 1Mbps)
 # cckbw202gpo cckbw20ul2gpo
 # 
-HNBU_CCKBW202GPO {
+cckbw202gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKBW202GPO
 	compat		>= 0
 	u16 cckbw202gpo {
@@ -658,7 +658,7 @@ HNBU_CCKBW202GPO {
 }
 
 # CCK digital filter selection options
-HNBU_CCKFILTTYPE {
+cckfilttype {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKFILTTYPE
 	compat		>= 0
 	u8 cckdigfilttype {
@@ -668,7 +668,7 @@ HNBU_CCKFILTTYPE {
 }
 
 # 2 byte cck power offsets in rev 3
-HNBU_CCKPO {
+cckpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKPO
 	compat		>= 0
 	u16 cckpo {
@@ -679,17 +679,17 @@ HNBU_CCKPO {
 # Country code (2 bytes ascii + 1 byte cctl)
 # in rev 2
 # 
-HNBU_CCODE {
+ccode {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCODE
 	compat		>= 0
 	char ccode {
 		sfmt	ccode
 		cis	{ u16 @ 0x0 }
-		srom 0-3	{  char[2] @ 0x76 (&0xFFFF) }
-		srom 4	{  char[2] @ 0x52 (&0xFFFF) }
-		srom 5-7	{  char[2] @ 0x44 (&0xFFFF) }
-		srom 8-10	{  char[2] @ 0x92 (&0xFFFF) }
-		srom >= 11	{  char[2] @ 0x96 (&0xFFFF) }
+		srom 0-3	{  char[2] @ 0x76 }
+		srom 4	{  char[2] @ 0x52 }
+		srom 5-7	{  char[2] @ 0x44 }
+		srom 8-10	{  char[2] @ 0x92 }
+		srom >= 11	{  char[2] @ 0x96 }
 	}
 	u8 cctl {
 		cis	{ 0x2 }
@@ -697,7 +697,7 @@ HNBU_CCODE {
 }
 
 # 2 byte; txchain, rxchain
-HNBU_CHAINSWITCH {
+chainswitch {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHAINSWITCH
 	compat		>= 0
 	u8 txchain {
@@ -721,7 +721,7 @@ HNBU_CHAINSWITCH {
 }
 
 # Two 16bit values: PCI vendor & device id
-HNBU_CHIPID {
+chipid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHIPID
 	compat		>= 0
 	u16 vendid {
@@ -744,7 +744,7 @@ HNBU_CHIPID {
 }
 
 # 4 byte; For non-BRCM post-mfg additions
-HNBU_CUSTOM1 {
+custom1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CUSTOM1
 	compat		>= 0
 	u32 customvar1 {
@@ -752,7 +752,7 @@ HNBU_CUSTOM1 {
 	}
 }
 
-HNBU_ELNA2G {
+elna2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA2G
 	compat		>= 0
 	u8 elna2g {
@@ -761,7 +761,7 @@ HNBU_ELNA2G {
 	}
 }
 
-HNBU_ELNA5G {
+elna5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA5G
 	compat		>= 0
 	u8 elna5g {
@@ -771,7 +771,7 @@ HNBU_ELNA5G {
 }
 
 # 2 or 4 byte: 11n frontend specification
-HNBU_FEM {
+fem {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM
 	compat		1-10
 	u8 antswctl2g {
@@ -817,7 +817,7 @@ HNBU_FEM {
 }
 
 # FEM config
-HNBU_FEM_CFG {
+fem_cfg {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM_CFG
 	compat		>= 11
 	u8 femctrl {
@@ -883,7 +883,7 @@ HNBU_FEM_CFG {
 }
 
 # 4 byte GPIO pull down mask
-HNBU_GPIO_PULL_DOWN {
+gpio_pull_down {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_GPIO_PULL_DOWN
 	compat		>= 0
 	u32 gpdn {
@@ -892,22 +892,22 @@ HNBU_GPIO_PULL_DOWN {
 }
 
 # 2 bytes; LED duty cycle
-HNBU_LEDDC {
+leddc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDDC
 	compat		>= 0
-	u16 leddc {
+	u8[2] leddc {
 		sfmt	leddc
 		cis	{ 0x0 }
-		srom 3	{  u8[2] @ 0x7C (&0xFFFF) }
-		srom 4	{  u8[2] @ 0x5A (&0xFFFF) }
-		srom 5-7	{  u8[2] @ 0x5A (&0xFFFF) }
-		srom 8-10	{  u8[2] @ 0x9A (&0xFFFF) }
-		srom >= 11	{  u8[2] @ 0x9E (&0xFFFF) }
+		srom 3	{ 0x7C }
+		srom 4	{ 0x5A }
+		srom 5-7	{ 0x5A }
+		srom 8-10	{ 0x9A }
+		srom >= 11	{ 0x9E }
 	}
 }
 
 # LED set
-HNBU_LEDS {
+leds {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDS
 	compat		>= 0
 	u8 ledbh0 {
@@ -986,7 +986,7 @@ HNBU_LEDS {
 # LSB nibble: 2G band, MSB nibble: 5G band high subband.
 # leg40dup5ghpo, leg40dup5gmpo, leg40dup5glpo, leg40dup2gpo
 # 
-HNBU_LEG40DUPPO {
+leg40duppo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEG40DUPPO
 	compat		>= 0
 	u16 legofdm40duppo {
@@ -1000,7 +1000,7 @@ HNBU_LEG40DUPPO {
 # (54, 48, 36, 24, 18, 12, 9, 6 Mbps)
 # legofdmbw202gpo  legofdmbw20ul2gpo
 # 
-HNBU_LEGOFDMBW202GPO {
+legofdmbw202gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW202GPO
 	compat		>= 0
 	u32 legofdmbw202gpo {
@@ -1020,7 +1020,7 @@ HNBU_LEGOFDMBW202GPO {
 # mid subband :legofdmbw205gmpo  legofdmbw20ul2gmpo
 # high subband :legofdmbw205ghpo  legofdmbw20ul2ghpo
 # 
-HNBU_LEGOFDMBW205GPO {
+legofdmbw205gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW205GPO
 	compat		>= 0
 	u32 legofdmbw205glpo {
@@ -1050,17 +1050,17 @@ HNBU_LEGOFDMBW205GPO {
 }
 
 # mac addr override for the standard CIS LAN_NID
-HNBU_MACADDR {
+macaddr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MACADDR
 	compat		>= 0
 	u8[48] macaddr {
 		sfmt	macaddr
 		cis	{ 0x0 }
-		srom 3	{ 0x4A (&0xFFFF) }
-		srom 4	{ 0x4C (&0xFFFF) }
-		srom 5-7	{ 0x52 (&0xFFFF) }
-		srom 8-10	{ 0x8C (&0xFFFF) }
-		srom >= 11	{ 0x90 (&0xFFFF) }
+		srom 3	{ 0x4A }
+		srom 4	{ 0x4C }
+		srom 5-7	{ 0x52 }
+		srom 8-10	{ 0x8C }
+		srom >= 11	{ 0x90 }
 	}
 }
 
@@ -1068,7 +1068,7 @@ HNBU_MACADDR {
 # mcs 0-7  power-offset. LSB nibble: m0, MSB nibble: m7
 # mcsbw202gpo  mcsbw20ul2gpo mcsbw402gpo
 # 
-HNBU_MCS2GPO {
+mcs2gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS2GPO
 	compat		>= 0
 	u32 mcsbw202gpo {
@@ -1092,7 +1092,7 @@ HNBU_MCS2GPO {
 # LSB nibble: m0, MSB nibble: m7
 # mcsbw205ghpo  mcsbw20ul5ghpo mcsbw405ghpo
 # 
-HNBU_MCS5GHPO {
+mcs5ghpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GHPO
 	compat		>= 0
 	u32 mcsbw205ghpo {
@@ -1116,7 +1116,7 @@ HNBU_MCS5GHPO {
 # LSB nibble: m0, MSB nibble: m7
 # mcsbw205glpo  mcsbw20ul5glpo mcsbw405glpo
 # 
-HNBU_MCS5GLPO {
+mcs5glpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GLPO
 	compat		>= 0
 	u32 mcsbw205glpo {
@@ -1140,7 +1140,7 @@ HNBU_MCS5GLPO {
 # LSB nibble: m0, MSB nibble: m7
 # mcsbw205gmpo  mcsbw20ul5gmpo mcsbw405gmpo
 # 
-HNBU_MCS5GMPO {
+mcs5gmpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GMPO
 	compat		>= 0
 	u32 mcsbw205gmpo {
@@ -1164,7 +1164,7 @@ HNBU_MCS5GMPO {
 # LSB nibble: 2G band, MSB nibble:
 # mcs322ghpo, mcs325gmpo, mcs325glpo, mcs322gpo
 # 
-HNBU_MCS32PO {
+mcs32po {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS32PO
 	compat		>= 0
 	u16 mcs32po {
@@ -1173,7 +1173,7 @@ HNBU_MCS32PO {
 	}
 }
 
-HNBU_MEAS_PWR {
+meas_pwr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MEAS_PWR
 	compat		>= 11
 	u8 measpower {
@@ -1199,7 +1199,7 @@ HNBU_MEAS_PWR {
 }
 
 # 1 byte to enable mux options
-HNBU_MUXENAB {
+muxenab {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MUXENAB
 	compat		>= 0
 	u8 muxenab {
@@ -1207,7 +1207,7 @@ HNBU_MUXENAB {
 	}
 }
 
-HNBU_NOISELVL {
+noiselvl {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_NOISELVL
 	compat		>= 11
 	u8 noiselvl2ga0 {
@@ -1246,7 +1246,7 @@ HNBU_NOISELVL {
 }
 
 # Eight bytes OEM data (sromrev == 1)
-HNBU_OEM {
+oem {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OEM
 	compat		1
 	u8[8] oem {
@@ -1256,7 +1256,7 @@ HNBU_OEM {
 }
 
 # 4 byte 11g ofdm power offsets in rev 3
-HNBU_OFDMPO {
+ofdmpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO
 	compat		>= 0
 	u32 ofdmpo {
@@ -1266,7 +1266,7 @@ HNBU_OFDMPO {
 
 # 4
 # 3 = 12 byte 11a ofdm power offsets in rev 3
-HNBU_OFDMPO5G {
+ofdmpo5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO5G
 	compat		>= 0
 	u32 ofdm5gpo {
@@ -1287,7 +1287,7 @@ HNBU_OFDMPO5G {
 }
 
 # paparambwver
-HNBU_PAPARAMBWVER {
+paparambwver {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARAMBWVER
 	compat		>= 11
 	u8 paparambwver {
@@ -1300,7 +1300,7 @@ HNBU_PAPARAMBWVER {
 # PA parameters: 8 (sromrev == 1)
 # or 9 (sromrev > 1) bytes
 # 
-HNBU_PAPARMS {
+paparms {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS
 	compat		>= 0
 	u16 pa0b0 {
@@ -1341,7 +1341,7 @@ HNBU_PAPARMS {
 }
 
 # 5G PA params
-HNBU_PAPARMS5G {
+paparms5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS5G
 	compat		>= 0
 	u16 pa1b0 {
@@ -1425,7 +1425,7 @@ HNBU_PAPARMS5G {
 }
 
 # 8 or 30 bytes: 11n pa paramater for chain 0
-HNBU_PAPARMS_C0 {
+paparms_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C0
 	compat		1-10
 	u8 maxp2ga0 {
@@ -1535,7 +1535,7 @@ HNBU_PAPARMS_C0 {
 }
 
 # 8 or 30 bytes: 11n pa paramater for chain 1
-HNBU_PAPARMS_C1 {
+paparms_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C1
 	compat		1-10
 	u8 maxp2ga1 {
@@ -1645,7 +1645,7 @@ HNBU_PAPARMS_C1 {
 }
 
 # 8 or 30 bytes: 11n pa paramater for chain 2
-HNBU_PAPARMS_C2 {
+paparms_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C2
 	compat		1-10
 	u8 maxp2ga2 {
@@ -1755,7 +1755,7 @@ HNBU_PAPARMS_C2 {
 }
 
 # 8 or 30 bytes: 11n pa paramater for chain 3
-HNBU_PAPARMS_C3 {
+paparms_c3 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C3
 	compat		1-10
 	u8 maxp2ga3 {
@@ -1862,7 +1862,7 @@ HNBU_PAPARMS_C3 {
 	}
 }
 
-HNBU_PDOFF {
+pdoff {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF
 	compat		>= 11
 	u16 pdoffset40ma0 {
@@ -1891,7 +1891,7 @@ HNBU_PDOFF {
 	}
 }
 
-HNBU_PDOFF_2G {
+pdoff_2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF_2G
 	compat		>= 11
 	u8 pdoffset2g40ma0 {
@@ -1913,7 +1913,7 @@ HNBU_PDOFF_2G {
 }
 
 # 2 bytes: 40Mhz channel 2g/5g power offset
-HNBU_PO_40M {
+po_40m {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40M
 	compat		>= 0
 	u16 bw40po {
@@ -1924,7 +1924,7 @@ HNBU_PO_40M {
 }
 
 # 2 bytes: 40Mhz channel dup 2g/5g power offset
-HNBU_PO_40MDUP {
+po_40mdup {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40MDUP
 	compat		>= 0
 	u16 bwduppo {
@@ -1935,7 +1935,7 @@ HNBU_PO_40MDUP {
 }
 
 # 6 or 18 bytes: cck2g/ofdm2g/ofdm5g power offset
-HNBU_PO_CCKOFDM {
+po_cckofdm {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CCKOFDM
 	compat		>= 0
 	u16 cck2gpo {
@@ -1966,7 +1966,7 @@ HNBU_PO_CCKOFDM {
 }
 
 # 2 bytes: cdd2g/5g power offset
-HNBU_PO_CDD {
+po_cdd {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CDD
 	compat		>= 0
 	u16 cddpo {
@@ -1977,7 +1977,7 @@ HNBU_PO_CDD {
 }
 
 # 8 bytes: mcs2g power offset
-HNBU_PO_MCS2G {
+po_mcs2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS2G
 	compat		>= 0
 	u16 mcs2gpo0 {
@@ -2023,7 +2023,7 @@ HNBU_PO_MCS2G {
 }
 
 # 16 bytes: mcs5g low-high band power offset
-HNBU_PO_MCS5GLH {
+po_mcs5glh {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GLH
 	compat		>= 0
 	u16 mcs5glpo0 {
@@ -2109,7 +2109,7 @@ HNBU_PO_MCS5GLH {
 }
 
 # 8 bytes: mcs5g mid band power offset
-HNBU_PO_MCS5GM {
+po_mcs5gm {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GM
 	compat		>= 0
 	u16 mcs5gpo0 {
@@ -2155,7 +2155,7 @@ HNBU_PO_MCS5GM {
 }
 
 # 2 bytes: stbc2g/5g power offset
-HNBU_PO_STBC {
+po_stbc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_STBC
 	compat		>= 0
 	u16 stbcpo {
@@ -2166,7 +2166,7 @@ HNBU_PO_STBC {
 }
 
 # 2 byte USB remote downloader (RDL) product Id
-HNBU_RDLID {
+rdlid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RDLID
 	compat		>= 0
 	u16 rdlid {
@@ -2175,7 +2175,7 @@ HNBU_RDLID {
 }
 
 # 1 byte;
-HNBU_REGREV {
+regrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_REGREV
 	compat		>= 0
 	u8 regrev {
@@ -2191,7 +2191,7 @@ HNBU_REGREV {
 # 4328 2G RSSI mid pt sel & board switch arch,
 # 2 bytes, rev 3.
 # 
-HNBU_RSSISMBXA2G {
+rssismbxa2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA2G
 	compat		>= 0
 	u8 rssismf2g {
@@ -2219,7 +2219,7 @@ HNBU_RSSISMBXA2G {
 # 4328 5G RSSI mid pt sel & board switch arch,
 # 2 bytes, rev 3.
 # 
-HNBU_RSSISMBXA5G {
+rssismbxa5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA5G
 	compat		>= 0
 	u8 rssismf5g {
@@ -2244,7 +2244,7 @@ HNBU_RSSISMBXA5G {
 	}
 }
 
-HNBU_RXGAIN_ERR {
+rxgain_err {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXGAIN_ERR
 	compat		>= 11
 	u8 rxgainerr2ga0 {
@@ -2313,7 +2313,7 @@ HNBU_RXGAIN_ERR {
 }
 
 # 4328 2G RX power offset, 1 byte
-HNBU_RXPO2G {
+rxpo2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO2G
 	compat		>= 0
 	i8 rxpo2g {
@@ -2325,7 +2325,7 @@ HNBU_RXPO2G {
 }
 
 # 4328 5G RX power offset, 1 byte
-HNBU_RXPO5G {
+rxpo5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO5G
 	compat		>= 0
 	i8 rxpo5g {
@@ -2337,7 +2337,7 @@ HNBU_RXPO5G {
 }
 
 # A byte with sromrev, 1 if not present
-HNBU_SROMREV {
+sromrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SROMREV
 	compat		>= 0
 	u8 sromrev {
@@ -2347,7 +2347,7 @@ HNBU_SROMREV {
 }
 
 # subband5gver
-HNBU_SUBBAND5GVER {
+subband5gver {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SUBBAND5GVER
 	compat		>= 11
 	u16 subband5gver {
@@ -2361,7 +2361,7 @@ HNBU_SUBBAND5GVER {
 # byte1 tempthresh
 # byte2 period(msb 4 bits) | hysterisis(lsb 4 bits)
 # 
-HNBU_TEMPTHRESH {
+tempthresh {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TEMPTHRESH
 	compat		>= 0
 	u8 tempthresh {
@@ -2411,7 +2411,7 @@ HNBU_TEMPTHRESH {
 }
 
 # 4328 2G TR isolation, 1 byte
-HNBU_TRI2G {
+tri2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI2G
 	compat		>= 0
 	u8 tri2g {
@@ -2422,7 +2422,7 @@ HNBU_TRI2G {
 }
 
 # 4328 5G TR isolation, 3 bytes
-HNBU_TRI5G {
+tri5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI5G
 	compat		>= 0
 	u8 tri5gl {
@@ -2443,7 +2443,7 @@ HNBU_TRI5G {
 }
 
 # phy txbf rpcalvars
-HNBU_TXBFRPCALS {
+txbfrpcals {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXBFRPCALS
 	compat		>= 11
 	u16 rpcal2g {
@@ -2469,7 +2469,7 @@ HNBU_TXBFRPCALS {
 }
 
 # Tx duty cycle for ACPHY 5g 40/80 Mhz
-HNBU_TXDUTY {
+txduty {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXDUTY
 	compat		>= 11
 	u16 tx_duty_cycle_ofdm_40_5g {
@@ -2490,7 +2490,7 @@ HNBU_TXDUTY {
 	}
 }
 
-HNBU_UMANFID {
+umanfid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UMANFID
 	compat		>= 0
 	u32 usbmanfid {
@@ -2499,7 +2499,7 @@ HNBU_UMANFID {
 }
 
 # USB30 NO Super Speed
-HNBU_USB30PHY_NOSS {
+usb30phy_noss {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_NOSS
 	compat		>= 0
 	u8 usbnoss {
@@ -2508,7 +2508,7 @@ HNBU_USB30PHY_NOSS {
 }
 
 # USB30 PHY REGs update
-HNBU_USB30PHY_REGS {
+usb30phy_regs {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_REGS
 	compat		>= 0
 	u32[4] usb30regs0 {
@@ -2520,7 +2520,7 @@ HNBU_USB30PHY_REGS {
 }
 
 # USB30 PHY U1U2 Enable
-HNBU_USB30PHY_U1U2 {
+usb30phy_u1u2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_U1U2
 	compat		>= 0
 	u8 usb30u1u2 {
@@ -2529,7 +2529,7 @@ HNBU_USB30PHY_U1U2 {
 }
 
 # usb30regs0
-HNBU_USB30REGS0 {
+usb30regs0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS0
 	compat		>= 11
 	u32[10] usb30regs0 {
@@ -2538,7 +2538,7 @@ HNBU_USB30REGS0 {
 }
 
 # usb30regs1
-HNBU_USB30REGS1 {
+usb30regs1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS1
 	compat		>= 11
 	u32[10] usb30regs1 {
@@ -2547,7 +2547,7 @@ HNBU_USB30REGS1 {
 }
 
 # usb30u1u2
-HNBU_USB30U1U2 {
+usb30u1u2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30U1U2
 	compat		>= 11
 	u16 usb30u1u2 {
@@ -2556,7 +2556,7 @@ HNBU_USB30U1U2 {
 }
 
 # USB WLAN/BT composite descriptor
-HNBU_USBDESC_COMPOSITE {
+usbdesc_composite {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBDESC_COMPOSITE
 	compat		>= 0
 	u16 usbdesc_composite {
@@ -2565,7 +2565,7 @@ HNBU_USBDESC_COMPOSITE {
 }
 
 # USB endpoint numbers
-HNBU_USBEPNUM {
+usbepnum {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBEPNUM
 	compat		>= 0
 	u16 usbepnum {
@@ -2573,7 +2573,7 @@ HNBU_USBEPNUM {
 	}
 }
 
-HNBU_USBFLAGS {
+usbflags {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFLAGS
 	compat		>= 0
 	u32 usbflags {
@@ -2582,7 +2582,7 @@ HNBU_USBFLAGS {
 }
 
 # 1 byte; 1 = USB advertises FS mode only
-HNBU_USBFS {
+usbfs {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFS
 	compat		>= 0
 	u8 usbfs {
@@ -2592,7 +2592,7 @@ HNBU_USBFS {
 }
 
 # USB SSPHY INIT regs setting
-HNBU_USBSSPHY_MDIO {
+usbssphy_mdio {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_MDIO
 	compat		>= 0
 	u32[4] usbssmdio {
@@ -2601,7 +2601,7 @@ HNBU_USBSSPHY_MDIO {
 }
 
 # 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP0 {
+usbssphy_sleep0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP0
 	compat		>= 0
 	u16 usbssphy_sleep0 {
@@ -2610,7 +2610,7 @@ HNBU_USBSSPHY_SLEEP0 {
 }
 
 # 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP1 {
+usbssphy_sleep1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP1
 	compat		>= 0
 	u16 usbssphy_sleep1 {
@@ -2619,7 +2619,7 @@ HNBU_USBSSPHY_SLEEP1 {
 }
 
 # 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP2 {
+usbssphy_sleep2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP2
 	compat		>= 0
 	u16 usbssphy_sleep2 {
@@ -2628,7 +2628,7 @@ HNBU_USBSSPHY_SLEEP2 {
 }
 
 # 2 byte USB SSPHY sleep
-HNBU_USBSSPHY_SLEEP3 {
+usbssphy_sleep3 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP3
 	compat		>= 0
 	u16 usbssphy_sleep3 {
@@ -2637,7 +2637,7 @@ HNBU_USBSSPHY_SLEEP3 {
 }
 
 # 4 byte USB SSPHY UTMI Control
-HNBU_USBSSPHY_UTMI_CTL0 {
+usbssphy_utmi_ctl0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL0
 	compat		>= 0
 	u32 usbssphy_utmi_ctl0 {
@@ -2646,7 +2646,7 @@ HNBU_USBSSPHY_UTMI_CTL0 {
 }
 
 # 4 byte USB SSPHY UTMI Control
-HNBU_USBSSPHY_UTMI_CTL1 {
+usbssphy_utmi_ctl1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL1
 	compat		>= 0
 	u32 usbssphy_utmi_ctl1 {
@@ -2655,7 +2655,7 @@ HNBU_USBSSPHY_UTMI_CTL1 {
 }
 
 # 4 byte USB SSPHY UTMI Control
-HNBU_USBSSPHY_UTMI_CTL2 {
+usbssphy_utmi_ctl2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL2
 	compat		>= 0
 	u32 usbssphy_utmi_ctl2 {
@@ -2664,7 +2664,7 @@ HNBU_USBSSPHY_UTMI_CTL2 {
 }
 
 # 2 byte USB UTMI/LDO Control
-HNBU_USBUTMI_CTL {
+usbutmi_ctl {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBUTMI_CTL
 	compat		>= 0
 	u16 usbutmi_ctl {
@@ -2673,7 +2673,7 @@ HNBU_USBUTMI_CTL {
 }
 
 # 16 Bytes Hex
-HNBU_UUID {
+uuid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UUID
 	compat		>= 0
 	u8[16] uuid {
@@ -2683,7 +2683,7 @@ HNBU_UUID {
 }
 
 # 1 byte bit 7 initial polarity, bit 6..0 gpio pin
-HNBU_WOWLGPIO {
+wowlgpio {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WOWLGPIO
 	compat		>= 0
 	u8 wowl_gpio {
@@ -2697,7 +2697,7 @@ HNBU_WOWLGPIO {
 }
 
 # 1 byte; GPIO pin for WPS button
-HNBU_WPS {
+wps {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WPS
 	compat		>= 0
 	u8 wpsgpio {
@@ -2711,7 +2711,7 @@ HNBU_WPS {
 }
 
 # 4 byte Crystal frequency in kilohertz
-HNBU_XTALFREQ {
+xtalfreq {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_XTALFREQ
 	compat		>= 0
 	u32 xtalfreq {
@@ -2728,7 +2728,7 @@ srom_misc {
 	}
 	u8 et1macaddr {
 		sfmt	macaddr
-		srom 0-2	{  u8[48] @ 0x54 (&0xFFFF) }
+		srom 0-2	{  u8[48] @ 0x54 }
 	}
 	u8 eu_edthresh2g {
 		srom 8	{ 0x1A9 }
@@ -2750,7 +2750,7 @@ srom_misc {
 	}
 	u8 il0macaddr {
 		sfmt	macaddr
-		srom 0-2	{  u8[48] @ 0x48 (&0xFFFF) }
+		srom 0-2	{  u8[48] @ 0x48 }
 	}
 	u8 iqcal_swp_dis {
 		srom 8-10	{ 0xB9 (&0x10, >>4) }
