@@ -1,6 +1,7 @@
 CISTPL_MANFID {
 	cis_tuple	CISTPL_MANFID
 	compat		>= 0
+
 	u16 manfid {
 		cis	{ 0x0 }
 	}
@@ -12,6 +13,7 @@ CISTPL_MANFID {
 CISTPL_VERS_1 {
 	cis_tuple	CISTPL_VERS_1
 	compat		>= 0
+
 	cstr manf {
 		sfmt	ascii
 		cis	{ 0x0 }
@@ -26,6 +28,7 @@ CISTPL_VERS_1 {
 aa {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AA
 	compat		>= 0
+
 	u8 aa2g {
 		cis	{ 0x0 }
 		srom 1-3	{ 0x5C (&0x30, >>4) }
@@ -46,6 +49,7 @@ aa {
 acpa_40 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_40
 	compat		>= 11
+
 	u16[12] pa5gbw40a0 {
 		cis	{ 0x0 }
 		srom 	{ 0x110 }
@@ -56,6 +60,7 @@ acpa_40 {
 acpa_80 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_80
 	compat		>= 11
+
 	u16[12] pa5gbw80a0 {
 		cis	{ 0x0 }
 		srom 	{ 0x138 }
@@ -66,6 +71,7 @@ acpa_80 {
 acpa_4080 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_4080
 	compat		>= 11
+
 	u16[12] pa5gbw4080a0 {
 		cis	{ 0x0 }
 		srom 	{ 0x138 }
@@ -80,6 +86,7 @@ acpa_4080 {
 acpa_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C0
 	compat		>= 11
+
 	u16 subband5gver {
 		cis	{ 0x0 }
 		srom 8-10	{  u8 @ 0x1A5 (&0x7) }
@@ -111,6 +118,7 @@ acpa_c0 {
 acpa_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C1
 	compat		>= 11
+
 	u16 maxp2ga1 {
 		cis	{ 0x0 }
 		srom 4-7	{  u8 @ 0xAF }
@@ -137,6 +145,7 @@ acpa_c1 {
 acpa_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C2
 	compat		>= 11
+
 	u16 maxp2ga2 {
 		cis	{ 0x0 }
 		srom 4-7	{  u8 @ 0xDD }
@@ -163,6 +172,7 @@ acpa_c2 {
 acpa_cck {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_CCK
 	compat		>= 11
+
 	u16[3] pa2gccka0 {
 		cis	{ 0x0 }
 		srom 	{ 0x102 }
@@ -173,6 +183,7 @@ acpa_cck {
 acppr_2gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_2GPO
 	compat		>= 11
+
 	u16 dot11agofdmhrbw202gpo {
 		cis	{ 0x0 }
 		srom 	{ 0x15C }
@@ -187,6 +198,7 @@ acppr_2gpo {
 acppr_5gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_5GPO
 	compat		>= 11
+
 	u32 mcsbw805glpo {
 		cis	{ 0x0 }
 		srom 	{ 0x168 }
@@ -226,6 +238,7 @@ acppr_5gpo {
 acppr_sbpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_SBPO
 	compat		>= 11
+
 	u16 sb20in40hrpo {
 		cis	{ 0x0 }
 		srom 	{ 0x196 }
@@ -296,6 +309,7 @@ acppr_sbpo {
 acrxgains_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C0
 	compat		>= 11
+
 	u8 rxgains5gtrelnabypa0 {
 		sfmt	sdec
 		cis	{ 0x1 (&0x80, >>7) }
@@ -362,6 +376,7 @@ acrxgains_c0 {
 acrxgains_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C1
 	compat		>= 11
+
 	u8 rxgains5gtrelnabypa1 {
 		sfmt	sdec
 		cis	{ 0x1 (&0x80, >>7) }
@@ -428,6 +443,7 @@ acrxgains_c1 {
 acrxgains_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C2
 	compat		>= 11
+
 	u8 rxgains5gtrelnabypa2 {
 		sfmt	sdec
 		cis	{ 0x1 (&0x80, >>7) }
@@ -494,6 +510,7 @@ acrxgains_c2 {
 ag {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AG
 	compat		>= 0
+
 	u8 ag0 {
 		cis	{ 0x0 }
 		srom 1-3	{ 0x75 }
@@ -521,6 +538,7 @@ ag {
 agbga {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AGBGA
 	compat		>= 11
+
 	u8 agbg0 {
 		cis	{ 0x0 }
 		srom 	{ 0xA2 }
@@ -551,6 +569,7 @@ agbga {
 ant5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ANT5G
 	compat		>= 0
+
 	u8 aa5g {
 		cis	{ 0x0 }
 		srom 1-3	{ 0x5C (&0xC0, >>6) }
@@ -570,6 +589,7 @@ ant5g {
 boardflags {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDFLAGS
 	compat		>= 0
+
 	u32 boardflags {
 		cis	{ 0x0 }
 		srom 1	{  u16 @ 0x72 }
@@ -595,6 +615,7 @@ boardflags {
 boardnum {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDNUM
 	compat		>= 0
+
 	u16 boardnum {
 		cis	{ 0x0 }
 		srom 1-2	{ 0x4C }
@@ -610,6 +631,7 @@ boardnum {
 boardrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDREV
 	compat		>= 0
+
 	u16 boardrev {
 		cis	{ 0x0 }
 		srom 1-3	{  u8 @ 0x5D }
@@ -622,6 +644,7 @@ boardrev {
 boardtype {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDTYPE
 	compat		>= 0
+
 	u16 boardtype {
 		cis	{ 0x0 }
 		srom >= 2	{ 0x4 }
@@ -632,6 +655,7 @@ boardtype {
 cc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CC
 	compat		1
+
 	u8 cc {
 		cis	{ 0x0 (&0xF) }
 		srom 	{ 0x5C (&0xF) }
@@ -645,6 +669,7 @@ cc {
 cckbw202gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKBW202GPO
 	compat		>= 0
+
 	u16 cckbw202gpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x140 }
@@ -661,6 +686,7 @@ cckbw202gpo {
 cckfilttype {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKFILTTYPE
 	compat		>= 0
+
 	u8 cckdigfilttype {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -671,6 +697,7 @@ cckfilttype {
 cckpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKPO
 	compat		>= 0
+
 	u16 cckpo {
 		cis	{ 0x0 }
 	}
@@ -682,6 +709,7 @@ cckpo {
 ccode {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCODE
 	compat		>= 0
+
 	char ccode {
 		sfmt	ccode
 		cis	{ u16 @ 0x0 }
@@ -700,6 +728,7 @@ ccode {
 chainswitch {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHAINSWITCH
 	compat		>= 0
+
 	u8 txchain {
 		all1	ignore
 		cis	{ 0x0 }
@@ -727,6 +756,7 @@ chainswitch {
 chipid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHIPID
 	compat		>= 0
+
 	u16 vendid {
 		cis	{ 0x0 }
 	}
@@ -750,6 +780,7 @@ chipid {
 custom1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CUSTOM1
 	compat		>= 0
+
 	u32 customvar1 {
 		cis	{ 0x0 }
 	}
@@ -758,6 +789,7 @@ custom1 {
 elna2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA2G
 	compat		>= 0
+
 	u8 elna2g {
 		cis	{ 0x0 }
 		srom 8-10	{ 0xBB }
@@ -767,6 +799,7 @@ elna2g {
 elna5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA5G
 	compat		>= 0
+
 	u8 elna5g {
 		cis	{ 0x0 }
 		srom 8-10	{ 0xBA }
@@ -777,6 +810,7 @@ elna5g {
 fem {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM
 	compat		1-10
+
 	u8 antswctl2g {
 		cis	{ 0x1 (&0xF8, >>3) }
 		srom 8-10	{ 0xAE (&0xF8, >>3) }
@@ -823,6 +857,7 @@ fem {
 fem_cfg {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM_CFG
 	compat		>= 11
+
 	u8 femctrl {
 		sfmt	sdec
 		cis	{ 0x1 (&0xF8, >>3) }
@@ -889,6 +924,7 @@ fem_cfg {
 gpio_pull_down {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_GPIO_PULL_DOWN
 	compat		>= 0
+
 	u32 gpdn {
 		cis	{ 0x0 }
 	}
@@ -898,6 +934,7 @@ gpio_pull_down {
 leddc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDDC
 	compat		>= 0
+
 	u8[2] leddc {
 		sfmt	leddc
 		all1	ignore
@@ -914,6 +951,7 @@ leddc {
 leds {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDS
 	compat		>= 0
+
 	u8 ledbh0 {
 		all1	ignore
 		cis	{ 0x0 }
@@ -997,6 +1035,7 @@ leds {
 leg40duppo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEG40DUPPO
 	compat		>= 0
+
 	u16 legofdm40duppo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x196 }
@@ -1011,6 +1050,7 @@ leg40duppo {
 legofdmbw202gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW202GPO
 	compat		>= 0
+
 	u32 legofdmbw202gpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x144 }
@@ -1031,6 +1071,7 @@ legofdmbw202gpo {
 legofdmbw205gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW205GPO
 	compat		>= 0
+
 	u32 legofdmbw205glpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x14C }
@@ -1061,6 +1102,7 @@ legofdmbw205gpo {
 macaddr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MACADDR
 	compat		>= 0
+
 	u8[48] macaddr {
 		sfmt	macaddr
 		cis	{ 0x0 }
@@ -1079,6 +1121,7 @@ macaddr {
 mcs2gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS2GPO
 	compat		>= 0
+
 	u32 mcsbw202gpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x164 }
@@ -1103,6 +1146,7 @@ mcs2gpo {
 mcs5ghpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GHPO
 	compat		>= 0
+
 	u32 mcsbw205ghpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x188 }
@@ -1127,6 +1171,7 @@ mcs5ghpo {
 mcs5glpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GLPO
 	compat		>= 0
+
 	u32 mcsbw205glpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x170 }
@@ -1151,6 +1196,7 @@ mcs5glpo {
 mcs5gmpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GMPO
 	compat		>= 0
+
 	u32 mcsbw205gmpo {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x17C }
@@ -1175,6 +1221,7 @@ mcs5gmpo {
 mcs32po {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS32PO
 	compat		>= 0
+
 	u16 mcs32po {
 		cis	{ 0x0 }
 		srom 9-10	{ 0x194 }
@@ -1184,6 +1231,7 @@ mcs32po {
 meas_pwr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MEAS_PWR
 	compat		>= 11
+
 	u8 measpower {
 		cis	{ 0x0 }
 		srom 8-10	{ 0xB4 (&0xFE, >>1) }
@@ -1210,6 +1258,7 @@ meas_pwr {
 muxenab {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MUXENAB
 	compat		>= 0
+
 	u8 muxenab {
 		cis	{ 0x0 }
 	}
@@ -1218,6 +1267,7 @@ muxenab {
 noiselvl {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_NOISELVL
 	compat		>= 11
+
 	u8 noiselvl2ga0 {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -1257,6 +1307,7 @@ noiselvl {
 oem {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OEM
 	compat		1
+
 	u8[8] oem {
 		sfmt	hexbin
 		cis	{ 0x0 (&0xF) }
@@ -1267,6 +1318,7 @@ oem {
 ofdmpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO
 	compat		>= 0
+
 	u32 ofdmpo {
 		cis	{ 0x0 }
 	}
@@ -1277,6 +1329,7 @@ ofdmpo {
 ofdmpo5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO5G
 	compat		>= 0
+
 	u32 ofdm5gpo {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x13E }
@@ -1298,6 +1351,7 @@ ofdmpo5g {
 paparambwver {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARAMBWVER
 	compat		>= 11
+
 	u8 paparambwver {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -1311,6 +1365,7 @@ paparambwver {
 paparms {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS
 	compat		>= 0
+
 	u16 pa0b0 {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -1352,6 +1407,7 @@ paparms {
 paparms5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS5G
 	compat		>= 0
+
 	u16 pa1b0 {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -1436,6 +1492,7 @@ paparms5g {
 paparms_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C0
 	compat		1-10
+
 	u8 maxp2ga0 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x81 }
@@ -1546,6 +1603,7 @@ paparms_c0 {
 paparms_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C1
 	compat		1-10
+
 	u8 maxp2ga1 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0xAF }
@@ -1656,6 +1714,7 @@ paparms_c1 {
 paparms_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C2
 	compat		1-10
+
 	u8 maxp2ga2 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0xDD }
@@ -1766,6 +1825,7 @@ paparms_c2 {
 paparms_c3 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C3
 	compat		1-10
+
 	u8 maxp2ga3 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x10B }
@@ -1873,6 +1933,7 @@ paparms_c3 {
 pdoff {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF
 	compat		>= 11
+
 	u16 pdoffset40ma0 {
 		cis	{ 0x0 }
 		srom 	{ 0xCA }
@@ -1902,6 +1963,7 @@ pdoff {
 pdoff_2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF_2G
 	compat		>= 11
+
 	u8 pdoffset2g40ma0 {
 		cis	{ 0x0 (&0xF) }
 		srom 	{ 0xC9 (&0xF) }
@@ -1924,6 +1986,7 @@ pdoff_2g {
 po_40m {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40M
 	compat		>= 0
+
 	u16 bw40po {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x18E }
@@ -1935,6 +1998,7 @@ po_40m {
 po_40mdup {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40MDUP
 	compat		>= 0
+
 	u16 bwduppo {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x190 }
@@ -1946,6 +2010,7 @@ po_40mdup {
 po_cckofdm {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CCKOFDM
 	compat		>= 0
+
 	u16 cck2gpo {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x138 }
@@ -1977,6 +2042,7 @@ po_cckofdm {
 po_cdd {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CDD
 	compat		>= 0
+
 	u16 cddpo {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x18A }
@@ -1988,6 +2054,7 @@ po_cdd {
 po_mcs2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS2G
 	compat		>= 0
+
 	u16 mcs2gpo0 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x14A }
@@ -2034,6 +2101,7 @@ po_mcs2g {
 po_mcs5glh {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GLH
 	compat		>= 0
+
 	u16 mcs5glpo0 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x16A }
@@ -2120,6 +2188,7 @@ po_mcs5glh {
 po_mcs5gm {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GM
 	compat		>= 0
+
 	u16 mcs5gpo0 {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x15A }
@@ -2166,6 +2235,7 @@ po_mcs5gm {
 po_stbc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_STBC
 	compat		>= 0
+
 	u16 stbcpo {
 		cis	{ 0x0 }
 		srom 4-7	{ 0x18C }
@@ -2177,6 +2247,7 @@ po_stbc {
 rdlid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RDLID
 	compat		>= 0
+
 	u16 rdlid {
 		cis	{ 0x0 }
 	}
@@ -2186,6 +2257,7 @@ rdlid {
 regrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_REGREV
 	compat		>= 0
+
 	u8 regrev {
 		cis	{ 0x0 }
 		srom 3	{ 0x78 }
@@ -2202,6 +2274,7 @@ regrev {
 rssismbxa2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA2G
 	compat		>= 0
+
 	u8 rssismf2g {
 		cis	{ 0x0 (&0xF) }
 		srom 3	{ 0x51 (&0xF) }
@@ -2230,6 +2303,7 @@ rssismbxa2g {
 rssismbxa5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA5G
 	compat		>= 0
+
 	u8 rssismf5g {
 		cis	{ 0x0 (&0xF) }
 		srom 3	{ 0x53 (&0xF) }
@@ -2255,6 +2329,7 @@ rssismbxa5g {
 rxgain_err {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXGAIN_ERR
 	compat		>= 11
+
 	u8 rxgainerr2ga0 {
 		cis	{ 0x0 }
 		srom 8-10	{ 0x19B (&0x3F) }
@@ -2324,6 +2399,7 @@ rxgain_err {
 rxpo2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO2G
 	compat		>= 0
+
 	i8 rxpo2g {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -2336,6 +2412,7 @@ rxpo2g {
 rxpo5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO5G
 	compat		>= 0
+
 	i8 rxpo5g {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -2348,6 +2425,7 @@ rxpo5g {
 sromrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SROMREV
 	compat		>= 0
+
 	u8 sromrev {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -2358,6 +2436,7 @@ sromrev {
 subband5gver {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SUBBAND5GVER
 	compat		>= 11
+
 	u16 subband5gver {
 		cis	{ 0x0 }
 		srom 8-10	{  u8 @ 0x1A5 (&0x7) }
@@ -2372,6 +2451,7 @@ subband5gver {
 tempthresh {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TEMPTHRESH
 	compat		>= 0
+
 	u8 tempthresh {
 		cis	{ 0x0 }
 		srom 8-10	{ 0xB2 }
@@ -2422,6 +2502,7 @@ tempthresh {
 tri2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI2G
 	compat		>= 0
+
 	u8 tri2g {
 		cis	{ 0x0 }
 		srom 3	{ 0x55 }
@@ -2433,6 +2514,7 @@ tri2g {
 tri5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI5G
 	compat		>= 0
+
 	u8 tri5gl {
 		cis	{ 0x0 }
 		srom 3	{ 0x57 }
@@ -2454,6 +2536,7 @@ tri5g {
 txbfrpcals {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXBFRPCALS
 	compat		>= 11
+
 	u16 rpcal2g {
 		cis	{ 0x0 }
 		srom 	{ 0x16C }
@@ -2480,6 +2563,7 @@ txbfrpcals {
 txduty {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXDUTY
 	compat		>= 11
+
 	u16 tx_duty_cycle_ofdm_40_5g {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -2501,6 +2585,7 @@ txduty {
 umanfid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UMANFID
 	compat		>= 0
+
 	u32 usbmanfid {
 		cis	{ 0x0 }
 	}
@@ -2510,6 +2595,7 @@ umanfid {
 usb30phy_noss {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_NOSS
 	compat		>= 0
+
 	u8 usbnoss {
 		cis	{ 0x0 }
 	}
@@ -2519,6 +2605,7 @@ usb30phy_noss {
 usb30phy_regs {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_REGS
 	compat		>= 0
+
 	u32[4] usb30regs0 {
 		cis	{ 0x0 }
 	}
@@ -2531,6 +2618,7 @@ usb30phy_regs {
 usb30phy_u1u2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_U1U2
 	compat		>= 0
+
 	u8 usb30u1u2 {
 		cis	{ 0x0 }
 	}
@@ -2540,6 +2628,7 @@ usb30phy_u1u2 {
 usb30regs0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS0
 	compat		>= 11
+
 	u32[10] usb30regs0 {
 		cis	{ 0x0 }
 	}
@@ -2549,6 +2638,7 @@ usb30regs0 {
 usb30regs1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS1
 	compat		>= 11
+
 	u32[10] usb30regs1 {
 		cis	{ 0x0 }
 	}
@@ -2558,6 +2648,7 @@ usb30regs1 {
 usb30u1u2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30U1U2
 	compat		>= 11
+
 	u16 usb30u1u2 {
 		cis	{ 0x0 }
 	}
@@ -2567,6 +2658,7 @@ usb30u1u2 {
 usbdesc_composite {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBDESC_COMPOSITE
 	compat		>= 0
+
 	u16 usbdesc_composite {
 		cis	{ 0x0 }
 	}
@@ -2576,6 +2668,7 @@ usbdesc_composite {
 usbepnum {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBEPNUM
 	compat		>= 0
+
 	u16 usbepnum {
 		cis	{ 0x0 }
 	}
@@ -2584,6 +2677,7 @@ usbepnum {
 usbflags {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFLAGS
 	compat		>= 0
+
 	u32 usbflags {
 		cis	{ 0x0 }
 	}
@@ -2593,6 +2687,7 @@ usbflags {
 usbfs {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFS
 	compat		>= 0
+
 	u8 usbfs {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -2603,6 +2698,7 @@ usbfs {
 usbssphy_mdio {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_MDIO
 	compat		>= 0
+
 	u32[4] usbssmdio {
 		cis	{ 0x0 (&0xFFFFFF) }
 	}
@@ -2612,6 +2708,7 @@ usbssphy_mdio {
 usbssphy_sleep0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP0
 	compat		>= 0
+
 	u16 usbssphy_sleep0 {
 		cis	{ 0x0 }
 	}
@@ -2621,6 +2718,7 @@ usbssphy_sleep0 {
 usbssphy_sleep1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP1
 	compat		>= 0
+
 	u16 usbssphy_sleep1 {
 		cis	{ 0x0 }
 	}
@@ -2630,6 +2728,7 @@ usbssphy_sleep1 {
 usbssphy_sleep2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP2
 	compat		>= 0
+
 	u16 usbssphy_sleep2 {
 		cis	{ 0x0 }
 	}
@@ -2639,6 +2738,7 @@ usbssphy_sleep2 {
 usbssphy_sleep3 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP3
 	compat		>= 0
+
 	u16 usbssphy_sleep3 {
 		cis	{ 0x0 }
 	}
@@ -2648,6 +2748,7 @@ usbssphy_sleep3 {
 usbssphy_utmi_ctl0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL0
 	compat		>= 0
+
 	u32 usbssphy_utmi_ctl0 {
 		cis	{ 0x0 }
 	}
@@ -2657,6 +2758,7 @@ usbssphy_utmi_ctl0 {
 usbssphy_utmi_ctl1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL1
 	compat		>= 0
+
 	u32 usbssphy_utmi_ctl1 {
 		cis	{ 0x0 }
 	}
@@ -2666,6 +2768,7 @@ usbssphy_utmi_ctl1 {
 usbssphy_utmi_ctl2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL2
 	compat		>= 0
+
 	u32 usbssphy_utmi_ctl2 {
 		cis	{ 0x0 }
 	}
@@ -2675,6 +2778,7 @@ usbssphy_utmi_ctl2 {
 usbutmi_ctl {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBUTMI_CTL
 	compat		>= 0
+
 	u16 usbutmi_ctl {
 		cis	{ 0x0 }
 	}
@@ -2684,6 +2788,7 @@ usbutmi_ctl {
 uuid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UUID
 	compat		>= 0
+
 	u8[16] uuid {
 		sfmt	ascii
 		cis	{ 0x0 }
@@ -2694,6 +2799,7 @@ uuid {
 wowlgpio {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WOWLGPIO
 	compat		>= 0
+
 	u8 wowl_gpio {
 		sfmt	sdec
 		cis	{ 0x0 (&0x7F) }
@@ -2708,6 +2814,7 @@ wowlgpio {
 wps {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WPS
 	compat		>= 0
+
 	u8 wpsgpio {
 		sfmt	sdec
 		cis	{ 0x0 }
@@ -2722,6 +2829,7 @@ wps {
 xtalfreq {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_XTALFREQ
 	compat		>= 0
+
 	u32 xtalfreq {
 		sfmt	sdec
 		cis	{ 0x0 }

@@ -73,13 +73,12 @@ void genmap::generate() {
             if (vs->cis().is<var_set_cis>()) {
                 auto cis = ftl::get<var_set_cis>(vs->cis());
                 
-                print("cis_tuple\t%s", cis.tag().name().c_str());
                 if (cis.hnbu_tag().is<symbolic_constant>()) {
-                    printf(",%s", ftl::get<symbolic_constant>(cis.hnbu_tag()).name().c_str());
+                    print("cis_tuple\t%s,%s\n", cis.tag().name().c_str(), ftl::get<symbolic_constant>(cis.hnbu_tag()).name().c_str());
+                } else {
+                    print("cis_tuple\t%s\n", cis.tag().name().c_str());
                 }
-                printf("\n");
-                
-                println("compat\t\t%s", cis.compat().description().c_str());
+                println("compat\t\t%s\n", cis.compat().description().c_str());
             }
             
             for (const auto &v : *vs->vars()) {
