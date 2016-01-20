@@ -80,7 +80,6 @@ void genmap::generate() {
                 } else {
                     print("cis_tuple\t%s\n", cis.tag().name().c_str());
                 }
-                println("compat\t\t%s\n", cis.compat().description().c_str());
             }
             
             for (const auto &v : *vs->vars()) {
@@ -110,25 +109,14 @@ void genmap::generate() {
                             type = " " + type + " @ ";
                         
                         string rdesc = cis.compat().description();
-                        if (cis.compat() == ftl::get<var_set_cis>(vs->cis()).compat())
-                            rdesc = "\t";
-                        else
-                            rdesc = " " + rdesc + "\t";
-                        
-                        print("cis%s{%s%s", rdesc.c_str(), type.c_str(), value.cis_description().c_str());
-                        printf(" }\n");
+                        print("cis %s\t%s%s", rdesc.c_str(), type.c_str(), value.cis_description().c_str());
+                        printf("\n");
                     }
                     
                     
                     for (const auto &sp : *v->sprom_offsets()) {
                         auto rdesc = sp.compat().description();
-                        // TODO: Saner method for determining covered sromrevs
-                        if (vs->cis().is<var_set_cis>() && sp.compat() == ftl::get<var_set_cis>(vs->cis()).compat() && v->sprom_offsets()->size() == 1)
-                            rdesc = " ";
-                        else
-                            rdesc = " " + rdesc;
-                        
-                        print("srom%s\t{ ", rdesc.c_str());
+                        print("srom %s\t ", rdesc.c_str());
                         for (size_t vi = 0; vi < sp.values()->size(); vi++) {
                             const auto &val = sp.values()->at(vi);
                             auto segs = val.segments();
@@ -152,7 +140,7 @@ void genmap::generate() {
                             if (vi+1 < sp.values()->size())
                                 printf(", ");
                         }
-                        printf(" }\n");
+                        printf("\n");
                     }
                 });
             }
