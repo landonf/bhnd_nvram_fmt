@@ -116,7 +116,7 @@ void genmap::generate() {
                     
                     for (const auto &sp : *v->sprom_offsets()) {
                         auto rdesc = sp.compat().description();
-                        print("srom %s\t ", rdesc.c_str());
+                        print("srom %s\t", rdesc.c_str());
                         for (size_t vi = 0; vi < sp.values()->size(); vi++) {
                             const auto &val = sp.values()->at(vi);
                             auto segs = val.segments();
