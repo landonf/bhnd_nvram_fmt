@@ -1,4 +1,4 @@
-CISTPL_MANFID {
+pcmcia_manfid {
 	cis_tuple	CISTPL_MANFID
 	compat		>= 0
 
@@ -10,7 +10,7 @@ CISTPL_MANFID {
 	}
 }
 
-CISTPL_VERS_1 {
+pcmcia_vers_1 {
 	cis_tuple	CISTPL_VERS_1
 	compat		>= 0
 
