@@ -104,9 +104,9 @@ void genmap::generate() {
                             type += "[" + to_string(value.count()) + "]";
                         
                         if (type == vtype)
-                            type = " ";
+                            type = "";
                         else
-                            type = " " + type + " @ ";
+                            type = type + " @ ";
                         
                         string rdesc = cis.compat().description();
                         print("cis %s\t%s%s", rdesc.c_str(), type.c_str(), value.cis_description().c_str());
@@ -130,7 +130,7 @@ void genmap::generate() {
                                 if (type == vtype)
                                     type = "";
                                 else
-                                    type = " " + type + " @ ";
+                                    type = type + " @ ";
                                 
                                 printf("%s%s", type.c_str(), s.description().c_str());
                                 if (seg+1 < segs->size())

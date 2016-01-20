@@ -1,10 +1,10 @@
 pcmcia_manfid {
 	cis_tuple	CISTPL_MANFID
 	u16 manfid {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 	u16 prodid {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 	}
 }
 
@@ -12,11 +12,11 @@ pcmcia_vers_1 {
 	cis_tuple	CISTPL_VERS_1
 	cstr manf {
 		sfmt	ascii
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 	cstr productname {
 		sfmt	ascii
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -24,14 +24,14 @@ pcmcia_vers_1 {
 aa {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AA
 	u8 aa2g {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-3	0x5C (&0x30, >>4)
 		srom 4-7	0x5D
 		srom 8-10	0x9D
 		srom >= 11	0xA1
 	}
 	u8 aa5g {
-		cis >= 0	 0x1
+		cis >= 0	0x1
 		srom 1-3	0x5C (&0xC0, >>6)
 		srom 4-7	0x5C
 		srom 8-10	0x9C
@@ -43,7 +43,7 @@ aa {
 acpa_40 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_40
 	u16[12] pa5gbw40a0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x110
 	}
 }
@@ -52,7 +52,7 @@ acpa_40 {
 acpa_80 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_80
 	u16[12] pa5gbw80a0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x138
 	}
 }
@@ -61,12 +61,12 @@ acpa_80 {
 acpa_4080 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_4080
 	u16[12] pa5gbw4080a0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x138
 	}
 	u16[12] pa5gbw4080a1 {
-		cis >= 11	 0x18
-		srom >= 11	 u16 @ 0xB6,  u16 @ 0xBC,  u16 @ 0xCE,  u16 @ 0xD4,  u16[8] @ 0x128
+		cis >= 11	0x18
+		srom >= 11	u16 @ 0xB6, u16 @ 0xBC, u16 @ 0xCE, u16 @ 0xD4, u16[8] @ 0x128
 	}
 }
 
@@ -74,28 +74,28 @@ acpa_4080 {
 acpa_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C0
 	u16 subband5gver {
-		cis >= 11	 0x0
-		srom 8-10	 u8 @ 0x1A5 (&0x7)
+		cis >= 11	0x0
+		srom 8-10	u8 @ 0x1A5 (&0x7)
 		srom >= 11	0xD6
 	}
 	u16 maxp2ga0 {
-		cis >= 11	 0x2
-		srom 4-7	 u8 @ 0x81
-		srom 8-10	 u8 @ 0xC1
-		srom >= 11	 u8 @ 0xD9
+		cis >= 11	0x2
+		srom 4-7	u8 @ 0x81
+		srom 8-10	u8 @ 0xC1
+		srom >= 11	u8 @ 0xD9
 	}
 	u16[3] pa2ga0 {
-		cis >= 11	 0x4
+		cis >= 11	0x4
 		srom >= 11	0xDA
 	}
 	u8[4] maxp5ga0 {
-		cis >= 11	 0xA
-		srom 4-7	 u8 @ 0x8B
-		srom 8-10	 u8 @ 0xC9
-		srom >= 11	 u8 @ 0xE5,  u8 @ 0xE4,  u8 @ 0xE7,  u8 @ 0xE6
+		cis >= 11	0xA
+		srom 4-7	u8 @ 0x8B
+		srom 8-10	u8 @ 0xC9
+		srom >= 11	u8 @ 0xE5, u8 @ 0xE4, u8 @ 0xE7, u8 @ 0xE6
 	}
 	u16[12] pa5ga0 {
-		cis >= 11	 0xE
+		cis >= 11	0xE
 		srom >= 11	0xE8
 	}
 }
@@ -104,23 +104,23 @@ acpa_c0 {
 acpa_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C1
 	u16 maxp2ga1 {
-		cis >= 11	 0x0
-		srom 4-7	 u8 @ 0xAF
-		srom 8-10	 u8 @ 0xE1
-		srom >= 11	 u8 @ 0x101
+		cis >= 11	0x0
+		srom 4-7	u8 @ 0xAF
+		srom 8-10	u8 @ 0xE1
+		srom >= 11	u8 @ 0x101
 	}
 	u16[3] pa2ga1 {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0x102
 	}
 	u8[4] maxp5ga1 {
-		cis >= 11	 0x8
-		srom 4-7	 u8 @ 0xB9
-		srom 8-10	 u8 @ 0xE9
-		srom >= 11	 u8 @ 0x10D,  u8 @ 0x10C,  u8 @ 0x10F,  u8 @ 0x10E
+		cis >= 11	0x8
+		srom 4-7	u8 @ 0xB9
+		srom 8-10	u8 @ 0xE9
+		srom >= 11	u8 @ 0x10D, u8 @ 0x10C, u8 @ 0x10F, u8 @ 0x10E
 	}
 	u16[12] pa5ga1 {
-		cis >= 11	 0xC
+		cis >= 11	0xC
 		srom >= 11	0x110
 	}
 }
@@ -129,23 +129,23 @@ acpa_c1 {
 acpa_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_C2
 	u16 maxp2ga2 {
-		cis >= 11	 0x0
-		srom 4-7	 u8 @ 0xDD
-		srom 8-10	 u8 @ 0x101
-		srom >= 11	 u8 @ 0x129
+		cis >= 11	0x0
+		srom 4-7	u8 @ 0xDD
+		srom 8-10	u8 @ 0x101
+		srom >= 11	u8 @ 0x129
 	}
 	u16[3] pa2ga2 {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0x12A
 	}
 	u8[4] maxp5ga2 {
-		cis >= 11	 0x8
-		srom 4-7	 u8 @ 0xE7
-		srom 8-10	 u8 @ 0x109
-		srom >= 11	 u8 @ 0x135,  u8 @ 0x134,  u8 @ 0x137,  u8 @ 0x136
+		cis >= 11	0x8
+		srom 4-7	u8 @ 0xE7
+		srom 8-10	u8 @ 0x109
+		srom >= 11	u8 @ 0x135, u8 @ 0x134, u8 @ 0x137, u8 @ 0x136
 	}
 	u16[12] pa5ga2 {
-		cis >= 11	 0xC
+		cis >= 11	0xC
 		srom >= 11	0x138
 	}
 }
@@ -154,7 +154,7 @@ acpa_c2 {
 acpa_cck {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPA_CCK
 	u16[3] pa2gccka0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x102
 	}
 }
@@ -163,11 +163,11 @@ acpa_cck {
 acppr_2gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_2GPO
 	u16 dot11agofdmhrbw202gpo {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x15C
 	}
 	u16 ofdmlrbw202gpo {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0x15E
 	}
 }
@@ -176,36 +176,36 @@ acppr_2gpo {
 acppr_5gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_5GPO
 	u32 mcsbw805glpo {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x168
 	}
 	u32 mcsbw1605glpo {
-		cis >= 11	 0x4
+		cis >= 11	0x4
 	}
 	u32 mcsbw805gmpo {
-		cis >= 11	 0x8
+		cis >= 11	0x8
 		srom >= 11	0x178
 	}
 	u32 mcsbw1605gmpo {
-		cis >= 11	 0xC
+		cis >= 11	0xC
 	}
 	u32 mcsbw805ghpo {
-		cis >= 11	 0x10
+		cis >= 11	0x10
 		srom >= 11	0x188
 	}
 	u32 mcsbw1605ghpo {
-		cis >= 11	 0x14
+		cis >= 11	0x14
 	}
 	u16 mcslr5glpo {
-		cis >= 11	 0x18
+		cis >= 11	0x18
 		srom >= 11	0x190 (&0xFFF)
 	}
 	u16 mcslr5gmpo {
-		cis >= 11	 0x1A
+		cis >= 11	0x1A
 		srom >= 11	0x192
 	}
 	u16 mcslr5ghpo {
-		cis >= 11	 0x1C
+		cis >= 11	0x1C
 		srom >= 11	0x194
 	}
 }
@@ -214,67 +214,67 @@ acppr_5gpo {
 acppr_sbpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACPPR_SBPO
 	u16 sb20in40hrpo {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x196
 	}
 	u16 sb20in80and160hr5glpo {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0x198
 	}
 	u16 sb40and80hr5glpo {
-		cis >= 11	 0x4
+		cis >= 11	0x4
 		srom >= 11	0x19A
 	}
 	u16 sb20in80and160hr5gmpo {
-		cis >= 11	 0x6
+		cis >= 11	0x6
 		srom >= 11	0x19C
 	}
 	u16 sb40and80hr5gmpo {
-		cis >= 11	 0x8
+		cis >= 11	0x8
 		srom >= 11	0x19E
 	}
 	u16 sb20in80and160hr5ghpo {
-		cis >= 11	 0xA
+		cis >= 11	0xA
 		srom >= 11	0x1A0
 	}
 	u16 sb40and80hr5ghpo {
-		cis >= 11	 0xC
+		cis >= 11	0xC
 		srom >= 11	0x1A2
 	}
 	u16 sb20in40lrpo {
-		cis >= 11	 0xE
+		cis >= 11	0xE
 		srom >= 11	0x1A4
 	}
 	u16 sb20in80and160lr5glpo {
-		cis >= 11	 0x10
+		cis >= 11	0x10
 		srom >= 11	0x1A6
 	}
 	u16 sb40and80lr5glpo {
-		cis >= 11	 0x12
+		cis >= 11	0x12
 		srom >= 11	0x1A8
 	}
 	u16 sb20in80and160lr5gmpo {
-		cis >= 11	 0x14
+		cis >= 11	0x14
 		srom >= 11	0x1AA
 	}
 	u16 sb40and80lr5gmpo {
-		cis >= 11	 0x16
+		cis >= 11	0x16
 		srom >= 11	0x1AC
 	}
 	u16 sb20in80and160lr5ghpo {
-		cis >= 11	 0x18
+		cis >= 11	0x18
 		srom >= 11	0x1AE
 	}
 	u16 sb40and80lr5ghpo {
-		cis >= 11	 0x1A
+		cis >= 11	0x1A
 		srom >= 11	0x1B0
 	}
 	u16 dot11agduphrpo {
-		cis >= 11	 0x1C
+		cis >= 11	0x1C
 		srom >= 11	0x1B2
 	}
 	u16 dot11agduplrpo {
-		cis >= 11	 0x1E
+		cis >= 11	0x1E
 		srom >= 11	0x1B4
 	}
 }
@@ -284,62 +284,62 @@ acrxgains_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C0
 	u8 rxgains5gtrelnabypa0 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x80, >>7)
+		cis >= 11	0x1 (&0x80, >>7)
 		srom >= 11	0xE2 (&0x80, >>7)
 	}
 	u8 rxgains5gtrisoa0 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x78, >>3)
+		cis >= 11	0x1 (&0x78, >>3)
 		srom >= 11	0xE2 (&0x78, >>3)
 	}
 	u8 rxgains5gelnagaina0 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x7)
+		cis >= 11	0x1 (&0x7)
 		srom >= 11	0xE2 (&0x7)
 	}
 	u8 rxgains2gtrelnabypa0 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x80, >>7)
+		cis >= 11	0x0 (&0x80, >>7)
 		srom >= 11	0xE3 (&0x80, >>7)
 	}
 	u8 rxgains2gtrisoa0 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x78, >>3)
+		cis >= 11	0x0 (&0x78, >>3)
 		srom >= 11	0xE3 (&0x78, >>3)
 	}
 	u8 rxgains2gelnagaina0 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x7)
+		cis >= 11	0x0 (&0x7)
 		srom >= 11	0xE3 (&0x7)
 	}
 	u8 rxgains5ghtrelnabypa0 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x80, >>7)
+		cis >= 11	0x2 (&0x80, >>7)
 		srom >= 11	0xE0 (&0x80, >>7)
 	}
 	u8 rxgains5ghtrisoa0 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x78, >>3)
+		cis >= 11	0x2 (&0x78, >>3)
 		srom >= 11	0xE0 (&0x78, >>3)
 	}
 	u8 rxgains5ghelnagaina0 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x7)
+		cis >= 11	0x2 (&0x7)
 		srom >= 11	0xE0 (&0x7)
 	}
 	u8 rxgains5gmtrelnabypa0 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x80, >>7)
+		cis >= 11	0x3 (&0x80, >>7)
 		srom >= 11	0xE1 (&0x80, >>7)
 	}
 	u8 rxgains5gmtrisoa0 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x78, >>3)
+		cis >= 11	0x3 (&0x78, >>3)
 		srom >= 11	0xE1 (&0x78, >>3)
 	}
 	u8 rxgains5gmelnagaina0 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x7)
+		cis >= 11	0x3 (&0x7)
 		srom >= 11	0xE1 (&0x7)
 	}
 }
@@ -349,62 +349,62 @@ acrxgains_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C1
 	u8 rxgains5gtrelnabypa1 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x80, >>7)
+		cis >= 11	0x1 (&0x80, >>7)
 		srom >= 11	0x10A (&0x80, >>7)
 	}
 	u8 rxgains5gtrisoa1 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x78, >>3)
+		cis >= 11	0x1 (&0x78, >>3)
 		srom >= 11	0x10A (&0x78, >>3)
 	}
 	u8 rxgains5gelnagaina1 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x7)
+		cis >= 11	0x1 (&0x7)
 		srom >= 11	0x10A (&0x7)
 	}
 	u8 rxgains2gtrelnabypa1 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x80, >>7)
+		cis >= 11	0x0 (&0x80, >>7)
 		srom >= 11	0x10B (&0x80, >>7)
 	}
 	u8 rxgains2gtrisoa1 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x78, >>3)
+		cis >= 11	0x0 (&0x78, >>3)
 		srom >= 11	0x10B (&0x78, >>3)
 	}
 	u8 rxgains2gelnagaina1 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x7)
+		cis >= 11	0x0 (&0x7)
 		srom >= 11	0x10B (&0x7)
 	}
 	u8 rxgains5ghtrelnabypa1 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x80, >>7)
+		cis >= 11	0x2 (&0x80, >>7)
 		srom >= 11	0x108 (&0x80, >>7)
 	}
 	u8 rxgains5ghtrisoa1 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x78, >>3)
+		cis >= 11	0x2 (&0x78, >>3)
 		srom >= 11	0x108 (&0x78, >>3)
 	}
 	u8 rxgains5ghelnagaina1 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x7)
+		cis >= 11	0x2 (&0x7)
 		srom >= 11	0x108 (&0x7)
 	}
 	u8 rxgains5gmtrelnabypa1 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x80, >>7)
+		cis >= 11	0x3 (&0x80, >>7)
 		srom >= 11	0x109 (&0x80, >>7)
 	}
 	u8 rxgains5gmtrisoa1 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x78, >>3)
+		cis >= 11	0x3 (&0x78, >>3)
 		srom >= 11	0x109 (&0x78, >>3)
 	}
 	u8 rxgains5gmelnagaina1 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x7)
+		cis >= 11	0x3 (&0x7)
 		srom >= 11	0x109 (&0x7)
 	}
 }
@@ -414,62 +414,62 @@ acrxgains_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ACRXGAINS_C2
 	u8 rxgains5gtrelnabypa2 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x80, >>7)
+		cis >= 11	0x1 (&0x80, >>7)
 		srom >= 11	0x132 (&0x80, >>7)
 	}
 	u8 rxgains5gtrisoa2 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x78, >>3)
+		cis >= 11	0x1 (&0x78, >>3)
 		srom >= 11	0x132 (&0x78, >>3)
 	}
 	u8 rxgains5gelnagaina2 {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x7)
+		cis >= 11	0x1 (&0x7)
 		srom >= 11	0x132 (&0x7)
 	}
 	u8 rxgains2gtrelnabypa2 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x80, >>7)
+		cis >= 11	0x0 (&0x80, >>7)
 		srom >= 11	0x133 (&0x80, >>7)
 	}
 	u8 rxgains2gtrisoa2 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x78, >>3)
+		cis >= 11	0x0 (&0x78, >>3)
 		srom >= 11	0x133 (&0x78, >>3)
 	}
 	u8 rxgains2gelnagaina2 {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x7)
+		cis >= 11	0x0 (&0x7)
 		srom >= 11	0x133 (&0x7)
 	}
 	u8 rxgains5ghtrelnabypa2 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x80, >>7)
+		cis >= 11	0x2 (&0x80, >>7)
 		srom >= 11	0x130 (&0x80, >>7)
 	}
 	u8 rxgains5ghtrisoa2 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x78, >>3)
+		cis >= 11	0x2 (&0x78, >>3)
 		srom >= 11	0x130 (&0x78, >>3)
 	}
 	u8 rxgains5ghelnagaina2 {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x7)
+		cis >= 11	0x2 (&0x7)
 		srom >= 11	0x130 (&0x7)
 	}
 	u8 rxgains5gmtrelnabypa2 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x80, >>7)
+		cis >= 11	0x3 (&0x80, >>7)
 		srom >= 11	0x131 (&0x80, >>7)
 	}
 	u8 rxgains5gmtrisoa2 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x78, >>3)
+		cis >= 11	0x3 (&0x78, >>3)
 		srom >= 11	0x131 (&0x78, >>3)
 	}
 	u8 rxgains5gmelnagaina2 {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x7)
+		cis >= 11	0x3 (&0x7)
 		srom >= 11	0x131 (&0x7)
 	}
 }
@@ -478,24 +478,24 @@ acrxgains_c2 {
 ag {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AG
 	u8 ag0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-3	0x75
 		srom 4-7	0x5F
 		srom 8-10	0x9F
 	}
 	u8 ag1 {
-		cis >= 0	 0x1
+		cis >= 0	0x1
 		srom 1-3	0x74
 		srom 4-7	0x5E
 		srom 8-10	0x9E
 	}
 	u8 ag2 {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 4-7	0x61
 		srom 8-10	0xA1
 	}
 	u8 ag3 {
-		cis >= 0	 0x3
+		cis >= 0	0x3
 		srom 4-7	0x60
 		srom 8-10	0xA0
 	}
@@ -504,27 +504,27 @@ ag {
 agbga {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_AGBGA
 	u8 agbg0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0xA2
 	}
 	u8 agbg1 {
-		cis >= 11	 0x1
+		cis >= 11	0x1
 		srom >= 11	0xA3
 	}
 	u8 agbg2 {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0xA4
 	}
 	u8 aga0 {
-		cis >= 11	 0x3
+		cis >= 11	0x3
 		srom >= 11	0xA5
 	}
 	u8 aga1 {
-		cis >= 11	 0x4
+		cis >= 11	0x4
 		srom >= 11	0xA6
 	}
 	u8 aga2 {
-		cis >= 11	 0x5
+		cis >= 11	0x5
 		srom >= 11	0xA7
 	}
 }
@@ -533,14 +533,14 @@ agbga {
 ant5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ANT5G
 	u8 aa5g {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-3	0x5C (&0xC0, >>6)
 		srom 4-7	0x5C
 		srom 8-10	0x9C
 		srom >= 11	0xA0
 	}
 	u8 ag1 {
-		cis >= 0	 0x1
+		cis >= 0	0x1
 		srom 1-3	0x74
 		srom 4-7	0x5E
 		srom 8-10	0x9E
@@ -551,22 +551,22 @@ ant5g {
 boardflags {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDFLAGS
 	u32 boardflags {
-		cis >= 0	 0x0
-		srom 1	 u16 @ 0x72
-		srom 2	 u16 @ 0x72 |  u16 @ 0x38 (<<16)
-		srom 3	 u16 @ 0x72 |  u16 @ 0x7A (<<16)
+		cis >= 0	0x0
+		srom 1	u16 @ 0x72
+		srom 2	u16 @ 0x72 | u16 @ 0x38 (<<16)
+		srom 3	u16 @ 0x72 | u16 @ 0x7A (<<16)
 		srom 4	0x44
 		srom 5-7	0x4A
 		srom >= 8	0x84
 	}
 	u32 boardflags2 {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 4	0x48
 		srom 5-7	0x4E
 		srom >= 8	0x88
 	}
 	u32 boardflags3 {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom >= 11	0x8C
 	}
 }
@@ -575,7 +575,7 @@ boardflags {
 boardnum {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDNUM
 	u16 boardnum {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-2	0x4C
 		srom 3	0x4E
 		srom 4	0x50
@@ -589,8 +589,8 @@ boardnum {
 boardrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDREV
 	u16 boardrev {
-		cis >= 0	 0x0
-		srom 1-3	 u8 @ 0x5D
+		cis >= 0	0x0
+		srom 1-3	u8 @ 0x5D
 		srom 4-7	0x42
 		srom >= 8	0x82
 	}
@@ -600,7 +600,7 @@ boardrev {
 boardtype {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_BOARDTYPE
 	u16 boardtype {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom >= 2	0x4
 	}
 }
@@ -609,7 +609,7 @@ boardtype {
 cc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CC
 	u8 cc {
-		cis 1	 0x0 (&0xF)
+		cis 1	0x0 (&0xF)
 		srom 1	0x5C (&0xF)
 	}
 }
@@ -621,12 +621,12 @@ cc {
 cckbw202gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKBW202GPO
 	u16 cckbw202gpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x140
 		srom >= 11	0x150
 	}
 	u16 cckbw20ul2gpo {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 9-10	0x142
 		srom >= 11	0x152
 	}
@@ -637,7 +637,7 @@ cckfilttype {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKFILTTYPE
 	u8 cckdigfilttype {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -645,7 +645,7 @@ cckfilttype {
 cckpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCKPO
 	u16 cckpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -656,15 +656,15 @@ ccode {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CCODE
 	char ccode {
 		sfmt	ccode
-		cis >= 0	 u16 @ 0x0
-		srom 0-3	 char[2] @ 0x76
-		srom 4	 char[2] @ 0x52
-		srom 5-7	 char[2] @ 0x44
-		srom 8-10	 char[2] @ 0x92
-		srom >= 11	 char[2] @ 0x96
+		cis >= 0	u16 @ 0x0
+		srom 0-3	char[2] @ 0x76
+		srom 4	char[2] @ 0x52
+		srom 5-7	char[2] @ 0x44
+		srom 8-10	char[2] @ 0x92
+		srom >= 11	char[2] @ 0x96
 	}
 	u8 cctl {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 	}
 }
 
@@ -673,24 +673,24 @@ chainswitch {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHAINSWITCH
 	u8 txchain {
 		all1	ignore
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x7B (&0xF)
 		srom 8-10	0xA3 (&0xF)
 		srom >= 11	0xA9 (&0xF)
 	}
 	u8 rxchain {
 		all1	ignore
-		cis >= 0	 0x1
+		cis >= 0	0x1
 		srom 4-7	0x7B (&0xF0, >>4)
 		srom 8-10	0xA3 (&0xF0, >>4)
 		srom >= 11	0xA9 (&0xF0, >>4)
 	}
 	u16 antswitch {
 		all1	ignore
-		cis >= 0	 0x2
-		srom 4-7	 u8 @ 0x7A
-		srom 8-10	 u8 @ 0xA2
-		srom >= 11	 u8 @ 0xA8
+		cis >= 0	0x2
+		srom 4-7	u8 @ 0x7A
+		srom 8-10	u8 @ 0xA2
+		srom >= 11	u8 @ 0xA8
 	}
 }
 
@@ -698,21 +698,21 @@ chainswitch {
 chipid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CHIPID
 	u16 vendid {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 	private u16 devid {
-		cis >= 0	 u16 @ 0x2
-		srom >= 8	 u16 @ 0x60
+		cis >= 0	u16 @ 0x2
+		srom >= 8	u16 @ 0x60
 	}
 	u16 chiprev {
 		sfmt	sdec
-		cis >= 0	 0x4
+		cis >= 0	0x4
 	}
 	u16 subvendid {
-		cis >= 0	 0x6
+		cis >= 0	0x6
 	}
 	u16 subdevid {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 	}
 }
 
@@ -720,14 +720,14 @@ chipid {
 custom1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_CUSTOM1
 	u32 customvar1 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
 elna2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA2G
 	u8 elna2g {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 8-10	0xBB
 	}
 }
@@ -735,7 +735,7 @@ elna2g {
 elna5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_ELNA5G
 	u8 elna5g {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 8-10	0xBA
 	}
 }
@@ -744,43 +744,43 @@ elna5g {
 fem {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM
 	u8 antswctl2g {
-		cis 1-10	 0x1 (&0xF8, >>3)
+		cis 1-10	0x1 (&0xF8, >>3)
 		srom 8-10	0xAE (&0xF8, >>3)
 	}
 	u8 triso2g {
-		cis 1-10	 0x1 (&0x7)
+		cis 1-10	0x1 (&0x7)
 		srom 8-10	0xAE (&0x7)
 	}
 	u8 pdetrange2g {
-		cis 1-10	 0x0 (&0xF8, >>3)
+		cis 1-10	0x0 (&0xF8, >>3)
 		srom 8-10	0xAF (&0xF8, >>3)
 	}
 	u8 extpagain2g {
-		cis 1-10	 0x0 (&0x6, >>1)
+		cis 1-10	0x0 (&0x6, >>1)
 		srom 8-10	0xAF (&0x6, >>1)
 	}
 	u8 tssipos2g {
-		cis 1-10	 0x0 (&0x1)
+		cis 1-10	0x0 (&0x1)
 		srom 8-10	0xAF (&0x1)
 	}
 	u8 antswctl5g {
-		cis 1-10	 0x3 (&0xF8, >>3)
+		cis 1-10	0x3 (&0xF8, >>3)
 		srom 8-10	0xB0 (&0xF8, >>3)
 	}
 	u8 triso5g {
-		cis 1-10	 0x3 (&0x7)
+		cis 1-10	0x3 (&0x7)
 		srom 8-10	0xB0 (&0x7)
 	}
 	u8 pdetrange5g {
-		cis 1-10	 0x2 (&0xF8, >>3)
+		cis 1-10	0x2 (&0xF8, >>3)
 		srom 8-10	0xB1 (&0xF8, >>3)
 	}
 	u8 extpagain5g {
-		cis 1-10	 0x2 (&0x6, >>1)
+		cis 1-10	0x2 (&0x6, >>1)
 		srom 8-10	0xB1 (&0x6, >>1)
 	}
 	u8 tssipos5g {
-		cis 1-10	 0x2 (&0x1)
+		cis 1-10	0x2 (&0x1)
 		srom 8-10	0xB1 (&0x1)
 	}
 }
@@ -790,62 +790,62 @@ fem_cfg {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_FEM_CFG
 	u8 femctrl {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0xF8, >>3)
+		cis >= 11	0x1 (&0xF8, >>3)
 		srom >= 11	0xAA (&0xF8, >>3)
 	}
 	u8 papdcap2g {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x4, >>2)
+		cis >= 11	0x1 (&0x4, >>2)
 		srom >= 11	0xAA (&0x4, >>2)
 	}
 	u8 tworangetssi2g {
 		sfmt	sdec
-		cis >= 11	 0x1 (&0x2, >>1)
+		cis >= 11	0x1 (&0x2, >>1)
 		srom >= 11	0xAA (&0x2, >>1)
 	}
 	u16 pdgain2g {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x1F0, >>4)
+		cis >= 11	0x0 (&0x1F0, >>4)
 		srom >= 11	0xAA (&0x1F0, >>4)
 	}
 	u8 epagain2g {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0xE, >>1)
+		cis >= 11	0x0 (&0xE, >>1)
 		srom >= 11	0xAB (&0xE, >>1)
 	}
 	u8 tssiposslope2g {
 		sfmt	sdec
-		cis >= 11	 0x0 (&0x1)
+		cis >= 11	0x0 (&0x1)
 		srom >= 11	0xAB (&0x1)
 	}
 	u8 gainctrlsph {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0xF8, >>3)
+		cis >= 11	0x3 (&0xF8, >>3)
 		srom >= 11	0xAC (&0xF8, >>3)
 	}
 	u8 papdcap5g {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x4, >>2)
+		cis >= 11	0x3 (&0x4, >>2)
 		srom >= 11	0xAC (&0x4, >>2)
 	}
 	u8 tworangetssi5g {
 		sfmt	sdec
-		cis >= 11	 0x3 (&0x2, >>1)
+		cis >= 11	0x3 (&0x2, >>1)
 		srom >= 11	0xAC (&0x2, >>1)
 	}
 	u16 pdgain5g {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x1F0, >>4)
+		cis >= 11	0x2 (&0x1F0, >>4)
 		srom >= 11	0xAC (&0x1F0, >>4)
 	}
 	u8 epagain5g {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0xE, >>1)
+		cis >= 11	0x2 (&0xE, >>1)
 		srom >= 11	0xAD (&0xE, >>1)
 	}
 	u8 tssiposslope5g {
 		sfmt	sdec
-		cis >= 11	 0x2 (&0x1)
+		cis >= 11	0x2 (&0x1)
 		srom >= 11	0xAD (&0x1)
 	}
 }
@@ -854,7 +854,7 @@ fem_cfg {
 gpio_pull_down {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_GPIO_PULL_DOWN
 	u32 gpdn {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -864,7 +864,7 @@ leddc {
 	u8[2] leddc {
 		sfmt	leddc
 		all1	ignore
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x7C
 		srom 4	0x5A
 		srom 5-7	0x5A
@@ -878,7 +878,7 @@ leds {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDS
 	u8 ledbh0 {
 		all1	ignore
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-3	0x65
 		srom 4	0x57
 		srom 5-7	0x77
@@ -887,7 +887,7 @@ leds {
 	}
 	u8 ledbh1 {
 		all1	ignore
-		cis >= 0	 0x1
+		cis >= 0	0x1
 		srom 1-3	0x64
 		srom 4	0x56
 		srom 5-7	0x76
@@ -896,7 +896,7 @@ leds {
 	}
 	u8 ledbh2 {
 		all1	ignore
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 1-3	0x67
 		srom 4	0x59
 		srom 5-7	0x79
@@ -905,7 +905,7 @@ leds {
 	}
 	u8 ledbh3 {
 		all1	ignore
-		cis >= 0	 0x3
+		cis >= 0	0x3
 		srom 1-3	0x66
 		srom 4	0x58
 		srom 5-7	0x78
@@ -913,40 +913,40 @@ leds {
 		srom >= 11	0x9C
 	}
 	u8 ledbh4 {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 	}
 	u8 ledbh5 {
-		cis >= 0	 0x5
+		cis >= 0	0x5
 	}
 	u8 ledbh6 {
-		cis >= 0	 0x6
+		cis >= 0	0x6
 	}
 	u8 ledbh7 {
-		cis >= 0	 0x7
+		cis >= 0	0x7
 	}
 	u8 ledbh8 {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 	}
 	u8 ledbh9 {
-		cis >= 0	 0x9
+		cis >= 0	0x9
 	}
 	u8 ledbh10 {
-		cis >= 0	 0xA
+		cis >= 0	0xA
 	}
 	u8 ledbh11 {
-		cis >= 0	 0xB
+		cis >= 0	0xB
 	}
 	u8 ledbh12 {
-		cis >= 0	 0xC
+		cis >= 0	0xC
 	}
 	u8 ledbh13 {
-		cis >= 0	 0xD
+		cis >= 0	0xD
 	}
 	u8 ledbh14 {
-		cis >= 0	 0xE
+		cis >= 0	0xE
 	}
 	u8 ledbh15 {
-		cis >= 0	 0xF
+		cis >= 0	0xF
 	}
 }
 
@@ -959,7 +959,7 @@ leds {
 leg40duppo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEG40DUPPO
 	u16 legofdm40duppo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x196
 	}
 }
@@ -972,11 +972,11 @@ leg40duppo {
 legofdmbw202gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW202GPO
 	u32 legofdmbw202gpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x144
 	}
 	u32 legofdmbw20ul2gpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 9-10	0x148
 	}
 }
@@ -991,27 +991,27 @@ legofdmbw202gpo {
 legofdmbw205gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEGOFDMBW205GPO
 	u32 legofdmbw205glpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x14C
 	}
 	u32 legofdmbw20ul5glpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 9-10	0x150
 	}
 	u32 legofdmbw205gmpo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 9-10	0x154
 	}
 	u32 legofdmbw20ul5gmpo {
-		cis >= 0	 0xC
+		cis >= 0	0xC
 		srom 9-10	0x158
 	}
 	u32 legofdmbw205ghpo {
-		cis >= 0	 0x10
+		cis >= 0	0x10
 		srom 9-10	0x15C
 	}
 	u32 legofdmbw20ul5ghpo {
-		cis >= 0	 0x14
+		cis >= 0	0x14
 		srom 9-10	0x160
 	}
 }
@@ -1021,7 +1021,7 @@ macaddr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MACADDR
 	u8[48] macaddr {
 		sfmt	macaddr
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x4A
 		srom 4	0x4C
 		srom 5-7	0x52
@@ -1037,16 +1037,16 @@ macaddr {
 mcs2gpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS2GPO
 	u32 mcsbw202gpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x164
 		srom >= 11	0x154
 	}
 	u32 mcsbw20ul2gpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 9-10	0x168
 	}
 	u32 mcsbw402gpo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 9-10	0x16C
 		srom >= 11	0x158
 	}
@@ -1060,16 +1060,16 @@ mcs2gpo {
 mcs5ghpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GHPO
 	u32 mcsbw205ghpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x188
 		srom >= 11	0x180
 	}
 	u32 mcsbw20ul5ghpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 9-10	0x18C
 	}
 	u32 mcsbw405ghpo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 9-10	0x190
 		srom >= 11	0x184
 	}
@@ -1083,16 +1083,16 @@ mcs5ghpo {
 mcs5glpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GLPO
 	u32 mcsbw205glpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x170
 		srom >= 11	0x160
 	}
 	u32 mcsbw20ul5glpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 9-10	0x174
 	}
 	u32 mcsbw405glpo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 9-10	0x178
 		srom >= 11	0x164
 	}
@@ -1106,16 +1106,16 @@ mcs5glpo {
 mcs5gmpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS5GMPO
 	u32 mcsbw205gmpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x17C
 		srom >= 11	0x170
 	}
 	u32 mcsbw20ul5gmpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 9-10	0x180
 	}
 	u32 mcsbw405gmpo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 9-10	0x184
 		srom >= 11	0x174
 	}
@@ -1129,7 +1129,7 @@ mcs5gmpo {
 mcs32po {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MCS32PO
 	u16 mcs32po {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 9-10	0x194
 	}
 }
@@ -1137,22 +1137,22 @@ mcs32po {
 meas_pwr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MEAS_PWR
 	u8 measpower {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom 8-10	0xB4 (&0xFE, >>1)
 		srom >= 11	0xB0 (&0xFE, >>1)
 	}
 	u8 measpower1 {
-		cis >= 11	 0x1
+		cis >= 11	0x1
 		srom 8-10	0xBF (&0x7F)
 		srom >= 11	0xBB (&0x7F)
 	}
 	u16 measpower2 {
-		cis >= 11	 u8 @ 0x2
+		cis >= 11	u8 @ 0x2
 		srom 8-10	0xBE (&0x3F80, >>7)
 		srom >= 11	0xBA (&0x3F80, >>7)
 	}
 	u16 rawtempsense {
-		cis >= 11	 0x3
+		cis >= 11	0x3
 		srom 8-10	0xB4 (&0x1FF)
 		srom >= 11	0xB0 (&0x1FF)
 	}
@@ -1162,7 +1162,7 @@ meas_pwr {
 muxenab {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MUXENAB
 	u8 muxenab {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -1170,36 +1170,36 @@ noiselvl {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_NOISELVL
 	u8 noiselvl2ga0 {
 		sfmt	sdec
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom 8-10	0x1AB (&0x1F)
 		srom >= 11	0x1BD (&0x1F)
 	}
 	u16 noiselvl2ga1 {
 		sfmt	sdec
-		cis >= 11	 u8 @ 0x1
+		cis >= 11	u8 @ 0x1
 		srom 8-10	0x1AA (&0x3E0, >>5)
 		srom >= 11	0x1BC (&0x3E0, >>5)
 	}
 	u8 noiselvl2ga2 {
 		sfmt	sdec
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom 8-10	0x1AA (&0x7C, >>2)
 		srom >= 11	0x1BC (&0x7C, >>2)
 	}
 	u8[4] noiselvl5ga0 {
 		sfmt	sdec
-		cis >= 11	 0x3
-		srom >= 11	 u8 @ 0x1BF (&0x1F),  u8 @ 0x1C1 (&0x1F),  u8 @ 0x1C3 (&0x1F),  u8 @ 0x1C5 (&0x1F)
+		cis >= 11	0x3
+		srom >= 11	u8 @ 0x1BF (&0x1F), u8 @ 0x1C1 (&0x1F), u8 @ 0x1C3 (&0x1F), u8 @ 0x1C5 (&0x1F)
 	}
 	u16[4] noiselvl5ga1 {
 		sfmt	sdec
-		cis >= 11	 u8[4] @ 0x7
+		cis >= 11	u8[4] @ 0x7
 		srom >= 11	0x1BE (&0x3E0, >>5)
 	}
 	u8[4] noiselvl5ga2 {
 		sfmt	sdec
-		cis >= 11	 0xB
-		srom >= 11	 u8 @ 0x1BE (&0x7C, >>2),  u8 @ 0x1C0 (&0x7C, >>2),  u8 @ 0x1C2 (&0x7C, >>2),  u8 @ 0x1C4 (&0x7C, >>2)
+		cis >= 11	0xB
+		srom >= 11	u8 @ 0x1BE (&0x7C, >>2), u8 @ 0x1C0 (&0x7C, >>2), u8 @ 0x1C2 (&0x7C, >>2), u8 @ 0x1C4 (&0x7C, >>2)
 	}
 }
 
@@ -1208,7 +1208,7 @@ oem {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OEM
 	u8[8] oem {
 		sfmt	hexbin
-		cis 1	 0x0 (&0xF)
+		cis 1	0x0 (&0xF)
 	}
 }
 
@@ -1216,7 +1216,7 @@ oem {
 ofdmpo {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO
 	u32 ofdmpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -1225,17 +1225,17 @@ ofdmpo {
 ofdmpo5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_OFDMPO5G
 	u32 ofdm5gpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x13E
 		srom 8	0x146
 	}
 	u32 ofdm5glpo {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 4-7	0x142
 		srom 8	0x14A
 	}
 	u32 ofdm5ghpo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 4-7	0x146
 		srom 8	0x14E
 	}
@@ -1246,7 +1246,7 @@ paparambwver {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARAMBWVER
 	u8 paparambwver {
 		sfmt	sdec
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x190 (&0xF0, >>4)
 	}
 }
@@ -1258,36 +1258,36 @@ paparms {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS
 	u16 pa0b0 {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-3	0x5E
 		srom 8-10	0xC2
 	}
 	u16 pa0b1 {
 		sfmt	sdec
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 1-3	0x60
 		srom 8-10	0xC4
 	}
 	u16 pa0b2 {
 		sfmt	sdec
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 1-3	0x62
 		srom 8-10	0xC6
 	}
 	u8 pa0itssit {
 		sfmt	sdec
-		cis >= 0	 0x6
+		cis >= 0	0x6
 		srom 1-3	0x71
 		srom 8-10	0xC0
 	}
 	u8 pa0maxpwr {
 		sfmt	sdec
-		cis >= 0	 0x7
+		cis >= 0	0x7
 		srom 1-3	0x69
 		srom 8-10	0xC1
 	}
 	u8 opo {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 2-3	0x79
 		srom 8-10	0x143
 	}
@@ -1298,79 +1298,79 @@ paparms5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS5G
 	u16 pa1b0 {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 1-3	0x6A
 		srom 8-10	0xCC
 	}
 	u16 pa1b1 {
 		sfmt	sdec
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 1-3	0x6C
 		srom 8-10	0xCE
 	}
 	u16 pa1b2 {
 		sfmt	sdec
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 1-3	0x6E
 		srom 8-10	0xD0
 	}
 	u16 pa1lob0 {
 		sfmt	sdec
-		cis >= 0	 0x6
+		cis >= 0	0x6
 		srom 2-3	0x3C
 		srom 8-10	0xD2
 	}
 	u16 pa1lob1 {
 		sfmt	sdec
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 2-3	0x3E
 		srom 8-10	0xD4
 	}
 	u16 pa1lob2 {
 		sfmt	sdec
-		cis >= 0	 0xA
+		cis >= 0	0xA
 		srom 2-3	0x40
 		srom 8-10	0xD6
 	}
 	u16 pa1hib0 {
 		sfmt	sdec
-		cis >= 0	 0xC
+		cis >= 0	0xC
 		srom 2-3	0x42
 		srom 8-10	0xD8
 	}
 	u16 pa1hib1 {
 		sfmt	sdec
-		cis >= 0	 0xE
+		cis >= 0	0xE
 		srom 2-3	0x44
 		srom 8-10	0xDA
 	}
 	u16 pa1hib2 {
 		sfmt	sdec
-		cis >= 0	 0x10
+		cis >= 0	0x10
 		srom 2-3	0x46
 		srom 8-10	0xDC
 	}
 	u8 pa1itssit {
 		sfmt	sdec
-		cis >= 0	 0x12
+		cis >= 0	0x12
 		srom 1-3	0x70
 		srom 8-10	0xC8
 	}
 	u8 pa1maxpwr {
 		sfmt	sdec
-		cis >= 0	 0x13
+		cis >= 0	0x13
 		srom 1-3	0x68
 		srom 8-10	0xC9
 	}
 	u8 pa1lomaxpwr {
 		sfmt	sdec
-		cis >= 0	 0x14
+		cis >= 0	0x14
 		srom 2-3	0x3A
 		srom 8-10	0xCA
 	}
 	u8 pa1himaxpwr {
 		sfmt	sdec
-		cis >= 0	 0x15
+		cis >= 0	0x15
 		srom 2-3	0x3B
 		srom 8-10	0xCB
 	}
@@ -1380,94 +1380,94 @@ paparms5g {
 paparms_c0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C0
 	u8 maxp2ga0 {
-		cis 1-10	 0x0
+		cis 1-10	0x0
 		srom 4-7	0x81
 		srom 8-10	0xC1
 		srom >= 11	0xD9
 	}
 	u8 itt2ga0 {
-		cis 1-10	 0x1
+		cis 1-10	0x1
 		srom 4-7	0x80
 		srom 8-10	0xC0
 	}
 	u16 pa2gw0a0 {
-		cis 1-10	 0x2
+		cis 1-10	0x2
 		srom 4-7	0x82
 		srom 8-10	0xC2
 	}
 	u16 pa2gw1a0 {
-		cis 1-10	 0x4
+		cis 1-10	0x4
 		srom 4-7	0x84
 		srom 8-10	0xC4
 	}
 	u16 pa2gw2a0 {
-		cis 1-10	 0x6
+		cis 1-10	0x6
 		srom 4-7	0x86
 		srom 8-10	0xC6
 	}
 	u8[4] maxp5ga0 {
-		cis 1-10	 u8 @ 0x8
-		srom 4-7	 u8 @ 0x8B
-		srom 8-10	 u8 @ 0xC9
-		srom >= 11	 u8 @ 0xE5,  u8 @ 0xE4,  u8 @ 0xE7,  u8 @ 0xE6
+		cis 1-10	u8 @ 0x8
+		srom 4-7	u8 @ 0x8B
+		srom 8-10	u8 @ 0xC9
+		srom >= 11	u8 @ 0xE5, u8 @ 0xE4, u8 @ 0xE7, u8 @ 0xE6
 	}
 	u8 itt5ga0 {
-		cis 1-10	 0x9
+		cis 1-10	0x9
 		srom 4-7	0x8A
 		srom 8-10	0xC8
 	}
 	u8 maxp5gha0 {
-		cis 1-10	 0xA
+		cis 1-10	0xA
 		srom 4-7	0x8D
 		srom 8-10	0xCB
 	}
 	u8 maxp5gla0 {
-		cis 1-10	 0xB
+		cis 1-10	0xB
 		srom 4-7	0x8C
 		srom 8-10	0xCA
 	}
 	u16 pa5gw0a0 {
-		cis 1-10	 0xC
+		cis 1-10	0xC
 		srom 4-7	0x8E
 		srom 8-10	0xCC
 	}
 	u16 pa5gw1a0 {
-		cis 1-10	 0xE
+		cis 1-10	0xE
 		srom 4-7	0x90
 		srom 8-10	0xCE
 	}
 	u16 pa5gw2a0 {
-		cis 1-10	 0x10
+		cis 1-10	0x10
 		srom 4-7	0x92
 		srom 8-10	0xD0
 	}
 	u16 pa5glw0a0 {
-		cis 1-10	 0x12
+		cis 1-10	0x12
 		srom 4-7	0x96
 		srom 8-10	0xD2
 	}
 	u16 pa5glw1a0 {
-		cis 1-10	 0x14
+		cis 1-10	0x14
 		srom 4-7	0x98
 		srom 8-10	0xD4
 	}
 	u16 pa5glw2a0 {
-		cis 1-10	 0x16
+		cis 1-10	0x16
 		srom 4-7	0x9A
 		srom 8-10	0xD6
 	}
 	u16 pa5ghw0a0 {
-		cis 1-10	 0x18
+		cis 1-10	0x18
 		srom 4-7	0x9E
 		srom 8-10	0xD8
 	}
 	u16 pa5ghw1a0 {
-		cis 1-10	 0x1A
+		cis 1-10	0x1A
 		srom 4-7	0xA0
 		srom 8-10	0xDA
 	}
 	u16 pa5ghw2a0 {
-		cis 1-10	 0x1C
+		cis 1-10	0x1C
 		srom 4-7	0xA2
 		srom 8-10	0xDC
 	}
@@ -1489,94 +1489,94 @@ paparms_c0 {
 paparms_c1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C1
 	u8 maxp2ga1 {
-		cis 1-10	 0x0
+		cis 1-10	0x0
 		srom 4-7	0xAF
 		srom 8-10	0xE1
 		srom >= 11	0x101
 	}
 	u8 itt2ga1 {
-		cis 1-10	 0x1
+		cis 1-10	0x1
 		srom 4-7	0xAE
 		srom 8-10	0xE0
 	}
 	u16 pa2gw0a1 {
-		cis 1-10	 0x2
+		cis 1-10	0x2
 		srom 4-7	0xB0
 		srom 8-10	0xE2
 	}
 	u16 pa2gw1a1 {
-		cis 1-10	 0x4
+		cis 1-10	0x4
 		srom 4-7	0xB2
 		srom 8-10	0xE4
 	}
 	u16 pa2gw2a1 {
-		cis 1-10	 0x6
+		cis 1-10	0x6
 		srom 4-7	0xB4
 		srom 8-10	0xE6
 	}
 	u8[4] maxp5ga1 {
-		cis 1-10	 u8 @ 0x8
-		srom 4-7	 u8 @ 0xB9
-		srom 8-10	 u8 @ 0xE9
-		srom >= 11	 u8 @ 0x10D,  u8 @ 0x10C,  u8 @ 0x10F,  u8 @ 0x10E
+		cis 1-10	u8 @ 0x8
+		srom 4-7	u8 @ 0xB9
+		srom 8-10	u8 @ 0xE9
+		srom >= 11	u8 @ 0x10D, u8 @ 0x10C, u8 @ 0x10F, u8 @ 0x10E
 	}
 	u8 itt5ga1 {
-		cis 1-10	 0x9
+		cis 1-10	0x9
 		srom 4-7	0xB8
 		srom 8-10	0xE8
 	}
 	u8 maxp5gha1 {
-		cis 1-10	 0xA
+		cis 1-10	0xA
 		srom 4-7	0xBB
 		srom 8-10	0xEB
 	}
 	u8 maxp5gla1 {
-		cis 1-10	 0xB
+		cis 1-10	0xB
 		srom 4-7	0xBA
 		srom 8-10	0xEA
 	}
 	u16 pa5gw0a1 {
-		cis 1-10	 0xC
+		cis 1-10	0xC
 		srom 4-7	0xBC
 		srom 8-10	0xEC
 	}
 	u16 pa5gw1a1 {
-		cis 1-10	 0xE
+		cis 1-10	0xE
 		srom 4-7	0xBE
 		srom 8-10	0xEE
 	}
 	u16 pa5gw2a1 {
-		cis 1-10	 0x10
+		cis 1-10	0x10
 		srom 4-7	0xC0
 		srom 8-10	0xF0
 	}
 	u16 pa5glw0a1 {
-		cis 1-10	 0x12
+		cis 1-10	0x12
 		srom 4-7	0xC4
 		srom 8-10	0xF2
 	}
 	u16 pa5glw1a1 {
-		cis 1-10	 0x14
+		cis 1-10	0x14
 		srom 4-7	0xC6
 		srom 8-10	0xF4
 	}
 	u16 pa5glw2a1 {
-		cis 1-10	 0x16
+		cis 1-10	0x16
 		srom 4-7	0xC8
 		srom 8-10	0xF6
 	}
 	u16 pa5ghw0a1 {
-		cis 1-10	 0x18
+		cis 1-10	0x18
 		srom 4-7	0xCC
 		srom 8-10	0xF8
 	}
 	u16 pa5ghw1a1 {
-		cis 1-10	 0x1A
+		cis 1-10	0x1A
 		srom 4-7	0xCE
 		srom 8-10	0xFA
 	}
 	u16 pa5ghw2a1 {
-		cis 1-10	 0x1C
+		cis 1-10	0x1C
 		srom 4-7	0xD0
 		srom 8-10	0xFC
 	}
@@ -1598,94 +1598,94 @@ paparms_c1 {
 paparms_c2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C2
 	u8 maxp2ga2 {
-		cis 1-10	 0x0
+		cis 1-10	0x0
 		srom 4-7	0xDD
 		srom 8-10	0x101
 		srom >= 11	0x129
 	}
 	u8 itt2ga2 {
-		cis 1-10	 0x1
+		cis 1-10	0x1
 		srom 4-7	0xDC
 		srom 8-10	0x100
 	}
 	u16 pa2gw0a2 {
-		cis 1-10	 0x2
+		cis 1-10	0x2
 		srom 4-7	0xDE
 		srom 8-10	0x102
 	}
 	u16 pa2gw1a2 {
-		cis 1-10	 0x4
+		cis 1-10	0x4
 		srom 4-7	0xE0
 		srom 8-10	0x104
 	}
 	u16 pa2gw2a2 {
-		cis 1-10	 0x6
+		cis 1-10	0x6
 		srom 4-7	0xE2
 		srom 8-10	0x106
 	}
 	u8[4] maxp5ga2 {
-		cis 1-10	 u8 @ 0x8
-		srom 4-7	 u8 @ 0xE7
-		srom 8-10	 u8 @ 0x109
-		srom >= 11	 u8 @ 0x135,  u8 @ 0x134,  u8 @ 0x137,  u8 @ 0x136
+		cis 1-10	u8 @ 0x8
+		srom 4-7	u8 @ 0xE7
+		srom 8-10	u8 @ 0x109
+		srom >= 11	u8 @ 0x135, u8 @ 0x134, u8 @ 0x137, u8 @ 0x136
 	}
 	u8 itt5ga2 {
-		cis 1-10	 0x9
+		cis 1-10	0x9
 		srom 4-7	0xE6
 		srom 8-10	0x108
 	}
 	u8 maxp5gha2 {
-		cis 1-10	 0xA
+		cis 1-10	0xA
 		srom 4-7	0xE9
 		srom 8-10	0x10B
 	}
 	u8 maxp5gla2 {
-		cis 1-10	 0xB
+		cis 1-10	0xB
 		srom 4-7	0xE8
 		srom 8-10	0x10A
 	}
 	u16 pa5gw0a2 {
-		cis 1-10	 0xC
+		cis 1-10	0xC
 		srom 4-7	0xEA
 		srom 8-10	0x10C
 	}
 	u16 pa5gw1a2 {
-		cis 1-10	 0xE
+		cis 1-10	0xE
 		srom 4-7	0xEC
 		srom 8-10	0x10E
 	}
 	u16 pa5gw2a2 {
-		cis 1-10	 0x10
+		cis 1-10	0x10
 		srom 4-7	0xEE
 		srom 8-10	0x110
 	}
 	u16 pa5glw0a2 {
-		cis 1-10	 0x12
+		cis 1-10	0x12
 		srom 4-7	0xF2
 		srom 8-10	0x112
 	}
 	u16 pa5glw1a2 {
-		cis 1-10	 0x14
+		cis 1-10	0x14
 		srom 4-7	0xF4
 		srom 8-10	0x114
 	}
 	u16 pa5glw2a2 {
-		cis 1-10	 0x16
+		cis 1-10	0x16
 		srom 4-7	0xF6
 		srom 8-10	0x116
 	}
 	u16 pa5ghw0a2 {
-		cis 1-10	 0x18
+		cis 1-10	0x18
 		srom 4-7	0xFA
 		srom 8-10	0x118
 	}
 	u16 pa5ghw1a2 {
-		cis 1-10	 0x1A
+		cis 1-10	0x1A
 		srom 4-7	0xFC
 		srom 8-10	0x11A
 	}
 	u16 pa5ghw2a2 {
-		cis 1-10	 0x1C
+		cis 1-10	0x1C
 		srom 4-7	0xFE
 		srom 8-10	0x11C
 	}
@@ -1707,92 +1707,92 @@ paparms_c2 {
 paparms_c3 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PAPARMS_C3
 	u8 maxp2ga3 {
-		cis 1-10	 0x0
+		cis 1-10	0x0
 		srom 4-7	0x10B
 		srom 8-10	0x121
 	}
 	u8 itt2ga3 {
-		cis 1-10	 0x1
+		cis 1-10	0x1
 		srom 4-7	0x10A
 		srom 8-10	0x120
 	}
 	u16 pa2gw0a3 {
-		cis 1-10	 0x2
+		cis 1-10	0x2
 		srom 4-7	0x10C
 		srom 8-10	0x122
 	}
 	u16 pa2gw1a3 {
-		cis 1-10	 0x4
+		cis 1-10	0x4
 		srom 4-7	0x10E
 		srom 8-10	0x124
 	}
 	u16 pa2gw2a3 {
-		cis 1-10	 0x6
+		cis 1-10	0x6
 		srom 4-7	0x110
 		srom 8-10	0x126
 	}
 	u8 maxp5ga3 {
-		cis 1-10	 0x8
+		cis 1-10	0x8
 		srom 4-7	0x115
 		srom 8-10	0x129
 	}
 	u8 itt5ga3 {
-		cis 1-10	 0x9
+		cis 1-10	0x9
 		srom 4-7	0x114
 		srom 8-10	0x128
 	}
 	u8 maxp5gha3 {
-		cis 1-10	 0xA
+		cis 1-10	0xA
 		srom 4-7	0x117
 		srom 8-10	0x12B
 	}
 	u8 maxp5gla3 {
-		cis 1-10	 0xB
+		cis 1-10	0xB
 		srom 4-7	0x116
 		srom 8-10	0x12A
 	}
 	u16 pa5gw0a3 {
-		cis 1-10	 0xC
+		cis 1-10	0xC
 		srom 4-7	0x118
 		srom 8-10	0x12C
 	}
 	u16 pa5gw1a3 {
-		cis 1-10	 0xE
+		cis 1-10	0xE
 		srom 4-7	0x11A
 		srom 8-10	0x12E
 	}
 	u16 pa5gw2a3 {
-		cis 1-10	 0x10
+		cis 1-10	0x10
 		srom 4-7	0x11C
 		srom 8-10	0x130
 	}
 	u16 pa5glw0a3 {
-		cis 1-10	 0x12
+		cis 1-10	0x12
 		srom 4-7	0x120
 		srom 8-10	0x132
 	}
 	u16 pa5glw1a3 {
-		cis 1-10	 0x14
+		cis 1-10	0x14
 		srom 4-7	0x122
 		srom 8-10	0x134
 	}
 	u16 pa5glw2a3 {
-		cis 1-10	 0x16
+		cis 1-10	0x16
 		srom 4-7	0x124
 		srom 8-10	0x136
 	}
 	u16 pa5ghw0a3 {
-		cis 1-10	 0x18
+		cis 1-10	0x18
 		srom 4-7	0x128
 		srom 8-10	0x138
 	}
 	u16 pa5ghw1a3 {
-		cis 1-10	 0x1A
+		cis 1-10	0x1A
 		srom 4-7	0x12A
 		srom 8-10	0x13A
 	}
 	u16 pa5ghw2a3 {
-		cis 1-10	 0x1C
+		cis 1-10	0x1C
 		srom 4-7	0x12C
 		srom 8-10	0x13C
 	}
@@ -1813,27 +1813,27 @@ paparms_c3 {
 pdoff {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF
 	u16 pdoffset40ma0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0xCA
 	}
 	u16 pdoffset40ma1 {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0xCC
 	}
 	u16 pdoffset40ma2 {
-		cis >= 11	 0x4
+		cis >= 11	0x4
 		srom >= 11	0xCE
 	}
 	u16 pdoffset80ma0 {
-		cis >= 11	 0x6
+		cis >= 11	0x6
 		srom >= 11	0xD0
 	}
 	u16 pdoffset80ma1 {
-		cis >= 11	 0x8
+		cis >= 11	0x8
 		srom >= 11	0xD2
 	}
 	u16 pdoffset80ma2 {
-		cis >= 11	 0xA
+		cis >= 11	0xA
 		srom >= 11	0xD4
 	}
 }
@@ -1841,19 +1841,19 @@ pdoff {
 pdoff_2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PDOFF_2G
 	u8 pdoffset2g40ma0 {
-		cis >= 11	 0x0 (&0xF)
+		cis >= 11	0x0 (&0xF)
 		srom >= 11	0xC9 (&0xF)
 	}
 	u8 pdoffset2g40ma1 {
-		cis >= 11	 0x0 (&0xF0, >>4)
+		cis >= 11	0x0 (&0xF0, >>4)
 		srom >= 11	0xC9 (&0xF0, >>4)
 	}
 	u8 pdoffset2g40ma2 {
-		cis >= 11	 0x1 (&0xF)
+		cis >= 11	0x1 (&0xF)
 		srom >= 11	0xC8 (&0xF)
 	}
 	u8 pdoffset2g40mvalid {
-		cis >= 11	 0x1 (&0x80, >>7)
+		cis >= 11	0x1 (&0x80, >>7)
 		srom >= 11	0xC8 (&0x80, >>7)
 	}
 }
@@ -1862,7 +1862,7 @@ pdoff_2g {
 po_40m {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40M
 	u16 bw40po {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x18E
 		srom 8	0x196
 	}
@@ -1872,7 +1872,7 @@ po_40m {
 po_40mdup {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_40MDUP
 	u16 bwduppo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x190
 		srom 8	0x198
 	}
@@ -1882,27 +1882,27 @@ po_40mdup {
 po_cckofdm {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CCKOFDM
 	u16 cck2gpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x138
 		srom 8	0x140
 	}
 	u32 ofdm2gpo {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 4-7	0x13A
 		srom 8	0x142
 	}
 	u32 ofdm5gpo {
-		cis >= 0	 0x6
+		cis >= 0	0x6
 		srom 4-7	0x13E
 		srom 8	0x146
 	}
 	u32 ofdm5glpo {
-		cis >= 0	 0xA
+		cis >= 0	0xA
 		srom 4-7	0x142
 		srom 8	0x14A
 	}
 	u32 ofdm5ghpo {
-		cis >= 0	 0xE
+		cis >= 0	0xE
 		srom 4-7	0x146
 		srom 8	0x14E
 	}
@@ -1912,7 +1912,7 @@ po_cckofdm {
 po_cdd {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_CDD
 	u16 cddpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x18A
 		srom 8	0x192
 	}
@@ -1922,42 +1922,42 @@ po_cdd {
 po_mcs2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS2G
 	u16 mcs2gpo0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x14A
 		srom 8	0x152
 	}
 	u16 mcs2gpo1 {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 4-7	0x14C
 		srom 8	0x154
 	}
 	u16 mcs2gpo2 {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 4-7	0x14E
 		srom 8	0x156
 	}
 	u16 mcs2gpo3 {
-		cis >= 0	 0x6
+		cis >= 0	0x6
 		srom 4-7	0x150
 		srom 8	0x158
 	}
 	u16 mcs2gpo4 {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 4-7	0x152
 		srom 8	0x15A
 	}
 	u16 mcs2gpo5 {
-		cis >= 0	 0xA
+		cis >= 0	0xA
 		srom 4-7	0x154
 		srom 8	0x15C
 	}
 	u16 mcs2gpo6 {
-		cis >= 0	 0xC
+		cis >= 0	0xC
 		srom 4-7	0x156
 		srom 8	0x15E
 	}
 	u16 mcs2gpo7 {
-		cis >= 0	 0xE
+		cis >= 0	0xE
 		srom 4-7	0x158
 		srom 8	0x160
 	}
@@ -1967,82 +1967,82 @@ po_mcs2g {
 po_mcs5glh {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GLH
 	u16 mcs5glpo0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x16A
 		srom 8	0x172
 	}
 	u16 mcs5glpo1 {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 4-7	0x16C
 		srom 8	0x174
 	}
 	u16 mcs5glpo2 {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 4-7	0x16E
 		srom 8	0x176
 	}
 	u16 mcs5glpo3 {
-		cis >= 0	 0x6
+		cis >= 0	0x6
 		srom 4-7	0x170
 		srom 8	0x178
 	}
 	u16 mcs5glpo4 {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 4-7	0x172
 		srom 8	0x17A
 	}
 	u16 mcs5glpo5 {
-		cis >= 0	 0xA
+		cis >= 0	0xA
 		srom 4-7	0x174
 		srom 8	0x17C
 	}
 	u16 mcs5glpo6 {
-		cis >= 0	 0xC
+		cis >= 0	0xC
 		srom 4-7	0x176
 		srom 8	0x17E
 	}
 	u16 mcs5glpo7 {
-		cis >= 0	 0xE
+		cis >= 0	0xE
 		srom 4-7	0x178
 		srom 8	0x180
 	}
 	u16 mcs5ghpo0 {
-		cis >= 0	 0x10
+		cis >= 0	0x10
 		srom 4-7	0x17A
 		srom 8	0x182
 	}
 	u16 mcs5ghpo1 {
-		cis >= 0	 0x12
+		cis >= 0	0x12
 		srom 4-7	0x17C
 		srom 8	0x184
 	}
 	u16 mcs5ghpo2 {
-		cis >= 0	 0x14
+		cis >= 0	0x14
 		srom 4-7	0x17E
 		srom 8	0x186
 	}
 	u16 mcs5ghpo3 {
-		cis >= 0	 0x16
+		cis >= 0	0x16
 		srom 4-7	0x180
 		srom 8	0x188
 	}
 	u16 mcs5ghpo4 {
-		cis >= 0	 0x18
+		cis >= 0	0x18
 		srom 4-7	0x182
 		srom 8	0x18A
 	}
 	u16 mcs5ghpo5 {
-		cis >= 0	 0x1A
+		cis >= 0	0x1A
 		srom 4-7	0x184
 		srom 8	0x18C
 	}
 	u16 mcs5ghpo6 {
-		cis >= 0	 0x1C
+		cis >= 0	0x1C
 		srom 4-7	0x186
 		srom 8	0x18E
 	}
 	u16 mcs5ghpo7 {
-		cis >= 0	 0x1E
+		cis >= 0	0x1E
 		srom 4-7	0x188
 		srom 8	0x190
 	}
@@ -2052,42 +2052,42 @@ po_mcs5glh {
 po_mcs5gm {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_MCS5GM
 	u16 mcs5gpo0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x15A
 		srom 8	0x162
 	}
 	u16 mcs5gpo1 {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 4-7	0x15C
 		srom 8	0x164
 	}
 	u16 mcs5gpo2 {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 4-7	0x15E
 		srom 8	0x166
 	}
 	u16 mcs5gpo3 {
-		cis >= 0	 0x6
+		cis >= 0	0x6
 		srom 4-7	0x160
 		srom 8	0x168
 	}
 	u16 mcs5gpo4 {
-		cis >= 0	 0x8
+		cis >= 0	0x8
 		srom 4-7	0x162
 		srom 8	0x16A
 	}
 	u16 mcs5gpo5 {
-		cis >= 0	 0xA
+		cis >= 0	0xA
 		srom 4-7	0x164
 		srom 8	0x16C
 	}
 	u16 mcs5gpo6 {
-		cis >= 0	 0xC
+		cis >= 0	0xC
 		srom 4-7	0x166
 		srom 8	0x16E
 	}
 	u16 mcs5gpo7 {
-		cis >= 0	 0xE
+		cis >= 0	0xE
 		srom 4-7	0x168
 		srom 8	0x170
 	}
@@ -2097,7 +2097,7 @@ po_mcs5gm {
 po_stbc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_PO_STBC
 	u16 stbcpo {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 4-7	0x18C
 		srom 8	0x194
 	}
@@ -2107,7 +2107,7 @@ po_stbc {
 rdlid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RDLID
 	u16 rdlid {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2115,7 +2115,7 @@ rdlid {
 regrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_REGREV
 	u8 regrev {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x78
 		srom 4	0x55
 		srom 5-7	0x47
@@ -2130,22 +2130,22 @@ regrev {
 rssismbxa2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA2G
 	u8 rssismf2g {
-		cis >= 0	 0x0 (&0xF)
+		cis >= 0	0x0 (&0xF)
 		srom 3	0x51 (&0xF)
 		srom 8-10	0xA5 (&0xF)
 	}
 	u8 rssismc2g {
-		cis >= 0	 0x0 (&0xF0, >>4)
+		cis >= 0	0x0 (&0xF0, >>4)
 		srom 3	0x51 (&0xF0, >>4)
 		srom 8-10	0xA5 (&0xF0, >>4)
 	}
 	u8 rssisav2g {
-		cis >= 0	 0x1 (&0x7)
+		cis >= 0	0x1 (&0x7)
 		srom 3	0x50 (&0x7)
 		srom 8-10	0xA4 (&0x7)
 	}
 	u8 bxa2g {
-		cis >= 0	 0x1 (&0x18, >>3)
+		cis >= 0	0x1 (&0x18, >>3)
 		srom 3	0x50 (&0x18, >>3)
 		srom 8-10	0xA4 (&0x18, >>3)
 	}
@@ -2157,22 +2157,22 @@ rssismbxa2g {
 rssismbxa5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RSSISMBXA5G
 	u8 rssismf5g {
-		cis >= 0	 0x0 (&0xF)
+		cis >= 0	0x0 (&0xF)
 		srom 3	0x53 (&0xF)
 		srom 8-10	0xA7 (&0xF)
 	}
 	u8 rssismc5g {
-		cis >= 0	 0x0 (&0xF0, >>4)
+		cis >= 0	0x0 (&0xF0, >>4)
 		srom 3	0x53 (&0xF0, >>4)
 		srom 8-10	0xA7 (&0xF0, >>4)
 	}
 	u8 rssisav5g {
-		cis >= 0	 0x1 (&0x7)
+		cis >= 0	0x1 (&0x7)
 		srom 3	0x52 (&0x7)
 		srom 8-10	0xA6 (&0x7)
 	}
 	u8 bxa5g {
-		cis >= 0	 0x1 (&0x18, >>3)
+		cis >= 0	0x1 (&0x18, >>3)
 		srom 3	0x52 (&0x18, >>3)
 		srom 8-10	0xA6 (&0x18, >>3)
 	}
@@ -2181,31 +2181,31 @@ rssismbxa5g {
 rxgain_err {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXGAIN_ERR
 	u8 rxgainerr2ga0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom 8-10	0x19B (&0x3F)
 		srom >= 11	0x1C7 (&0x3F)
 	}
 	u16 rxgainerr2ga1 {
-		cis >= 11	 u8 @ 0x1
+		cis >= 11	u8 @ 0x1
 		srom 8-10	0x19A (&0x7C0, >>6)
 		srom >= 11	0x1C6 (&0x7C0, >>6)
 	}
 	u8 rxgainerr2ga2 {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom 8-10	0x19A (&0xF8, >>3)
 		srom >= 11	0x1C6 (&0xF8, >>3)
 	}
 	u8[4] rxgainerr5ga0 {
-		cis >= 11	 0x3
-		srom >= 11	 u8 @ 0x1C9 (&0x3F),  u8 @ 0x1CB (&0x3F),  u8 @ 0x1CD (&0x3F),  u8 @ 0x1CF (&0x3F)
+		cis >= 11	0x3
+		srom >= 11	u8 @ 0x1C9 (&0x3F), u8 @ 0x1CB (&0x3F), u8 @ 0x1CD (&0x3F), u8 @ 0x1CF (&0x3F)
 	}
 	u16[4] rxgainerr5ga1 {
-		cis >= 11	 u8[4] @ 0x7
+		cis >= 11	u8[4] @ 0x7
 		srom >= 11	0x1C8 (&0x7C0, >>6)
 	}
 	u8[4] rxgainerr5ga2 {
-		cis >= 11	 0xB
-		srom >= 11	 u8 @ 0x1C8 (&0xF8, >>3),  u8 @ 0x1CA (&0xF8, >>3),  u8 @ 0x1CC (&0xF8, >>3),  u8 @ 0x1CE (&0xF8, >>3)
+		cis >= 11	0xB
+		srom >= 11	u8 @ 0x1C8 (&0xF8, >>3), u8 @ 0x1CA (&0xF8, >>3), u8 @ 0x1CC (&0xF8, >>3), u8 @ 0x1CE (&0xF8, >>3)
 	}
 	u8 rxgainerr5gha0 {
 		srom 8-10	0x1A1 (&0x3F)
@@ -2250,7 +2250,7 @@ rxpo2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO2G
 	i8 rxpo2g {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x5B
 		srom 8-10	0xAD
 	}
@@ -2261,7 +2261,7 @@ rxpo5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_RXPO5G
 	i8 rxpo5g {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x5A
 		srom 8-10	0xAC
 	}
@@ -2272,7 +2272,7 @@ sromrev {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SROMREV
 	u8 sromrev {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2280,8 +2280,8 @@ sromrev {
 subband5gver {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_SUBBAND5GVER
 	u16 subband5gver {
-		cis >= 11	 0x0
-		srom 8-10	 u8 @ 0x1A5 (&0x7)
+		cis >= 11	0x0
+		srom 8-10	u8 @ 0x1A5 (&0x7)
 		srom >= 11	0xD6
 	}
 }
@@ -2293,46 +2293,46 @@ subband5gver {
 tempthresh {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TEMPTHRESH
 	u8 tempthresh {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 8-10	0xB2
 		srom >= 11	0xAE
 	}
 	u8 temps_period {
 		sfmt	sdec
-		cis >= 0	 0x1 (&0xF0, >>4)
+		cis >= 0	0x1 (&0xF0, >>4)
 		srom 8-10	0xBC (&0xF)
 		srom >= 11	0xB8 (&0xF)
 	}
 	u8 temps_hysteresis {
 		sfmt	sdec
-		cis >= 0	 0x1 (&0xF)
+		cis >= 0	0x1 (&0xF)
 		srom 8-10	0xBC (&0xF0, >>4)
 		srom >= 11	0xB8 (&0xF0, >>4)
 	}
 	u8 tempoffset {
 		sfmt	sdec
-		cis >= 0	 0x3
+		cis >= 0	0x3
 		srom 8-10	0xB3
 		srom >= 11	0xAF
 	}
 	u8 tempsense_slope {
-		cis >= 0	 0x4
+		cis >= 0	0x4
 		srom 8-10	0xB7
 		srom >= 11	0xB3
 	}
 	u8 tempcorrx {
-		cis >= 0	 0x4 (&0xFC, >>2)
+		cis >= 0	0x4 (&0xFC, >>2)
 		srom 8-10	0xB6 (&0xFC, >>2)
 		srom >= 11	0xB2 (&0xFC, >>2)
 	}
 	u8 tempsense_option {
-		cis >= 0	 0x4 (&0x3)
+		cis >= 0	0x4 (&0x3)
 		srom 8-10	0xB6 (&0x3)
 		srom >= 11	0xB2 (&0x3)
 	}
 	u8 phycal_tempdelta {
 		sfmt	sdec
-		cis >= 0	 0x7
+		cis >= 0	0x7
 		srom 8-10	0xBD
 		srom >= 11	0xB9
 	}
@@ -2342,7 +2342,7 @@ tempthresh {
 tri2g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI2G
 	u8 tri2g {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x55
 		srom 8-10	0xA9
 	}
@@ -2352,17 +2352,17 @@ tri2g {
 tri5g {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TRI5G
 	u8 tri5gl {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 		srom 3	0x57
 		srom 8-10	0xAB
 	}
 	u8 tri5g {
-		cis >= 0	 0x1
+		cis >= 0	0x1
 		srom 3	0x54
 		srom 8-10	0xA8
 	}
 	u8 tri5gh {
-		cis >= 0	 0x2
+		cis >= 0	0x2
 		srom 3	0x56
 		srom 8-10	0xAA
 	}
@@ -2372,23 +2372,23 @@ tri5g {
 txbfrpcals {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXBFRPCALS
 	u16 rpcal2g {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 		srom >= 11	0x16C
 	}
 	u16 rpcal5gb0 {
-		cis >= 11	 0x2
+		cis >= 11	0x2
 		srom >= 11	0x16E
 	}
 	u16 rpcal5gb1 {
-		cis >= 11	 0x4
+		cis >= 11	0x4
 		srom >= 11	0x17C
 	}
 	u16 rpcal5gb2 {
-		cis >= 11	 0x6
+		cis >= 11	0x6
 		srom >= 11	0x17E
 	}
 	u16 rpcal5gb3 {
-		cis >= 11	 0x8
+		cis >= 11	0x8
 		srom >= 11	0x18C
 	}
 }
@@ -2398,26 +2398,26 @@ txduty {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_TXDUTY
 	u16 tx_duty_cycle_ofdm_40_5g {
 		sfmt	sdec
-		cis >= 11	 0x0
+		cis >= 11	0x0
 	}
 	u16 tx_duty_cycle_thresh_40_5g {
 		sfmt	sdec
-		cis >= 11	 0x2
+		cis >= 11	0x2
 	}
 	u16 tx_duty_cycle_ofdm_80_5g {
 		sfmt	sdec
-		cis >= 11	 0x4
+		cis >= 11	0x4
 	}
 	u16 tx_duty_cycle_thresh_80_5g {
 		sfmt	sdec
-		cis >= 11	 0x6
+		cis >= 11	0x6
 	}
 }
 
 umanfid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UMANFID
 	u32 usbmanfid {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2425,7 +2425,7 @@ umanfid {
 usb30phy_noss {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_NOSS
 	u8 usbnoss {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2433,10 +2433,10 @@ usb30phy_noss {
 usb30phy_regs {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_REGS
 	u32[4] usb30regs0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 	u32[4] usb30regs1 {
-		cis >= 0	 0x10
+		cis >= 0	0x10
 	}
 }
 
@@ -2444,7 +2444,7 @@ usb30phy_regs {
 usb30phy_u1u2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30PHY_U1U2
 	u8 usb30u1u2 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2452,7 +2452,7 @@ usb30phy_u1u2 {
 usb30regs0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS0
 	u32[10] usb30regs0 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 	}
 }
 
@@ -2460,7 +2460,7 @@ usb30regs0 {
 usb30regs1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30REGS1
 	u32[10] usb30regs1 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 	}
 }
 
@@ -2468,7 +2468,7 @@ usb30regs1 {
 usb30u1u2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USB30U1U2
 	u16 usb30u1u2 {
-		cis >= 11	 0x0
+		cis >= 11	0x0
 	}
 }
 
@@ -2476,7 +2476,7 @@ usb30u1u2 {
 usbdesc_composite {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBDESC_COMPOSITE
 	u16 usbdesc_composite {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2484,14 +2484,14 @@ usbdesc_composite {
 usbepnum {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBEPNUM
 	u16 usbepnum {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
 usbflags {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFLAGS
 	u32 usbflags {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2500,7 +2500,7 @@ usbfs {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBFS
 	u8 usbfs {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2508,7 +2508,7 @@ usbfs {
 usbssphy_mdio {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_MDIO
 	u32[4] usbssmdio {
-		cis >= 0	 0x0 (&0xFFFFFF)
+		cis >= 0	0x0 (&0xFFFFFF)
 	}
 }
 
@@ -2516,7 +2516,7 @@ usbssphy_mdio {
 usbssphy_sleep0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP0
 	u16 usbssphy_sleep0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2524,7 +2524,7 @@ usbssphy_sleep0 {
 usbssphy_sleep1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP1
 	u16 usbssphy_sleep1 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2532,7 +2532,7 @@ usbssphy_sleep1 {
 usbssphy_sleep2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP2
 	u16 usbssphy_sleep2 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2540,7 +2540,7 @@ usbssphy_sleep2 {
 usbssphy_sleep3 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_SLEEP3
 	u16 usbssphy_sleep3 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2548,7 +2548,7 @@ usbssphy_sleep3 {
 usbssphy_utmi_ctl0 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL0
 	u32 usbssphy_utmi_ctl0 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2556,7 +2556,7 @@ usbssphy_utmi_ctl0 {
 usbssphy_utmi_ctl1 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL1
 	u32 usbssphy_utmi_ctl1 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2564,7 +2564,7 @@ usbssphy_utmi_ctl1 {
 usbssphy_utmi_ctl2 {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBSSPHY_UTMI_CTL2
 	u32 usbssphy_utmi_ctl2 {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2572,7 +2572,7 @@ usbssphy_utmi_ctl2 {
 usbutmi_ctl {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_USBUTMI_CTL
 	u16 usbutmi_ctl {
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2581,7 +2581,7 @@ uuid {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_UUID
 	u8[16] uuid {
 		sfmt	ascii
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 }
 
@@ -2590,11 +2590,11 @@ wowlgpio {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WOWLGPIO
 	u8 wowl_gpio {
 		sfmt	sdec
-		cis >= 0	 0x0 (&0x7F)
+		cis >= 0	0x0 (&0x7F)
 	}
 	u8 wowl_gpiopol {
 		sfmt	sdec
-		cis >= 0	 0x0 (&0x80, >>7)
+		cis >= 0	0x0 (&0x80, >>7)
 	}
 }
 
@@ -2603,11 +2603,11 @@ wps {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_WPS
 	u8 wpsgpio {
 		sfmt	sdec
-		cis >= 0	 0x0
+		cis >= 0	0x0
 	}
 	u8 wpsled {
 		sfmt	sdec
-		cis >= 0	 0x1
+		cis >= 0	0x1
 	}
 }
 
@@ -2616,8 +2616,8 @@ xtalfreq {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_XTALFREQ
 	u32 xtalfreq {
 		sfmt	sdec
-		cis >= 0	 0x0
-		srom >= 11	 u16 @ 0xB4
+		cis >= 0	0x0
+		srom >= 11	u16 @ 0xB4
 	}
 }
 
@@ -2628,7 +2628,7 @@ srom_misc {
 	}
 	u8 et1macaddr {
 		sfmt	macaddr
-		srom 0-2	 u8[48] @ 0x54
+		srom 0-2	u8[48] @ 0x54
 	}
 	u8 eu_edthresh2g {
 		srom 8	0x1A9
@@ -2650,7 +2650,7 @@ srom_misc {
 	}
 	u8 il0macaddr {
 		sfmt	macaddr
-		srom 0-2	 u8[48] @ 0x48
+		srom 0-2	u8[48] @ 0x48
 	}
 	u8 iqcal_swp_dis {
 		srom 8-10	0xB9 (&0x10, >>4)
@@ -2721,13 +2721,13 @@ srom_misc {
 		srom >= 2	0x6
 	}
 	u32[2] swctrlmap_2g {
-		srom 10	 u32[4] @ 0x1B8,  u16 @ 0x1C8
+		srom 10	u32[4] @ 0x1B8, u16 @ 0x1C8
 	}
 	u16 tssifloor2g {
 		srom >= 11	0xBE (&0x3FF)
 	}
 	u16 tssifloor5g {
-		srom >= 11	 u16[4] @ 0xC0 (&0x3FF)
+		srom >= 11	u16[4] @ 0xC0 (&0x3FF)
 	}
 	u16 txidxcap2g {
 		srom >= 11	0x1A8 (&0xFF0, >>4)
