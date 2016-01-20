@@ -68,6 +68,8 @@ void genmap::generate() {
         NSString *sectName = @(vs->name().c_str());
         if ([sectName hasPrefix: @"HNBU_"])
             sectName = [[sectName substringFromIndex: 5] lowercaseString];
+        else if ([sectName hasPrefix: @"CISTPL_"])
+            sectName = [@"pcmcia_" stringByAppendingString: [[sectName substringFromIndex: 7] lowercaseString]];
     
         prints("%s", sectName.UTF8String, ^{
             if (vs->cis().is<var_set_cis>()) {

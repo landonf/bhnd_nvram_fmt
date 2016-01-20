@@ -531,13 +531,13 @@ void nvram_map::emit_diagnostics () {
                 srom_compats.push_back(sp.compat());
         }
         
-        
+        fprintf(stderr, "\t%s ", vs->name().c_str());
+#if 0
         if (!vs->has_hnbu_entry() && !vs->asserted_revmask() && srom_compats.size() == 0) {
-            fprintf(stderr, "\t%s", vs->name().c_str());
             fprintf(stderr, "(no range found; assuming >= 0)");
             fprintf(stderr, "\n");
         }
-#if 0
+#else
         if (!vs->has_hnbu_entry() && !vs->asserted_revmask() && srom_compats.size() == 0) {
             fprintf(stderr, "(no range found; assuming >= 0)");
         } else {
