@@ -275,9 +275,9 @@ public:
     }
 };
 
-/** SPROM variable offset */
-class sprom_offset {
-    PL_RECORD_FIELDS(sprom_offset,
+/** variable offset */
+class nv_offset {
+    PL_RECORD_FIELDS(nv_offset,
                      (compat_range,			compat),/**< sprom compatibility declaration */
                      (shared_ptr<vector<value>>,	values)	/**< value descriptor(s) */
     );
@@ -291,14 +291,6 @@ class sprom_offset {
         return max_width;
     }
 #endif
-};
-    
-/** CIS variable offset */
-class cis_offset {
-    PL_RECORD_FIELDS(cis_offset,
-                     (compat_range,			compat),/**< sprom compatibility declaration */
-                     (value_seg,	value)	/**< value descriptor(s) */
-    );
 };
 
 PL_RECORD_STRUCT(sprom_struct,
@@ -425,12 +417,17 @@ class var {
         (str_fmt,				sfmt),
         (size_t,				count),
         (uint32_t,				flags),
-        (shared_ptr<vector<cis_offset>>, cis_offsets),
-        (shared_ptr<vector<sprom_offset>>,	sprom_offsets)
+        (shared_ptr<vector<nv_offset>>, cis_offsets),
+        (shared_ptr<vector<nv_offset>>,	sprom_offsets)
     );
 public:
     bool operator < (const var &other) const {
         return ([@(name().c_str()) compare:@(other.name().c_str()) options:NSNumericSearch] == NSOrderedAscending);
+    }
+    
+    bool hasCommonCompatRange () {
+        // TODO
+        return false;
     }
 };
 

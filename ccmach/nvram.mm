@@ -741,9 +741,13 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 flags = _srom_tbl.at(v.name())->flags();
             }
             
-            cis_offset coff(layout.compat(), value_seg(v.offset(), ptype, v.count(), v.mask(), v.shift()));
-            auto vl = make_shared<vector<cis_offset>>();
-            vl->push_back(coff);
+            value val(make_shared<vector<nvram::value_seg>>());
+            val.segments()->emplace_back(v.offset(), ptype, v.count(), v.mask(), v.shift());
+            auto vals = make_shared<vector<value>>();
+            vals->push_back(val);
+
+            auto vl = make_shared<vector<nv_offset>>();
+            vl->push_back(nv_offset(layout.compat(), vals));
             vars->push_back(make_shared<var>(
                 v.name(),
                 ptype,
@@ -751,7 +755,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 v.count(),
                 flags,
                 vl,
-                make_shared<vector<sprom_offset>>()
+                make_shared<vector<nv_offset>>()
             ));
         }
         
@@ -844,8 +848,8 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                     sfmt,
                     sv->count(),
                     sv->flags(),
-                    make_shared<vector<cis_offset>>(),
-                    make_shared<vector<sprom_offset>>()
+                    make_shared<vector<nv_offset>>(),
+                    make_shared<vector<nv_offset>>()
                 );
                 vs->vars()->push_back(v);
             } else {

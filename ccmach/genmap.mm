@@ -58,6 +58,36 @@ int genmap::prints(const char *fmt, ...) {
 
     return (cnt);
 }
+    
+void genmap::emit_offset (const string &src, const string &vtype, const nv_offset &sp) {
+    auto rdesc = sp.compat().description();
+    print("%s %s\t", src.c_str(), rdesc.c_str());
+    for (size_t vi = 0; vi < sp.values()->size(); vi++) {
+        const auto &val = sp.values()->at(vi);
+        auto segs = val.segments();
+        for (size_t seg = 0; seg < segs->size(); seg++) {
+            auto s = segs->at(seg);
+            
+            string type = to_string(s.type());
+            if (s.count() > 1)
+                type += "[" + to_string(s.count()) + "]";
+            
+            if (type == vtype)
+                type = "";
+            else
+                type = type + " @ ";
+            
+            printf("%s%s", type.c_str(), s.description().c_str());
+            if (seg+1 < segs->size())
+                printf(" | ");
+        }
+        
+        if (vi+1 < sp.values()->size())
+            printf(", ");
+    }
+    printf("\n");
+
+}
 
 void genmap::generate() {
     auto vsets = _nv.var_sets();
@@ -97,51 +127,11 @@ void genmap::generate() {
                     if (v->flags() & FLAG_NOALL1)
                         println("all1\tignore");
                     
-                    for (const auto &cis : *v->cis_offsets()) {
-                        const auto &value = cis.value();
-                        string type = to_string(value.type());
-                        if (value.count() > 1)
-                            type += "[" + to_string(value.count()) + "]";
-                        
-                        if (type == vtype)
-                            type = "";
-                        else
-                            type = type + " @ ";
-                        
-                        string rdesc = cis.compat().description();
-                        print("cis %s\t%s%s", rdesc.c_str(), type.c_str(), value.cis_description().c_str());
-                        printf("\n");
-                    }
+                    for (const auto &cis : *v->cis_offsets())
+                        emit_offset("cis", vtype, cis);
                     
-                    
-                    for (const auto &sp : *v->sprom_offsets()) {
-                        auto rdesc = sp.compat().description();
-                        print("srom %s\t", rdesc.c_str());
-                        for (size_t vi = 0; vi < sp.values()->size(); vi++) {
-                            const auto &val = sp.values()->at(vi);
-                            auto segs = val.segments();
-                            for (size_t seg = 0; seg < segs->size(); seg++) {
-                                auto s = segs->at(seg);
-
-                                string type = to_string(s.type());
-                                if (s.count() > 1)
-                                    type += "[" + to_string(s.count()) + "]";
-                                
-                                if (type == vtype)
-                                    type = "";
-                                else
-                                    type = type + " @ ";
-                                
-                                printf("%s%s", type.c_str(), s.description().c_str());
-                                if (seg+1 < segs->size())
-                                    printf(" | ");
-                            }
-                            
-                            if (vi+1 < sp.values()->size())
-                                printf(", ");
-                        }
-                        printf("\n");
-                    }
+                    for (const auto &sp : *v->sprom_offsets())
+                        emit_offset("srom", vtype, sp);
                 });
             }
 

@@ -271,7 +271,7 @@ private:
             if (name.length() == 0)
                 errx(EXIT_FAILURE, "variable has zero-length name");
 
-            auto v = make_shared<nvram::var>(name, n->get_type(), n->get_sfmt(), 0 /* array count */, n->nvram_flags(), make_shared<vector<nvram::cis_offset>>(), make_shared<vector<nvram::sprom_offset>>());
+            auto v = make_shared<nvram::var>(name, n->get_type(), n->get_sfmt(), 0 /* array count */, n->nvram_flags(), make_shared<vector<nvram::nv_offset>>(), make_shared<vector<nvram::nv_offset>>());
             
             /* Compare against previous variable with this name, or
              * register the new variable */
@@ -382,11 +382,11 @@ private:
                 }
             }
 
-            nvram::sprom_offset sp_off(nvram::compat_range::from_revmask(revmask), vals);
+            nvram::nv_offset sp_off(nvram::compat_range::from_revmask(revmask), vals);
             v->sprom_offsets()->push_back(sp_off);
             
             /* Sort by compat range */
-            sort(v->sprom_offsets()->begin(), v->sprom_offsets()->end(), [](const nvram::sprom_offset &lhs, const nvram::sprom_offset &rhs) {
+            sort(v->sprom_offsets()->begin(), v->sprom_offsets()->end(), [](const nvram::nv_offset &lhs, const nvram::nv_offset &rhs) {
                 return (lhs.compat().first() < rhs.compat().first());
             });
         }
@@ -802,7 +802,7 @@ public:
                             string name = v->name() + to_string(i);
                             if (path_var_tbl.count(name) == 0) {
                                 add_var = true;
-                                newv = make_shared<nvram::var>(v->name(name).sprom_offsets(make_shared<vector<nvram::sprom_offset>>()));
+                                newv = make_shared<nvram::var>(v->name(name).sprom_offsets(make_shared<vector<nvram::nv_offset>>()));
                                 path_var_tbl.insert({name, newv});
                             } else {
                                 newv = path_var_tbl.at(name);

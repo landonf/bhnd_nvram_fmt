@@ -17,6 +17,8 @@ class genmap {
 private:
     nvram_map _nv;
     int _depth = 0;
+    
+    void emit_offset (const string &src, const string &vtype, const nv_offset &sp);
 
 public:
     int print(const char *fmt, ...);
