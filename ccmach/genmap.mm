@@ -125,7 +125,7 @@ void genmap::generate() {
             }
             
             for (const auto &v : *vs->vars()) {
-                string vtype = to_string(v->type());
+                string vtype = to_string(v->decoded_type());
                 if (v->count() > 1)
                     vtype += "[" + to_string(v->count()) + "]";
                 

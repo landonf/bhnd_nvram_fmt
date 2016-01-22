@@ -154,6 +154,54 @@ class value_seg {
     );
     
 public:
+    size_t decoded_width () const {
+        uint32_t masked;
+        if (_shift < 0)
+            masked = (_mask << (-_shift));
+        else
+            masked = (_mask >> _shift);
+        
+        if (masked & 0xFFFF0000)
+            return 4;
+        if (masked & 0x0000FF00)
+            return 2;
+        return 1;
+    }
+
+    prop_type decoded_type () const {
+        auto w = decoded_width();
+        switch (_type) {
+            case BHND_T_UINT8:
+            case BHND_T_UINT16:
+            case BHND_T_UINT32:
+                switch (w) {
+                    case 1: return BHND_T_UINT8;
+                    case 2: return BHND_T_UINT16;
+                    case 4: return BHND_T_UINT32;
+                    default: errx(EXIT_FAILURE, "bizzare decode width");
+                }
+    
+            case BHND_T_INT8:
+            case BHND_T_INT16:
+            case BHND_T_INT32:
+                switch (w) {
+                    case 1: return BHND_T_INT8;
+                    case 2: return BHND_T_INT16;
+                    case 4: return BHND_T_INT32;
+                    default: errx(EXIT_FAILURE, "bizzare decode width");
+                }
+
+                
+            case BHND_T_CHAR:
+                if (w != 1)
+                    warnx("BHND_T_CHAR decodes to > 1 byte");
+                return BHND_T_CHAR;
+                
+            case BHND_T_CSTR:
+                return BHND_T_CSTR;
+        }
+    }
+
     bool has_default_mask () const {
         switch (type()) {
             case BHND_T_UINT8:
@@ -256,6 +304,14 @@ class value {
     
 public:
     
+    prop_type decoded_type () const {
+        auto t = _segments->at(0).decoded_type();
+        for (const auto &seg : *_segments) {
+            t = prop_type_widen(t, seg.decoded_type());
+        }
+        return t;
+    }
+    
     size_t total_width () const {
         uint32_t mask = 0;
         for (const auto &seg : *_segments) {
@@ -281,7 +337,14 @@ class nv_offset {
                      (compat_range,			compat),/**< sprom compatibility declaration */
                      (shared_ptr<vector<value>>,	values)	/**< value descriptor(s) */
     );
-    
+public:
+    prop_type decoded_type () const {
+        auto t = _values->at(0).decoded_type();
+        for (const auto &v : *_values) {
+            t = prop_type_widen(t, v.decoded_type());
+        }
+        return t;
+    }
     
 #if 0
     size_t elem_width () const {
@@ -427,6 +490,24 @@ public:
     
     bool hasCommonCompatRange ();
     compat_range getCommonCompatRange ();
+    
+    prop_type decoded_type () const {
+        prop_type t;
+        if (_cis_offsets->size() > 0)
+            t = _cis_offsets->at(0).decoded_type();
+        else
+            t = _sprom_offsets->at(0).decoded_type();
+
+        for (const auto &v : *_cis_offsets) {
+            t = prop_type_widen(t, v.decoded_type());
+        }
+        
+        for (const auto &v : *_sprom_offsets) {
+            t = prop_type_widen(t, v.decoded_type());
+        }
+    
+        return t;
+    }
 };
 
 /** NVRAM struct / CIS tuple */
