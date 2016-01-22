@@ -226,7 +226,8 @@ unordered_set<string> nvram::cis_known_special_cases = {
 
 static unordered_map<string, prop_type> cis_ptype_overrides = {
     {"rxpo2g",  BHND_T_INT8},
-    {"rxpo5g",  BHND_T_INT8}
+    {"rxpo5g",  BHND_T_INT8},
+    {"ccode",   BHND_T_CHAR},
 };
 
 static unordered_map<string, str_fmt> sfmt_overrides = {
@@ -740,13 +741,17 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                     break;
             }
             
+            auto count = v.count();
+            if (v.name() == "ccode" && ptype == BHND_T_CHAR)
+                count = 2;
+            
             /* Try to find a SROM var we can borrow flags from */
             if (_srom_tbl.count(v.name()) > 0) {
                 flags = _srom_tbl.at(v.name())->flags();
             }
             
             value val(make_shared<vector<nvram::value_seg>>());
-            val.segments()->emplace_back(v.offset(), ptype, v.count(), v.mask(), v.shift());
+            val.segments()->emplace_back(v.offset(), ptype, count, v.mask(), v.shift());
             auto vals = make_shared<vector<value>>();
             vals->push_back(val);
 
@@ -756,7 +761,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                 v.name(),
                 ptype,
                 sfmt,
-                v.count(),
+                count,
                 flags,
                 vl,
                 make_shared<vector<nv_offset>>()
@@ -861,6 +866,7 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
                     if (v->name() == "ccode" && sv->type() == BHND_T_CHAR) {
                         // CIS is wrong-ish here
                         *v = v->type(BHND_T_CHAR);
+                        *v = v->count(2);
                     } else {
                         if (!prop_type_compat(v->type(), sv->type()))
                             warnx("%s cis/srom mismatch: %s(cis) != %s(srom)", v->name().c_str(), to_string(v->type()).c_str(), to_string(sv->type()).c_str());
