@@ -920,6 +920,59 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
     
     return result;
 }
+    
+    
+bool var::hasCommonCompatRange () {
+    compat_range r(0, 0);
+    if (_cis_offsets->size() > 0)
+        r = _cis_offsets->at(0).compat();
+    else if (_sprom_offsets->size() > 0)
+        r = _sprom_offsets->at(0).compat();
+    else
+        return false;
 
+    for (const auto &o : *_cis_offsets)
+        if (r != o.compat())
+            return false;
+    
+    for (const auto &o : *_sprom_offsets)
+        if (r != o.compat())
+            return false;
+
+    return true;
+}
+
+compat_range var::getCommonCompatRange () {
+    if (!hasCommonCompatRange())
+        errx(EX_USAGE, "can't request common compat range if there isn't one");
+    
+    for (const auto &o : *_cis_offsets)
+        return o.compat();
+    
+    for (const auto &o : *_sprom_offsets)
+        return o.compat();
+
+    __builtin_unreachable();
+}
+    
+    
+    
+bool var_set::hasCommonCompatRange () {
+    for (const auto &v : *_vars)
+        if (!v->hasCommonCompatRange())
+            return false;
+
+    return true;
+}
+
+compat_range var_set::getCommonCompatRange () {
+    if (!hasCommonCompatRange())
+        errx(EX_USAGE, "can't request common varset compat range if there isn't one");
+    
+    for (const auto &v : *_vars)
+        return (v->getCommonCompatRange());
+    
+    __builtin_unreachable();
+}
 
 }

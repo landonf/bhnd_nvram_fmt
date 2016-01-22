@@ -425,10 +425,8 @@ public:
         return ([@(name().c_str()) compare:@(other.name().c_str()) options:NSNumericSearch] == NSOrderedAscending);
     }
     
-    bool hasCommonCompatRange () {
-        // TODO
-        return false;
-    }
+    bool hasCommonCompatRange ();
+    compat_range getCommonCompatRange ();
 };
 
 /** NVRAM struct / CIS tuple */
@@ -439,6 +437,10 @@ class var_set {
         (string,                    comment),
         (shared_ptr<vector<shared_ptr<var>>>,   vars)
     );
+
+public:
+    bool hasCommonCompatRange ();
+    compat_range getCommonCompatRange ();
 };
 
 class phy {

@@ -18,7 +18,7 @@ private:
     nvram_map _nv;
     int _depth = 0;
     
-    void emit_offset (const string &src, const string &vtype, const nv_offset &sp);
+    void emit_offset (const string &src, const string &vtype, const nv_offset &sp, bool skip_rdesc);
 
 public:
     int print(const char *fmt, ...);

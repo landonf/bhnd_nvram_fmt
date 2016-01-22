@@ -59,9 +59,14 @@ int genmap::prints(const char *fmt, ...) {
     return (cnt);
 }
     
-void genmap::emit_offset (const string &src, const string &vtype, const nv_offset &sp) {
+void genmap::emit_offset (const string &src, const string &vtype, const nv_offset &sp, bool skip_rdesc) {
     auto rdesc = sp.compat().description();
-    print("%s %s\t", src.c_str(), rdesc.c_str());
+    if (skip_rdesc)
+        rdesc = "";
+    else
+        rdesc = " " + rdesc;
+
+    print("%s%s\t", src.c_str(), rdesc.c_str());
     for (size_t vi = 0; vi < sp.values()->size(); vi++) {
         const auto &val = sp.values()->at(vi);
         auto segs = val.segments();
@@ -112,6 +117,13 @@ void genmap::generate() {
                 }
             }
             
+            bool skip_rdesc = false;
+            if (vs->hasCommonCompatRange() && vs->vars()->size() > 1) {
+                if (!vs->getCommonCompatRange().elidable())
+                    println("compat\t%s", vs->getCommonCompatRange().description().c_str());
+                skip_rdesc = true;
+            }
+            
             for (const auto &v : *vs->vars()) {
                 string vtype = to_string(v->type());
                 if (v->count() > 1)
@@ -128,10 +140,10 @@ void genmap::generate() {
                         println("all1\tignore");
                     
                     for (const auto &cis : *v->cis_offsets())
-                        emit_offset("cis", vtype, cis);
+                        emit_offset("cis\t", vtype, cis, skip_rdesc);
                     
                     for (const auto &sp : *v->sprom_offsets())
-                        emit_offset("srom", vtype, sp);
+                        emit_offset("srom", vtype, sp, skip_rdesc);
                 });
             }
 
