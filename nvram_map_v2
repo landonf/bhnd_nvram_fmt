@@ -876,15 +876,15 @@ gpio_pull_down {
 # 2 bytes; LED duty cycle
 leddc {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_LEDDC
-	u16[2] leddc {
+	u8[2] leddc {
 		sfmt	leddc
 		all1	ignore
-		cis	 >= 0	u8[2] @ 0x0
-		srom 3	u8[2] @ 0x7C
-		srom 4	u8[2] @ 0x5A
-		srom 5-7	u8[2] @ 0x5A
-		srom 8-10	u8[2] @ 0x9A
-		srom >= 11	u8[2] @ 0x9E
+		cis	 >= 0	0x0
+		srom 3	0x7C
+		srom 4	0x5A
+		srom 5-7	0x5A
+		srom 8-10	0x9A
+		srom >= 11	0x9E
 	}
 }
 
@@ -1034,14 +1034,14 @@ legofdmbw205gpo {
 # mac addr override for the standard CIS LAN_NID
 macaddr {
 	cis_tuple	CISTPL_BRCM_HNBU,HNBU_MACADDR
-	u16[48] macaddr {
+	u8[48] macaddr {
 		sfmt	macaddr
-		cis	 >= 0	u8[48] @ 0x0
-		srom 3	u8[48] @ 0x4A
-		srom 4	u8[48] @ 0x4C
-		srom 5-7	u8[48] @ 0x52
-		srom 8-10	u8[48] @ 0x8C
-		srom >= 11	u8[48] @ 0x90
+		cis	 >= 0	0x0
+		srom 3	0x4A
+		srom 4	0x4C
+		srom 5-7	0x52
+		srom 8-10	0x8C
+		srom >= 11	0x90
 	}
 }
 
@@ -2702,7 +2702,7 @@ srom_misc {
 	u16 cckPwrOffset {
 		srom 10	0x1B4
 	}
-	u16 et1macaddr {
+	u8 et1macaddr {
 		sfmt	macaddr
 		srom 0-2	u8[48] @ 0x54
 	}
@@ -2724,7 +2724,7 @@ srom_misc {
 	u8 hw_iqcal_en {
 		srom 8-10	0xB9 (&0x20, >>5)
 	}
-	u16 il0macaddr {
+	u8 il0macaddr {
 		sfmt	macaddr
 		srom 0-2	u8[48] @ 0x48
 	}
