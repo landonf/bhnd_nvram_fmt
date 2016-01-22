@@ -93,6 +93,9 @@ size_t nvram::prop_type_size (prop_type t) {
 }
 
 static nvram::grouping srom_misc =       { "srom_misc",            "SROM variables not supported by CIS",  0xFF };
+
+static nvram::grouping srom_nphy_txpwr_war  = { "nphy_txpwr_war",   "N-PHY tx power workaround", 0xFF };
+
 static nvram::grouping paparams_c0 =     { "HNBU_PAPARMS_C0",      NULL,  HNBU_PAPARMS_C0 };
 static nvram::grouping paparams_c1 =     { "HNBU_PAPARMS_C1",      NULL,  HNBU_PAPARMS_C1 };
 static nvram::grouping paparams_c2 =     { "HNBU_PAPARMS_C2",      NULL,  HNBU_PAPARMS_C2 };
@@ -186,22 +189,23 @@ unordered_map<string, grouping&> nvram::srom_subst_groupings = {
     { "tssifloor5g",       srom_misc },      // TODO: what are these?
     { "txidxcap2g",       srom_misc },      // TODO: what are these?
     { "txidxcap5g",       srom_misc },      // TODO: what are these?
-    { "txpid2ga0",       srom_misc },      // TODO: what are these?
-    { "txpid2ga1",       srom_misc },      // TODO: what are these?
-    { "txpid2ga2",       srom_misc },      // TODO: what are these?
-    { "txpid2ga3",       srom_misc },      // TODO: what are these?
-    { "txpid5ga0",       srom_misc },      // TODO: what are these?
-    { "txpid5ga1",       srom_misc },      // TODO: what are these?
-    { "txpid5ga2",       srom_misc },      // TODO: what are these?
-    { "txpid5ga3",       srom_misc },      // TODO: what are these?
-    { "txpid5gha0",       srom_misc },      // TODO: what are these?
-    { "txpid5gha1",       srom_misc },      // TODO: what are these?
-    { "txpid5gha2",       srom_misc },      // TODO: what are these?
-    { "txpid5gha3",       srom_misc },      // TODO: what are these?
-    { "txpid5gla0",       srom_misc },      // TODO: what are these?
-    { "txpid5gla1",       srom_misc },      // TODO: what are these?
-    { "txpid5gla2",       srom_misc },      // TODO: what are these?
-    { "txpid5gla3",       srom_misc },      // TODO: what are these?
+    
+    { "txpid2ga0",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid2ga1",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid2ga2",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid2ga3",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5ga0",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5ga1",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5ga2",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5ga3",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gha0",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gha1",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gha2",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gha3",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gla0",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gla1",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gla2",       srom_nphy_txpwr_war },      // TODO: what are these?
+    { "txpid5gla3",       srom_nphy_txpwr_war },      // TODO: what are these?
 
 #if 0
     { "itt2ga2",            paparams_c2 },
