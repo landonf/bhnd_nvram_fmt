@@ -873,8 +873,6 @@ vector<shared_ptr<var_set>> nvram_map::var_sets () {
 
                         /* Widen the type */
                         *v = v->type(prop_type_widen(v->type(), sv->type()));
-                        if (v->name() == "measpower2")
-                            warnx("widening measpower2");
                     }
                 }
                 

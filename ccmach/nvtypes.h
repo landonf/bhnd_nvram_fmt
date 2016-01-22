@@ -161,6 +161,24 @@ public:
         else
             masked = (_mask >> _shift);
         
+        switch (_type) {
+            case BHND_T_UINT8:
+            case BHND_T_INT8:
+            case BHND_T_CHAR:
+                masked &= 0xFF;
+                break;
+            case BHND_T_UINT16:
+            case BHND_T_INT16:
+                masked &= 0xFFFF;
+                break;
+            case BHND_T_UINT32:
+            case BHND_T_INT32:
+                masked &= 0xFFFFFFFF;
+                break;
+            case BHND_T_CSTR:
+                break;
+        }
+        
         if (masked & 0xFFFF0000)
             return 4;
         if (masked & 0x0000FF00)
@@ -505,7 +523,23 @@ public:
         for (const auto &v : *_sprom_offsets) {
             t = prop_type_widen(t, v.decoded_type());
         }
-    
+
+#if 0
+        if (_name == "macaddr") {
+            warnx("widening macaddr from %u to %u", type(), t);
+            for (const auto &v : *_cis_offsets)
+                for (const auto &val : *v.values())
+                    for (const auto &seg : *val.segments())
+                        warnx("cis=%s<-%s", to_string(seg.decoded_type()).c_str(), to_string(seg.type()).c_str());
+            
+            for (const auto &v : *_sprom_offsets)
+                for (const auto &val : *v.values())
+                    for (const auto &seg : *val.segments())
+                        warnx("srom=%s<-%s", to_string(seg.decoded_type()).c_str(), to_string(seg.type()).c_str());
+
+        }
+#endif
+
         return t;
     }
 };
