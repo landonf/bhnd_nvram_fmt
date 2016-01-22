@@ -119,8 +119,7 @@ void genmap::generate() {
             
             bool skip_rdesc = false;
             if (vs->hasCommonCompatRange() && (vs->vars()->size() > 1 || (vs->vars()->size() == 1 && vs->vars()->at(0)->cis_offsets()->size() + vs->vars()->at(0)->sprom_offsets()->size() > 1))) {
-                if (!vs->getCommonCompatRange().elidable())
-                    println("compat\t\t%s", vs->getCommonCompatRange().description().c_str());
+                println("compat\t\t%s", vs->getCommonCompatRange().description().c_str());
                 skip_rdesc = true;
             }
             
