@@ -330,6 +330,10 @@ public:
         return t;
     }
     
+    size_t decoded_count () const {
+        return _segments->at(0).count();
+    }
+    
     size_t total_width () const {
         uint32_t mask = 0;
         for (const auto &seg : *_segments) {
@@ -362,6 +366,15 @@ public:
             t = prop_type_widen(t, v.decoded_type());
         }
         return t;
+    }
+    
+    size_t decoded_count () const {
+        size_t c = 0;
+
+        for (const auto &v : *_values)
+            c += v.decoded_count();
+
+        return c;
     }
     
 #if 0
@@ -508,6 +521,18 @@ public:
     
     bool hasCommonCompatRange ();
     compat_range getCommonCompatRange ();
+    
+    size_t decoded_count () const {
+        size_t c = 0;
+        
+        for (const auto &v : *_cis_offsets)
+            c = std::max(c, v.decoded_count());
+        
+        for (const auto &v : *_sprom_offsets)
+            c = std::max(c, v.decoded_count());
+        
+        return c;
+    }
     
     prop_type decoded_type () const {
         prop_type t;

@@ -125,8 +125,8 @@ void genmap::generate() {
             
             for (const auto &v : *vs->vars()) {
                 string vtype = to_string(v->decoded_type());
-                if (v->count() > 1)
-                    vtype += "[" + to_string(v->count()) + "]";
+                if (v->decoded_count() > 1)
+                    vtype += "[" + to_string(v->decoded_count()) + "]";
                 
                 if (v->flags() & nvram::FLAG_MFGINT)
                     vtype = "private " + vtype;

@@ -2702,9 +2702,9 @@ srom_misc {
 	u16 cckPwrOffset {
 		srom 10	0x1B4
 	}
-	u8 et1macaddr {
+	u8[48] et1macaddr {
 		sfmt	macaddr
-		srom 0-2	u8[48] @ 0x54
+		srom 0-2	0x54
 	}
 	u8 eu_edthresh2g {
 		srom 8	0x1A9
@@ -2724,9 +2724,9 @@ srom_misc {
 	u8 hw_iqcal_en {
 		srom 8-10	0xB9 (&0x20, >>5)
 	}
-	u8 il0macaddr {
+	u8[48] il0macaddr {
 		sfmt	macaddr
-		srom 0-2	u8[48] @ 0x48
+		srom 0-2	0x48
 	}
 	u8 iqcal_swp_dis {
 		srom 8-10	0xB9 (&0x10, >>4)
@@ -2796,14 +2796,14 @@ srom_misc {
 	u16 subvid {
 		srom >= 2	0x6
 	}
-	u32[2] swctrlmap_2g {
+	u32[5] swctrlmap_2g {
 		srom 10	u32[4] @ 0x1B8, u16 @ 0x1C8
 	}
 	u16 tssifloor2g {
 		srom >= 11	0xBE (&0x3FF)
 	}
-	u16 tssifloor5g {
-		srom >= 11	u16[4] @ 0xC0 (&0x3FF)
+	u16[4] tssifloor5g {
+		srom >= 11	0xC0 (&0x3FF)
 	}
 	u8 txidxcap2g {
 		srom >= 11	u16 @ 0x1A8 (&0xFF0, >>4)
