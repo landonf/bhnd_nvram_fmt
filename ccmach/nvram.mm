@@ -520,6 +520,7 @@ void nvram_map::emit_diagnostics () {
     vector<string> srom_undef;
     vector<string> cis_undef;
     vector<string> cis_layout_undef;
+    vector<string> cis_dupl;
 
     fprintf(stderr, "# CIS vars missing revision ranges:\n");
     for (auto &vs : _cis_vstrs) {
@@ -567,6 +568,11 @@ void nvram_map::emit_diagnostics () {
 #endif
     }
     
+    /* Find duplicates */
+    for (const auto &v : _cis_vstr_tbl)
+        if (_cis_layout_tbl.count(v.first) > 1)
+            cis_dupl.push_back(v.first);
+
     /* Find undefs */
     for (const auto &v : _cis_vstr_tbl)
         if (_srom_tbl.count(v.first) == 0)
@@ -583,6 +589,7 @@ void nvram_map::emit_diagnostics () {
     alpha_sort(srom_undef);
     alpha_sort(cis_undef);
     alpha_sort(cis_layout_undef);
+    alpha_sort(cis_dupl);
 
     fprintf(stderr, "# SROM vars not defined in CIS (no substitute groupings defined):\n");
     auto varb_regex = [NSRegularExpression regularExpressionWithPattern: @"[0-9]([a-z][0-9])?$" options: 0 error: nil];
@@ -617,7 +624,14 @@ void nvram_map::emit_diagnostics () {
         }
     }
 
-    
+    fprintf(stderr, "# CIS vars duplicated across tuples:\n");
+    for (const auto &v : cis_dupl) {
+        fprintf(stderr, "\t%s\n", v.c_str());
+        auto iter = _cis_layout_tbl.equal_range(v);
+        std::for_each(iter.first, iter.second, [&](decltype(_cis_layout_tbl)::value_type &cl) {
+            fprintf(stderr, "\t\t%s\n", cl.second.index_tag().c_str());
+        });
+    }
 
 #if 0
     fprintf(stderr, "# CIS vars not defined in SPROM:\n");
