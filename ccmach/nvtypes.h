@@ -112,6 +112,16 @@ public:
         return from_revmask(other.to_revmask() | to_revmask());
     }
     
+    bool overlaps (const compat_range &other) {
+        if (other.first() <= _first && other.first() >= _first)
+            return (true);
+        
+        if (other.last() > _first && other.last() <= _last)
+            return (true);
+    
+        return false;
+    }
+    
     uint32_t to_revmask (void) const {
         uint32_t ret = 0;
         for (uint8_t i = _first; i <= _last; i++) {
