@@ -560,20 +560,6 @@ $1 ~ IDENT_REGEX && allow_def(BLOCK_T_STRUCT) {
 	open_block(BLOCK_T_STRUCT, name)
 }
 
-# struct parameters
-$1 ~ IDENT_REGEX && $1 !~ TYPES_REGEX && in_block(BLOCK_T_STRUCT) {
-	sid = g(BLOCK_NAME)
-	if ($1 == PROP_T_CISTUP) {
-		# TODO
-	} else if ($1 == PROP_T_COMPAT) {
-		# TODO
-	} else {
-		error("unknown parameter " $1)
-	}
-
-	next
-}
-
 # variable definition
 (($1 == "private" && $2 ~ TYPES_REGEX) || $1 ~ TYPES_REGEX) &&
     allow_def(BLOCK_T_VAR) \
@@ -617,6 +603,20 @@ $1 ~ IDENT_REGEX && $1 !~ TYPES_REGEX && in_block(BLOCK_T_STRUCT) {
 	open_block(BLOCK_T_VAR, name)
 
 	debug("type=" DTYPE[base_type])
+}
+
+# struct parameters
+$1 ~ IDENT_REGEX && $1 !~ TYPES_REGEX && in_block(BLOCK_T_STRUCT) {
+	sid = g(BLOCK_NAME)
+	if ($1 == PROP_T_CISTUP) {
+		# TODO
+	} else if ($1 == PROP_T_COMPAT) {
+		# TODO
+	} else {
+		error("unknown parameter " $1)
+	}
+
+	next
 }
 
 # revision offset definition
