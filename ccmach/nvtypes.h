@@ -113,7 +113,7 @@ public:
     }
     
     bool overlaps (const compat_range &other) {
-        if (other.first() <= _first && other.first() >= _first)
+        if (other.first() <= _first && other.last() >= _first)
             return (true);
         
         if (other.last() > _first && other.last() <= _last)
