@@ -57,20 +57,23 @@ BEGIN {
 	HEX_REGEX	= "^0x[A-Fa-f0-9]+,?$"
 
 	ARRAY_REGEX	= "\\[(0|[1-9][0-9]*)\\]"
-	TYPES_REGEX	= "^(((u|i)(8|16|32))|char)("ARRAY_REGEX")?,?$"
+	TYPES_REGEX	= "^(((u|i)(8|16|32))|char|cstr)("ARRAY_REGEX")?,?$"
 
 	IDENT_REGEX	= "^[A-Za-z_][A-Za-z0-9_]*,?$"
 	SROM_OFF_REGEX	= "("TYPES_REGEX"|"HEX_REGEX")"
 
+	OFF_TYPE_REGEX	= "^(cis|srom)$"
+
 	# Block types
 	BLOCK_T_STRUCT	= "struct"
 	BLOCK_T_VAR	= "var"
-	BLOCK_T_SROM	= "srom"
 	BLOCK_T_NONE	= "NONE"
 
-	# Property types
-	PROP_T_FMT	= "fmt"
+	# Property names
+	PROP_T_SFMT	= "sfmt"
 	PROP_T_ALL1	= "all1"
+	PROP_T_COMPAT	= "compat"
+	PROP_T_CISTUP	= "cis_tuple"
 
 	# Internal variable names
 	BLOCK_TYPE	= "_block_type"
@@ -103,10 +106,9 @@ BEGIN {
 	VAR_NAME	= "v_name"
 	VAR_TYPE	= "v_type"
 	VAR_FMT		= "v_fmt"
-	VAR_STRUCT	= "v_parent_struct"
 	VAR_PRIVATE	= "v_private"
 	VAR_ARRAY	= "v_array"
-	VAR_IGNALL1	= "v_ignall1"
+	VAR_IGNALL1	= "v_all1"
 }
 
 NR == 1 {
@@ -213,67 +215,6 @@ function gen_var_tail (v, num_revs)
 	printi("}, " num_revs "},\n")
 }
 
-# generate a complete set of variable definitions for struct variable `v`.
-function gen_struct_var (v)
-{
-	st = vars[v,VAR_STRUCT]
-	st_max_off = 0
-
-	# determine the total number of variables to generate
-	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
-		srevk = subkey(st, REV, srev"")
-		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
-			if (off > st_max_off)
-				st_max_off = off
-		}
-	}
-
-	# generate variables for each defined struct offset
-	for (off = 0; off < st_max_off; off++) {
-		st_rev_count = 0
-		gen_var_head(v, off"")
-
-		for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
-			srevk = subkey(st, REV, srev"")
-
-			# Skip offsets not defined for this revision
-			if (off > structs[srevk,REV_NUM_OFFS])
-				continue
-
-			offk = subkey(srevk, OFF, off"")
-			base_addr = structs[offk,SEG_ADDR]
-
-			for (vrev = 0; vrev < vars[v,NUM_REVS]; vrev++) {
-				vrevk = subkey(v, REV, vrev"")
-				v_start = vars[vrevk,REV_START]
-				v_end = vars[vrevk,REV_END]
-				s_start = structs[srevk,REV_START]
-				s_end = structs[srevk,REV_END]
-
-				# XXX we don't support computing the union
-				# of partially overlapping ranges
-				if ((v_start < s_start && v_end >= s_start) ||
-				    (v_start <= s_end && v_end > s_end))
-				{
-					errorx("partially overlapping " \
-					    "revision ranges are not supported")
-				}
-
-				# skip variables revs that are not within
-				# the struct offset's compatibility range
-				if (v_start < s_start || v_start > s_end ||
-				    v_end < s_start || v_end > s_end)
-					continue
-
-				st_rev_count++
-				gen_var_rev_body(v, vrevk, base_addr)
-			}
-		}
-
-		gen_var_tail(v, st_rev_count)
-	}
-}
-
 END {
 	# skip completion handling if exiting from an error
 	if (_EARLY_EXIT)
@@ -289,13 +230,9 @@ END {
 	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
 	output_depth = 1
 	for (v in var_names) {
-		if (vars[v,VAR_STRUCT] != null) {
-			gen_struct_var(v)
-		} else {
-			gen_var_head(v)
-			gen_var_body(v)
-			gen_var_tail(v, vars[v,NUM_REVS])
-		}
+		gen_var_head(v)
+		gen_var_body(v)
+		gen_var_tail(v, vars[v,NUM_REVS])
 	}
 	output_depth = 0
 	printf("};\n")
@@ -595,24 +532,18 @@ function in_nested_block (type)
 # the current scope
 function allow_def (type)
 {
-	if (type == BLOCK_T_VAR) {
-		return (in_block(BLOCK_T_NONE) || in_block(BLOCK_T_STRUCT))
-	} else if (type == BLOCK_T_STRUCT) {
+	if (type == BLOCK_T_STRUCT) {
 		return (in_block(BLOCK_T_NONE))
-	} else if (type == BLOCK_T_SROM) {
-		return (in_block(BLOCK_T_VAR) || in_block(BLOCK_T_STRUCT))
+	} else if (type == BLOCK_T_VAR) {
+		return in_block(BLOCK_T_STRUCT)
 	}
 
 	error("unknown type '" type "'")
 }
 
 # struct definition
-$1 == BLOCK_T_STRUCT && allow_def($1) {
-	name = $2
-
-	# Remove array[] specifier
-	if (sub(/\[\]$/, "", name) == 0)
-		error("expected '" name "[]', not '" name "'")
+$1 ~ IDENT_REGEX && allow_def(BLOCK_T_STRUCT) {
+	name = $1
 
 	if (name !~ IDENT_REGEX || name ~ TYPES_REGEX)
 		error("invalid identifier '" name "'")
@@ -629,44 +560,121 @@ $1 == BLOCK_T_STRUCT && allow_def($1) {
 	open_block(BLOCK_T_STRUCT, name)
 }
 
-# struct srom descriptor
-$1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) && in_block(BLOCK_T_STRUCT) {
-	sid = g(BLOCK_NAME)
-
-	# parse revision descriptor
-	rev_desc[REV_START] = 0
-	parse_revdesc(rev_desc)
-
-	# assign revision id
-	rev = structs[sid,NUM_REVS] ""
-	revk = subkey(sid, REV, rev)
-	structs[sid,NUM_REVS]++
-
-	# init basic revision state
-	structs[revk,REV_START] = rev_desc[REV_START]
-	structs[revk,REV_END] = rev_desc[REV_END]
-
-	if (match($0, "\\[[^]]*\\]") <= 0)
-		error("expected base address array")
-
-	addrs_str = substr($0, RSTART+1, RLENGTH-2)
-	num_offs = split(addrs_str, addrs, ",[ \t]*")
-	structs[revk, REV_NUM_OFFS] = num_offs
-	for (i = 1; i <= num_offs; i++) {
-		offk = subkey(revk, OFF, (i-1) "")
-
-		if (addrs[i] !~ HEX_REGEX)
-			error("invalid base address '" addrs[i] "'")
-
-		structs[offk,SEG_ADDR] = addrs[i]
+# variable definition
+(($1 == "private" && $2 ~ TYPES_REGEX) || $1 ~ TYPES_REGEX) &&
+    allow_def(BLOCK_T_VAR) \
+{
+	# check for 'private' flag
+	if ($1 == "private") {
+		private = 1
+		shiftf(1)
+	} else {
+		private = 0
 	}
 
-	debug("struct_srom " structs[revk,REV_START] "... [" addrs_str "]")
+	type = $1
+	name = $2
+	array = 0
+	debug(type " " name " {")
+
+	# Check for and remove any array[] specifier
+	base_type = type
+	if (sub(ARRAY_REGEX"$", "", base_type) > 0)
+		array = 1
+
+	# verify type
+	if (!base_type in DTYPE)
+		error("unknown type '" $1 "'")
+
+	# Add top-level variable entry 
+	if (name in var_names) 
+		error("variable identifier '" name "' previously defined on " \
+		    "line " vars[name,DEF_LINE])
+
+	var_names[name] = 0
+	vars[name,VAR_NAME] = name
+	vars[name,DEF_LINE] = NR
+	vars[name,VAR_TYPE] = type
+	vars[name,NUM_REVS] = 0
+	vars[name,VAR_PRIVATE] = private
+	vars[name,VAR_ARRAY] = array
+	vars[name,VAR_FMT] = "hex" # default if not specified
+
+	open_block(BLOCK_T_VAR, name)
+
+	debug("type=" DTYPE[base_type])
+}
+
+# struct parameters
+$1 ~ IDENT_REGEX && $1 !~ TYPES_REGEX && in_block(BLOCK_T_STRUCT) {
+	sid = g(BLOCK_NAME)
+	if ($1 == PROP_T_CISTUP) {
+		# TODO
+	} else if ($1 == PROP_T_COMPAT) {
+		# TODO
+	} else {
+		error("unknown parameter " $1)
+	}
+
+	next
+}
+
+# revision offset definition
+$1 ~ OFF_TYPE_REGEX && in_block(BLOCK_T_VAR) {
+	vid = g(BLOCK_NAME)
+
+	# TODO: Either parse compat statement, or fetch compat
+	# from parent block
+
+	# parse all offsets
+if (0) {
+	do {
+		# assign offset id
+		off = vars[revk,REV_NUM_OFFS] ""
+		offk = subkey(revk, OFF, off)
+		vars[revk,REV_NUM_OFFS]++
+
+		# initialize segment count
+		vars[offk,DEF_LINE] = NR
+		vars[offk,OFF_NUM_SEGS] = 0
+
+		debug("[")
+		# parse all segments
+		do {
+			parse_offset_segment(revk, offk)
+			_more_seg = ($1 == "|")
+			if (_more_seg)
+				shiftf(1, 1)
+		} while (_more_seg)
+		debug("],")
+		_more_vals = ($1 == ",")
+		if (_more_vals)
+			shiftf(1, 1)
+	} while (_more_vals)
+}
+	next
+}
+
+
+# variable parameters
+$1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block(BLOCK_T_VAR) {
+	vid = g(BLOCK_NAME)
+	if ($1 == PROP_T_SFMT) {
+		if (!$2 in FMT)
+			error("invalid fmt '" $2 "'")
+
+		vars[vid,VAR_FMT] = $2
+		debug($1 "=" FMT[$2])
+	} else if ($1 == PROP_T_ALL1 && $2 == "ignore") {
+		vars[vid,VAR_IGNALL1] = 1
+	} else {
+		error("unknown parameter " $1)
+	}
 	next
 }
 
 # variable srom descriptor
-$1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
+0 && $1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
 	# parse revision descriptor
 	parse_revdesc(rev_desc)
 
@@ -781,109 +789,6 @@ function parse_offset_segment (revk, offk)
 
 }
 
-# revision offset definition
-$1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
-	vid = g(BLOCK_NAME)
-
-	# fetch rev id/key defined by our parent block
-	rev = g("rev_id")
-	revk = g("rev_key")
-
-	# parse all offsets
-	do {
-		# assign offset id
-		off = vars[revk,REV_NUM_OFFS] ""
-		offk = subkey(revk, OFF, off)
-		vars[revk,REV_NUM_OFFS]++
-
-		# initialize segment count
-		vars[offk,DEF_LINE] = NR
-		vars[offk,OFF_NUM_SEGS] = 0
-
-		debug("[")
-		# parse all segments
-		do {
-			parse_offset_segment(revk, offk)
-			_more_seg = ($1 == "|")
-			if (_more_seg)
-				shiftf(1, 1)
-		} while (_more_seg)
-		debug("],")
-		_more_vals = ($1 == ",")
-		if (_more_vals)
-			shiftf(1, 1)
-	} while (_more_vals)
-}
-
-# variable definition
-(($1 == "private" && $2 ~ TYPES_REGEX) || $1 ~ TYPES_REGEX) &&
-    allow_def(BLOCK_T_VAR) \
-{
-	# check for 'private' flag
-	if ($1 == "private") {
-		private = 1
-		shiftf(1)
-	} else {
-		private = 0
-	}
-
-	type = $1
-	name = $2
-	array = 0
-	debug(type " " name " {")
-
-	# Check for and remove any array[] specifier
-	base_type = type
-	if (sub(ARRAY_REGEX"$", "", base_type) > 0)
-		array = 1
-
-	# verify type
-	if (!base_type in DTYPE)
-		error("unknown type '" $1 "'")
-
-	# Add top-level variable entry 
-	if (name in var_names) 
-		error("variable identifier '" name "' previously defined on " \
-		    "line " vars[name,DEF_LINE])
-
-	var_names[name] = 0
-	vars[name,VAR_NAME] = name
-	vars[name,DEF_LINE] = NR
-	vars[name,VAR_TYPE] = type
-	vars[name,NUM_REVS] = 0
-	vars[name,VAR_PRIVATE] = private
-	vars[name,VAR_ARRAY] = array
-	vars[name,VAR_FMT] = "hex" # default if not specified
-
-	open_block(BLOCK_T_VAR, name)
-
-	if (in_nested_block("struct")) {
-		# Fetch the enclosing struct's name
-		sid = g(BLOCK_NAME, 1)
-
-		# Mark as a struct-based variable
-		vars[name,VAR_STRUCT] = sid
-	}
-
-	debug("type=" DTYPE[base_type])
-}
-
-# variable parameters
-$1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block(BLOCK_T_VAR) {
-	vid = g(BLOCK_NAME)
-	if ($1 == PROP_T_FMT) {
-		if (!$2 in FMT)
-			error("invalid fmt '" $2 "'")
-
-		vars[vid,VAR_FMT] = $2
-		debug($1 "=" FMT[$2])
-	} else if ($1 == PROP_T_ALL1 && $2 == "ignore") {
-		vars[vid,VAR_IGNALL1] = 1
-	} else {
-		error("unknown parameter " $1)
-	}
-	next
-}
 
 # Skip comments and blank lines
 /^[ \t]*#/ || /^$/ {
