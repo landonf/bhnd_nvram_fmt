@@ -76,7 +76,7 @@
 
 /* Begin PBXFileReference section */
 		050444B71C4185760040CBAC /* bcmsrom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bcmsrom.c; sourceTree = "<group>"; };
-		058089641C488A52004DDD20 /* genmap.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = genmap.mm; sourceTree = "<group>"; };
+		058089641C488A52004DDD20 /* genmap.mm */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 8; lastKnownFileType = sourcecode.cpp.objcpp; path = genmap.mm; sourceTree = "<group>"; tabWidth = 8; usesTabs = 1; };
 		058089651C488A52004DDD20 /* genmap.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = genmap.hpp; sourceTree = "<group>"; };
 		058CD2971C456533008D9435 /* cis_layout_desc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = cis_layout_desc.mm; sourceTree = "<group>"; };
 		058CD2981C456533008D9435 /* cis_layout_desc.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = cis_layout_desc.hpp; sourceTree = "<group>"; };

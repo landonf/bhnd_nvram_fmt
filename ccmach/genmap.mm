@@ -61,7 +61,7 @@ int genmap::prints(const char *fmt, ...) {
     
 void genmap::emit_offset (const string &src, const string &vtype, const nv_offset &sp, const compat_range &range, bool skip_rdesc, bool tnl) {
     auto rdesc = sp.compat().description();
-    if (skip_rdesc || sp.compat() == range)
+    if (skip_rdesc)
         rdesc = "";
     else
         rdesc = " " + rdesc;
@@ -149,7 +149,7 @@ void genmap::generate(const compat_range &range) {
                 skip_rdesc = true;
             }
 #endif
-            
+      
             for (const auto &v : *vs->vars()) {
                 size_t num_offs = 0;
                 for (const auto &sp : *v->sprom_offsets()) {
