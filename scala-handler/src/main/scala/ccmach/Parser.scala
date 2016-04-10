@@ -54,7 +54,7 @@ object Parser extends RegexParsers with PackratParsers {
   lazy val srom_fixed = integer <~ guard(sep) ^^ { x => Range.inclusive(x, x) }
 
   lazy val offsets = rep1sep(offset, ",")
-  lazy val offset = datatype ~ integer ~ opt(offsetOps) ^^ {
+  lazy val offset = opt(datatype <~ "@") ~ integer ~ opt(offsetOps) ^^ {
     case dt ~ v ~ Some(ops) => Offset(dt, v, ops)
     case dt ~ v ~ None => Offset(dt, v, List.empty)
   }
