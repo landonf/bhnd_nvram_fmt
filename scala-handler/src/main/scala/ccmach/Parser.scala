@@ -1,18 +1,23 @@
 package ccmach
 
+import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
 object Parser extends RegexParsers with PackratParsers {
   import AST._
 
+
+  override protected val whiteSpace: Regex = """(\s|#.*)+""".r
+
   def parseStr[T](parser: Parser[T], input: String): ParseResult[T] = {
     parseAll(parser, new PackratReader(new CharSequenceReader(input)))
   }
 
+
   lazy val vars = rep(decl) <~ """\z""".r
 
-  lazy val sep = ":" | "-" | "<" | ">" | "(" | ")" | "[" | "]" | "," | ";" | "{" | "}" | "^" | "=" | """\z""".r
+  lazy val sep = ":" | "-" | "<" | ">" | "(" | ")" | "[" | "]" | "," | ";" | "{" | "}" | "^" | "=" | "#" | """\z""".r
 
   lazy val identifier = """[A-Za-z_]+[A-Za-z0-9_]*""".r
 
