@@ -955,7 +955,7 @@ public:
 
         /* Emit the map */
         auto g = nvram::genmap(m);
-        g.generate();
+        g.generate(nvram::compat_range(0, 31));
     }
 };
 

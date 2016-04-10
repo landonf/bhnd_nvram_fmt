@@ -18,7 +18,7 @@ private:
     nvram_map _nv;
     int _depth = 0;
     
-    void emit_offset (const string &src, const string &vtype, const nv_offset &sp, bool skip_rdesc);
+    void emit_offset (const string &src, const string &vtype, const nv_offset &sp, const compat_range &range, bool skip_rdesc, bool tnl);
 
 public:
     int print(const char *fmt, ...);
@@ -28,7 +28,7 @@ public:
 
     genmap (const nvram_map &nv) : _nv(nv) {}
 
-    void generate();
+    void generate(const compat_range &);
 };
     
 }
