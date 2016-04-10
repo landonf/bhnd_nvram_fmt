@@ -11,10 +11,10 @@ object Main extends App {
 
   val parsed = Parser.parseStr(Parser.vars, input) match {
     case Parser.Success(r, _) => r
-    case Parser.Error(msg, rem) => throw new RuntimeException(s"Parse failed: $msg, remaining=$rem")
-    case Parser.Failure(msg, rem) => throw new RuntimeException(s"Parse failed: $msg, remaining=$rem")
+    case Parser.Error(msg, rem) => throw new RuntimeException(s"Parse failed: $msg, at line ${rem.pos.line}, column ${rem.pos.column}")
+    case Parser.Failure(msg, rem) => throw new RuntimeException(s"Parse failed: $msg, at line ${rem.pos.line}, column ${rem.pos.column}")
   }
 
-  println(s"Input: $input")
+  println(s"Input: ${parsed.mkString(",\n")}")
   System.exit(0)
 }

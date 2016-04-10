@@ -12,11 +12,12 @@ object PrettyPrint {
     case SInt8 => "i8"
     case SInt16 => "i16"
     case SInt32 => "i32"
+    case Char8 => "char"
 
     case CCode => "ccode"
     case Signed => "sdec"
     case MAC48 => "macaddr"
-    case LEDDutyCycle => "led_dc"
+    case LEDDutyCycle => "leddc"
 
     case IgnoreAll1 => "all1\tignore"
     case Private => "private"
@@ -27,7 +28,7 @@ object PrettyPrint {
     case ArrayType(et, sz) => s"${print(et)}[$sz]"
 
     case v@Variable(name, typed, _) => {
-      val body =  List(s"{") ++ v.opts.filter(_ != Private).map(print).map("\t" + _) ++ v.offsets.map(print).map("\t" + _).toList ++ List(s"}$nl")
+      val body =  List(s"{") ++ v.opts.filter(_ != Private).map(print).map("\t" + _) ++ v.offsets.map(print).map("\t" + _).toList ++ List(s"}")
 
       s"${if (v.isPrivate) "private " else ""}${print(typed)} $name ${body.mkString(nl)}"
     }

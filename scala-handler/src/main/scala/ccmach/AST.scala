@@ -25,6 +25,8 @@ object AST {
   case object SInt16 extends SInt
   case object SInt32 extends SInt
 
+  case object Char8 extends TypeAtom
+
   sealed trait StringFmt extends VarOption
 //  case object ASCII extends StringFmt
   case object CCode extends StringFmt
@@ -50,7 +52,9 @@ object AST {
   case object IgnoreAll1 extends VarOption
   case object Private extends VarOption
 
-  case class RevOffset (revs: Range, offsets: Seq[Offset]) extends VarTerm
+  case class RevOffset (revs: Range, offsetSeqs: Seq[OffsetSeq]) extends VarTerm
+
+  case class OffsetSeq (offsets: Seq[Offset])
   case class Offset (typed: Option[DataType], addr: Int, ops: List[Op])
 
   sealed trait Op extends Term
