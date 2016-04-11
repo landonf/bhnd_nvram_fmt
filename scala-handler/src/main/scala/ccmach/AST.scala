@@ -55,7 +55,7 @@ object AST {
   case class RevOffset (revs: Range, offsetSeqs: Seq[OffsetSeq]) extends VarTerm
 
   case class OffsetSeq (offsets: Seq[Offset])
-  case class Offset (typed: Option[DataType], addr: Int, ops: List[Op])
+  case class Offset (typed: DataType, addr: Int, ops: List[Op])
 
   sealed trait Op extends Term
   case class LShift (bits: Int) extends Op

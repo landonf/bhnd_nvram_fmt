@@ -20,14 +20,16 @@ object Parser extends RegexParsers with PackratParsers {
   lazy val ws = """\s+""".r
   lazy val ows = """\s*""".r
 
-  lazy val vars = rep(ows ~> decl <~ ows) <~ """\z""".r
+  lazy val vars = rep(ows ~> decl <~ ows) <~ """\z""".r ^^ VarMap
 
   lazy val sep = ws | ":" | "-" | "<" | ">" | "(" | ")" | "[" | "]" | "," | ";" | "{" | "}" | "^" | "=" | "#" | """\z""".r
 
   lazy val identifier = """[A-Za-z_]+[A-Za-z0-9_]*""".r
 
-  lazy val decl = ows ~> declopts ~ (ows ~> datatype) ~ (ows ~> identifier) ~ (ows ~> "{" ~> ows ~> vardefn <~ ows <~ "}" <~ ows) ^^ {
-    case declops ~ typed ~ id ~ defnops => Variable(id, typed, defnops ++ declops)
+  lazy val decl = ows ~> declopts ~ (ows ~> datatype) >> {
+    case declops ~ typed => (ows ~> identifier) ~ (ows ~> "{" ~> ows ~> vardefn(typed) <~ ows <~ "}" <~ ows) ^^ {
+      case id ~ defnops => Variable(id, typed, defnops ++ declops)
+    }
   }
   lazy val declopts = ("private" ^^^ Set(Private)) | success(Set.empty)
 
@@ -48,7 +50,7 @@ object Parser extends RegexParsers with PackratParsers {
 
   lazy val arraysize = "[" ~> ows ~> integer <~ ows <~ "]"
 
-  lazy val srom_offset = "srom" ~> ws ~> srom_rev ~ (rep1sep(ows ~> offsetseq <~ ows, """,""".r)) ^^ {
+  def srom_offset (defaultType: DataType) = "srom" ~> ws ~> srom_rev ~ rep1sep(ows ~> offsetseq(defaultType) <~ ows, """,""".r) ^^ {
     case rev ~ offs => RevOffset(rev, offs)
   }
 
@@ -59,10 +61,10 @@ object Parser extends RegexParsers with PackratParsers {
   }
   lazy val srom_gte = ">=" ~> ows ~> integer ^^ { x => Range.inclusive(x, MAX_REV) }
 
-  lazy val offsetseq = rep1sep(ows ~> offset <~ ows, "|") ^^ { s => OffsetSeq(s) }
-  lazy val offset = ows ~> opt(datatype <~ ows <~ "@" <~ ows) ~ integer ~ opt(ows ~> offsetOps) ^^ {
-    case dt ~ v ~ Some(ops) => Offset(dt, v, ops)
-    case dt ~ v ~ None => Offset(dt, v, List.empty)
+  def offsetseq (defaultType: DataType) = rep1sep(ows ~> offset(defaultType) <~ ows, "|") ^^ { s => OffsetSeq(s) }
+  def offset (defaultType: DataType) = ows ~> opt(datatype <~ ows <~ "@" <~ ows) ~ integer ~ opt(ows ~> offsetOps) ^^ {
+    case dt ~ v ~ Some(ops) => Offset(dt.getOrElse(defaultType), v, ops)
+    case dt ~ v ~ None => Offset(dt.getOrElse(defaultType), v, List.empty)
   }
 
   lazy val offsetOps = "(" ~> rep1sep(ows ~> offsetOp <~ ows, ",") <~ ")"
@@ -71,16 +73,15 @@ object Parser extends RegexParsers with PackratParsers {
   lazy val rshift = ">>" ~> ows ~> integer ^^ { x => RShift(x) }
   lazy val mask = "&" ~> ows ~> integer ^^ { x => Mask(x) }
 
-  lazy val vardefn: Parser[Set[VarTerm]] = rep1(opts | srom_offset) ^^ { _.toSet }
+  def vardefn (defaultType: DataType): Parser[Set[VarTerm]] = rep1(opts | srom_offset(defaultType)) ^^ { _.toSet }
   lazy val opts: Parser[VarOption] =
     ("all1" ~> ws ~> "ignore" <~ ows) ^^^ IgnoreAll1 |
     ("sfmt" ~> ws ~> fmtOpt <~ ows)
-  lazy val fmtOpt: Parser[VarOption] = (
+  lazy val fmtOpt: Parser[VarOption] =
     "ccode" ^^^ CCode |
     "sdec" ^^^ Signed |
     "macaddr" ^^^ MAC48 |
     "leddc" ^^^ LEDDutyCycle
-  )
 
   lazy val integer: Parser[Int] = hexInt | decInt
   lazy val hexInt = """0x[0-9A-Fa-f]+""".r <~ (ws | guard(sep)) ^^ { (str:String) => Integer.decode(str).intValue() }

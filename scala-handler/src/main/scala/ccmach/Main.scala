@@ -15,6 +15,5 @@ object Main extends App {
     case Parser.Failure(msg, rem) => throw new RuntimeException(s"Parse failed: $msg, at line ${rem.pos.line}, column ${rem.pos.column}")
   }
 
-  println(s"Input: ${parsed.mkString(",\n")}")
-  System.exit(0)
+  println(s"Input: ${parsed.variables.mkString(",\n")}")
 }
