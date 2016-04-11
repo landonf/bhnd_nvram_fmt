@@ -10,22 +10,47 @@ object AST {
     override def toString: String = PrettyPrint.print(this)
   }
 
-  sealed trait DataType extends Term
+  sealed trait DataType extends Term {
+    def width: Int
+  }
 
-  sealed trait TypeAtom extends DataType
+  sealed trait TypeAtom extends DataType {
+    def mask: Long
+  }
   sealed trait IntType extends TypeAtom
   sealed trait UInt extends IntType
   sealed trait SInt extends IntType
 
-  case object UInt8 extends UInt
-  case object UInt16 extends UInt
-  case object UInt32 extends UInt
+  case object UInt8 extends UInt {
+    override def width = 1
+    override def mask = 0xFF
+  }
+  case object UInt16 extends UInt {
+    override def width = 2
+    override def mask = 0xFFFF
+  }
+  case object UInt32 extends UInt {
+    override def width = 4
+    override def mask = 0xFFFFFFFF
+  }
 
-  case object SInt8 extends SInt
-  case object SInt16 extends SInt
-  case object SInt32 extends SInt
+  case object SInt8 extends SInt {
+    override def width = 1
+    override def mask = 0xFF
+  }
+  case object SInt16 extends SInt {
+    override def width = 2
+    override def mask = 0xFFFF
+  }
+  case object SInt32 extends SInt {
+    override def width = 4
+    override def mask = 0xFFFFFFFF
+  }
 
-  case object Char8 extends TypeAtom
+  case object Char8 extends TypeAtom {
+    override def width = 1
+    override def mask = 0xFF
+  }
 
   sealed trait StringFmt extends VarOption
 //  case object ASCII extends StringFmt
@@ -35,7 +60,7 @@ object AST {
   case object LEDDutyCycle extends StringFmt
 //  case object HexBin extends StringFmt
 
-  case class Variable(name: String, typed: DataType, defn: Set[VarTerm]) extends Term {
+  case class Variable (name: String, typed: DataType, defn: Set[VarTerm]) extends Term {
     val opts = defn.collect {
       case o:VarOption => o
     }
@@ -45,6 +70,8 @@ object AST {
     val offsets = defn.collect {
       case o:RevOffset => o
     }
+
+    val minOffset = offsets.minBy(_.startAddr)
   }
 
   sealed trait VarTerm extends Term
@@ -52,15 +79,47 @@ object AST {
   case object IgnoreAll1 extends VarOption
   case object Private extends VarOption
 
-  case class RevOffset (revs: Range, offsetSeqs: Seq[OffsetSeq]) extends VarTerm
+  case class RevOffset (revs: Range, offsetSeqs: Seq[OffsetSeq]) extends VarTerm {
+    val firstOffset = offsetSeqs.headOption.flatMap(_.offsets.headOption)
+    val startAddr = firstOffset.map(_.addr).getOrElse(0)
+    val nextAddr = firstOffset.map(_.nextAddr).getOrElse(0)
+  }
 
   case class OffsetSeq (offsets: Seq[Offset])
-  case class Offset (typed: DataType, addr: Int, ops: List[Op])
+  case class Offset (typed: DataType, addr: Int, ops: List[Op]) {
+    private def interpOps (accum: Long, rem: List[Op]): Long = rem match {
+      case LShift(lb) :: tail => interpOps(accum << lb, tail)
+      case RShift(lb) :: tail => interpOps(accum >> lb, tail)
+      case Mask(lb) :: Nil => interpOps(accum & lb, Nil)
+      case (m:Mask) :: tail => interpOps(accum, tail :+ m) /* Always compute the mask last */
+      case Nil => accum
+    }
 
-  sealed trait Op extends Term
-  case class LShift (bits: Int) extends Op
-  case class RShift (bits: Int) extends Op
-  case class Mask (bits: Int) extends Op
+    val size = typed.width
 
-  case class ArrayType(elemType: TypeAtom, size: Int) extends DataType
+    val nextAddr = addr + typed.width
+
+    // TODO
+    def mask = typed match {
+      case ArrayType(elemType, size) => ???
+      case t:TypeAtom => interpOps(t.mask, ops)
+    }
+  }
+
+  sealed trait Op extends Term {
+    def order: Int
+  }
+  case class LShift (bits: Int) extends Op {
+    override def order = 0
+  }
+  case class RShift (bits: Int) extends Op {
+    override def order = 0
+  }
+  case class Mask (bits: Int) extends Op {
+    override def order = 1
+  }
+
+  case class ArrayType(elemType: TypeAtom, size: Int) extends DataType {
+    override def width = elemType.width * size
+  }
 }
