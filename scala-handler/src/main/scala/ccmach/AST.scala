@@ -11,44 +11,49 @@ object AST {
   }
 
   sealed trait DataType extends Term {
-    def width: Int
+    def count: Int
+    def elemSize: Int
+    def totalSize: Int
   }
 
   sealed trait TypeAtom extends DataType {
+    override def count = 1
+    override def totalSize = elemSize
     def mask: Long
   }
+
   sealed trait IntType extends TypeAtom
   sealed trait UInt extends IntType
   sealed trait SInt extends IntType
 
   case object UInt8 extends UInt {
-    override def width = 1
+    override def elemSize = 1
     override def mask = 0xFF
   }
   case object UInt16 extends UInt {
-    override def width = 2
+    override def elemSize = 2
     override def mask = 0xFFFF
   }
   case object UInt32 extends UInt {
-    override def width = 4
+    override def elemSize = 4
     override def mask = 0xFFFFFFFF
   }
 
   case object SInt8 extends SInt {
-    override def width = 1
+    override def elemSize = 1
     override def mask = 0xFF
   }
   case object SInt16 extends SInt {
-    override def width = 2
+    override def elemSize = 2
     override def mask = 0xFFFF
   }
   case object SInt32 extends SInt {
-    override def width = 4
+    override def elemSize = 4
     override def mask = 0xFFFFFFFF
   }
 
   case object Char8 extends TypeAtom {
-    override def width = 1
+    override def elemSize = 1
     override def mask = 0xFF
   }
 
@@ -95,9 +100,7 @@ object AST {
       case Nil => accum
     }
 
-    val size = typed.width
-
-    val nextAddr = addr + typed.width
+    val nextAddr = addr + typed.totalSize
 
     // TODO
     def mask = typed match {
@@ -119,7 +122,8 @@ object AST {
     override def order = 1
   }
 
-  case class ArrayType(elemType: TypeAtom, size: Int) extends DataType {
-    override def width = elemType.width * size
+  case class ArrayType(elemType: TypeAtom, count: Int) extends DataType {
+    override def elemSize = elemType.elemSize
+    override def totalSize = elemSize * count
   }
 }

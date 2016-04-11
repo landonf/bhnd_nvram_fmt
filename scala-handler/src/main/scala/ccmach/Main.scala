@@ -26,43 +26,52 @@ object Main extends App {
 
   case class SETVAR(name: String, fmt: Option[Fmt])
 
-  case class CMPREV(range: Range) extends Opcode
+  case class CMPREV(ranges: Set[Int]) extends Opcode
   case class BEQ(offset: Int) extends Opcode
   case class BNE(offset: Int) extends Opcode
   case class SEEK(offset: Int) extends Opcode
   case class LSHIFT(bits: Int) extends Opcode
   case class RSHIFT(bits: Int) extends Opcode
-  case class MASK(bits: Int) extends Opcode
-  case class CONSEQ(count: Int) extends Opcode
-  case class READ(size: Int, incr: Boolean, cont: Boolean) extends Opcode
+  case class MASK(bits: Long) extends Opcode {
+    override def toString = f"Mask($bits%X)"
+  }
+  case class READ(size: Int, count: Int, incr: Boolean, cont: Boolean) extends Opcode
 
   case class DONE() extends Opcode
 
   case class Block (opcodes: List[Opcode], offset: Int)
   case class State (offsets: Map[Int, Int], blocks: Map[Range, List[Opcode]])
 
+  private def revStr (r: Range): String = if (r.min == r.max) {
+    s"rev ${r.min}"
+  } else if (r.max == AST.MAX_REV) {
+    s"rev >= ${r.min}"
+  } else {
+    s"rev ${r.min}-${r.max}"
+  }
+
   private def assemble (offset: Int, opcodes: List[Opcode], remainder: List[OffsetSeq]): Block = remainder match {
     case head :: tail =>
       val block = head.offsets.zipWithIndex.foldLeft(Block(List.empty, offset)) { (prev, n) =>
-        val (next, idx) = n
+        val (curr, idx) = n
 
-        val skip = if (prev.offset != next.addr)
-          List(SEEK(next.addr - prev.offset))
+        val skip = if (prev.offset != curr.addr)
+          List(SEEK(curr.addr - prev.offset))
         else
           List()
 
         val (incr, cont) = head.offsets.lift(idx + 1) match {
           case None     => (true, false)
-          case Some(c)  => (c.addr == next.addr, true)
+          case Some(c)  => (c.addr != curr.addr, true)
         }
 
-        val read = READ(next.size, incr, cont)
-        val vops = next.ops.sortBy(_.order).map {
+        val read = READ(curr.typed.elemSize, curr.typed.count, incr, cont)
+        val vops = curr.ops.sortBy(_.order).map {
           case AST.LShift(b) => LSHIFT(b)
           case AST.RShift(b) => RSHIFT(b)
           case AST.Mask(m) => MASK(m)
         }
-        val nextAddr = if (incr) next.nextAddr else next.addr
+        val nextAddr = if (incr) curr.nextAddr else curr.addr
 
         Block((prev.opcodes ++ skip :+ read) ++ vops, nextAddr)
       }
@@ -87,7 +96,7 @@ object Main extends App {
       State(newOffsets, accum.blocks ++ grouped)
     }
 
-    println(s"op: ${state.blocks.values.map(_.mkString(";")).mkString("\n\n")}")
+    println(s"\n${variable.typed} ${variable.name}:\n${state.blocks.map(kv => "    " + revStr(kv._1) + ":\n" + kv._2.map(_.toString).map("\t" + _).mkString("\n")).mkString("\n\n")}")
 
     (prevState ++ state.offsets, opcodes /* TODO: append opcodes */)
   }
