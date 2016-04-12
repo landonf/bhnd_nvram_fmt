@@ -96,7 +96,12 @@ object Main extends App {
       State(newOffsets, accum.blocks ++ grouped)
     }
 
-    println(s"\n${variable.typed} ${variable.name}:\n${state.blocks.map(kv => "    " + revStr(kv._1) + ":\n" + kv._2.map(_.toString).map("\t" + _).mkString("\n")).mkString("\n\n")}")
+    val newops = state.blocks.groupBy(_._2).map { kv =>
+      val revs = kv._2.keys.toList.map(_.toList).flatten
+      (revs, kv._1)
+    }
+
+    println(s"\n${variable.typed} ${variable.name}:\n${newops.map(kv => "    " + kv._1 + ":\n" + kv._2.map(_.toString).map("\t" + _).mkString("\n")).mkString("\n\n")}")
 
     (prevState ++ state.offsets, opcodes /* TODO: append opcodes */)
   }
