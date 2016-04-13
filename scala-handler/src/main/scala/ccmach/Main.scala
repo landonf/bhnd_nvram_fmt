@@ -2,6 +2,8 @@ package ccmach
 
 import ccmach.AST.{OffsetSeq, Offset}
 
+import scala.collection.mutable
+
 object Main extends App {
   private val input: String = args.toList match {
     case in :: Nil => scala.io.Source.fromFile(in).mkString
@@ -43,6 +45,14 @@ object Main extends App {
   case class State (offsets: Map[Int, Int], blocks: Map[Range, List[Opcode]])
 
   private def revStr (r: Range): String = if (r.min == r.max) {
+    s"rev ${r.min}"
+  } else if (r.max == AST.MAX_REV) {
+    s"rev >= ${r.min}"
+  } else {
+    s"rev ${r.min}-${r.max}"
+  }
+
+  private def revStr (r: List[Int]): String = if (r.min == r.max) {
     s"rev ${r.min}"
   } else if (r.max == AST.MAX_REV) {
     s"rev >= ${r.min}"
@@ -101,7 +111,7 @@ object Main extends App {
       (revs, kv._1)
     }
 
-    println(s"\n${variable.typed} ${variable.name}:\n${newops.map(kv => "    " + kv._1 + ":\n" + kv._2.map(_.toString).map("\t" + _).mkString("\n")).mkString("\n\n")}")
+    println(s"\n${variable.typed} ${variable.name}:\n${newops.map(kv => "    " + revStr(kv._1) + ":\n" + kv._2.map(_.toString).map("\t" + _).mkString("\n")).mkString("\n\n")}")
 
     (prevState ++ state.offsets, opcodes /* TODO: append opcodes */)
   }

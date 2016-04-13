@@ -74,7 +74,7 @@ object AST {
 
     val offsets = defn.collect {
       case o:RevOffset => o
-    }
+    }.toList.sortBy(_.revs.min)
 
     val minOffset = offsets.minBy(_.startAddr)
   }
