@@ -76,6 +76,15 @@ object AST {
       case o:RevOffset => o
     }.toList.sortBy(_.revs.min)
 
+    def revisions: Set[Int] = offsets.map(_.revs.toSet).foldLeft(Set.empty[Int])(_ ++ _)
+
+    def offsetMatching (rev: Int): Option[RevOffset] = offsets.find(_.revs.contains(rev))
+    def containsRev (rev: Int): Boolean =  offsets.exists(_.revs.contains(rev))
+
+    def startAddr (rev: Int): Option[Int] = offsetMatching(rev).map(_.startAddr)
+    def nextAddr (rev: Int): Option[Int] = offsetMatching(rev).map(_.nextAddr)
+
+
     val minOffset = offsets.minBy(_.startAddr)
   }
 
