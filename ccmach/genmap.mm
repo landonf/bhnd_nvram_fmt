@@ -84,7 +84,7 @@ void genmap::emit_offset (const string &src, const string &vtype, const nv_offse
             if (type == vtype)
                 type = "";
             else
-                type = type + " @ ";
+                type = type + " ";
             
             printf("%s%s", type.c_str(), s.description().c_str());
             if (seg+1 < segs->size())
@@ -167,7 +167,7 @@ void genmap::generate(const compat_range &range) {
                 if (v->flags() & nvram::FLAG_MFGINT)
                     vtype = "private " + vtype;
                 
-                if (num_offs > 1 || v->sfmt() != SFMT_HEX || v->flags() & FLAG_NOALL1) {
+                if (1 /*always add newline*/|| num_offs > 1 || v->sfmt() != SFMT_HEX || v->flags() & FLAG_NOALL1) {
                     prints("%s %s", vtype.c_str(), v->name().c_str(), ^{
                         if (v->sfmt() != SFMT_HEX)
                             println("sfmt\t%s", to_string(v->sfmt()).c_str());
