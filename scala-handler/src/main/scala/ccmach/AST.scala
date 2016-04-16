@@ -57,6 +57,30 @@ object AST {
     override def mask = 0xFF
   }
 
+  case class StructBase (revs: Range, addrs: List[Int])
+  case class Struct (baseAddrs: List[StructBase], vars: List[Variable]) {
+    def expand: List[Variable] = baseAddrs.flatMap { ba =>
+      ba.addrs.zipWithIndex.map { ai =>
+        val (baseAddr, varSuffix) = ai
+        val vs = vars.filter(_.revisions.intersect(ba.revs.toSet).nonEmpty)
+        vs.map { v =>
+          val newRevOffsets = v.offsets.map { roff =>
+            val newOffsetSeqs = roff.offsetSeqs.map { oseq =>
+              val newOffsets = oseq.offsets.map { off =>
+                off.copy(addr = off.addr + baseAddr)
+              }
+              oseq.copy(offsets = newOffsets)
+            }
+
+            roff.copy(offsetSeqs = newOffsetSeqs)
+          }
+
+          v.copy(name = s"${v.name}$varSuffix", offsets = newRevOffsets)
+        }
+      }
+    }.flatten
+  }
+
   sealed trait StringFmt extends VarOption
 //  case object ASCII extends StringFmt
   case object CCode extends StringFmt
@@ -65,16 +89,20 @@ object AST {
   case object LEDDutyCycle extends StringFmt
 //  case object HexBin extends StringFmt
 
-  case class Variable (name: String, typed: DataType, defn: Set[VarTerm]) extends Term {
+  def genVariable (name: String, typed: DataType, defn: Set[VarTerm]) = {
     val opts = defn.collect {
       case o:VarOption => o
     }
 
-    val isPrivate = opts.contains(Private)
-
     val offsets = defn.collect {
       case o:RevOffset => o
     }.toList.sortBy(_.revs.min)
+
+    Variable(name, typed, opts, offsets)
+  }
+
+  case class Variable (name: String, typed: DataType, opts: Set[VarOption], offsets: List[RevOffset]) extends Term {
+    val isPrivate = opts.contains(Private)
 
     def revisions: Set[Int] = offsets.map(_.revs.toSet).foldLeft(Set.empty[Int])(_ ++ _)
 
@@ -99,8 +127,8 @@ object AST {
     val nextAddr = firstOffset.map(_.nextAddr).getOrElse(0)
   }
 
-  case class OffsetSeq (offsets: Seq[Offset])
-  case class Offset (typed: DataType, addr: Int, ops: List[Op]) {
+  case class OffsetSeq (offsets: Seq[Offset]) extends Term
+  case class Offset (typed: DataType, addr: Int, ops: List[Op]) extends Term {
     private def interpOps (accum: Long, rem: List[Op]): Long = rem match {
       case LShift(lb) :: tail => interpOps(accum << lb, tail)
       case RShift(lb) :: tail => interpOps(accum >> lb, tail)

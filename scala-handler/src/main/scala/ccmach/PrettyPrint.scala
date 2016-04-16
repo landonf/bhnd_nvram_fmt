@@ -5,6 +5,16 @@ object PrettyPrint {
 
   private val nl = System.getProperty("line.separator")
 
+  private def revStr (r: Range): String = if (r.min == r.max) {
+    s"rev ${r.min}"
+  } else if (r.max == AST.MAX_REV) {
+    s"rev >= ${r.min}"
+  } else {
+    s"rev ${r.min}-${r.max}"
+  }
+
+  private def addrStr (addr: Int): String = f"0x$addr%X"
+
   def print (term: Term): String = term match {
     case UInt8 => "u8"
     case UInt16 => "u16"
@@ -27,12 +37,20 @@ object PrettyPrint {
 
     case ArrayType(et, sz) => s"${print(et)}[$sz]"
 
-    case v@Variable(name, typed, _) => {
+    case v@Variable(name, typed, opts, offs) => {
       val body =  List(s"{") ++ v.opts.filter(_ != Private).map(print).map("\t" + _) ++ v.offsets.map(print).map("\t" + _).toList ++ List(s"}")
 
       s"${if (v.isPrivate) "private " else ""}${print(typed)} $name ${body.mkString(nl)}"
     }
 
-    case RevOffset(revs, offsets) => s"$revs ${offsets.map(_.toString).mkString(",")}"
+    case Offset(typed, addr, ops) =>
+      val opstr = if (ops.isEmpty) "" else {
+        s" (${ops.mkString(", ")})"
+      }
+
+      s"$typed ${addrStr(addr)}$opstr"
+    case OffsetSeq(offs) => offs.mkString("|")
+
+    case RevOffset(revs, offsets) => s"${revStr(revs)} { ${offsets.map(PrettyPrint.print(_)).mkString(",")} }"
   }
 }

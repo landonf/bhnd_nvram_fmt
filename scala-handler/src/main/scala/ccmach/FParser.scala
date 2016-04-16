@@ -4,7 +4,7 @@ import scala.util.matching.Regex
 import scala.util.parsing.combinator.{PackratParsers, RegexParsers}
 import scala.util.parsing.input.CharSequenceReader
 
-object Parser extends RegexParsers with PackratParsers {
+object FParser extends RegexParsers with PackratParsers {
   import AST._
 
 
@@ -20,7 +20,9 @@ object Parser extends RegexParsers with PackratParsers {
   lazy val ws = """\s+""".r
   lazy val ows = """\s*""".r
 
-  lazy val vars = rep(ows ~> decl <~ ows) <~ """\z""".r ^^ VarMap
+  lazy val vars = rep(ows ~> decl <~ ows) ~ struct <~ """\z""".r ^^ {
+    case vars ~ svars => VarMap(vars ++ svars.expand)
+  }
 
   lazy val sep = ws | ":" | "-" | "<" | ">" | "(" | ")" | "[" | "]" | "," | ";" | "{" | "}" | "^" | "=" | "#" | """\z""".r
 
@@ -35,22 +37,28 @@ object Parser extends RegexParsers with PackratParsers {
 
   lazy val primtype: Parser[TypeAtom] =
     "u8"  ^^^ UInt8 |
-    "u16" ^^^ UInt16 |
-    "u32" ^^^ UInt32 |
-    "i8"  ^^^ SInt8 |
-    "i16" ^^^ SInt16 |
-    "i32" ^^^ SInt32 |
-    "char" ^^^ Char8
+      "u16" ^^^ UInt16 |
+      "u32" ^^^ UInt32 |
+      "i8"  ^^^ SInt8 |
+      "i16" ^^^ SInt16 |
+      "i32" ^^^ SInt32 |
+      "char" ^^^ Char8
 
   lazy val datatype = primtype ~ (ows ~> opt(arraysize)) ^^ {
     case t ~ Some(sz) => ArrayType(t, sz)
     case t ~ None     => t
   }
 
+  lazy val structBase = "srom" ~> ows ~> srom_rev ~ (ows ~> "[" ~> rep1sep(ows ~> integer <~ ows, ",") <~ "]") ^^ {
+    case revs ~ addrs => StructBase(revs, addrs)
+  }
+  lazy val struct = ("struct" ~> ows ~> identifier <~ ows <~ ("[" ~ ows ~ "]") <~ ows) ~> ows ~> "{" ~> ows ~> rep(ows ~> structBase <~ ows) ~ (ows ~> rep(ows ~> decl <~ ows) <~ ows <~ "}") ^^ {
+    case sb ~ vars => Struct(sb, vars)
+  }
 
   lazy val arraysize = "[" ~> ows ~> integer <~ ows <~ "]"
 
-  def srom_offset (defaultType: DataType) = "srom" ~> ws ~> srom_rev ~ rep1sep(ows ~> offsetseq(defaultType) <~ ows, """,""".r) ^^ {
+  def srom_offset (defaultType: DataType) = "srom" ~> ws ~> srom_rev ~ (ows ~> "{" ~> rep1sep(ows ~> offsetseq(defaultType) <~ ows, """,""".r) <~ "}" <~ ows) ^^ {
     case rev ~ offs => RevOffset(rev, offs)
   }
 
@@ -62,7 +70,7 @@ object Parser extends RegexParsers with PackratParsers {
   lazy val srom_gte = ">=" ~> ows ~> integer ^^ { x => Range.inclusive(x, MAX_REV) }
 
   def offsetseq (defaultType: DataType) = rep1sep(ows ~> offset(defaultType) <~ ows, "|") ^^ { s => OffsetSeq(s) }
-  def offset (defaultType: DataType) = ows ~> opt(datatype <~ ows <~ "@" <~ ows) ~ integer ~ opt(ows ~> offsetOps) ^^ {
+  def offset (defaultType: DataType) = ows ~> opt(datatype <~ ows) ~ integer ~ opt(ows ~> offsetOps) ^^ {
     case dt ~ v ~ Some(ops) => Offset(dt.getOrElse(defaultType), v, ops)
     case dt ~ v ~ None => Offset(dt.getOrElse(defaultType), v, List.empty)
   }
@@ -76,12 +84,12 @@ object Parser extends RegexParsers with PackratParsers {
   def vardefn (defaultType: DataType): Parser[Set[VarTerm]] = rep1(opts | srom_offset(defaultType)) ^^ { _.toSet }
   lazy val opts: Parser[VarOption] =
     ("all1" ~> ws ~> "ignore" <~ ows) ^^^ IgnoreAll1 |
-    ("sfmt" ~> ws ~> fmtOpt <~ ows)
+      ("fmt" ~> ws ~> fmtOpt <~ ows)
   lazy val fmtOpt: Parser[VarOption] =
     "ccode" ^^^ CCode |
-    "sdec" ^^^ Signed |
-    "macaddr" ^^^ MAC48 |
-    "leddc" ^^^ LEDDutyCycle
+      "sdec" ^^^ Signed |
+      "macaddr" ^^^ MAC48 |
+      "led_dc" ^^^ LEDDutyCycle
 
   lazy val integer: Parser[Int] = hexInt | decInt
   lazy val hexInt = """0x[0-9A-Fa-f]+""".r <~ (ws | guard(sep)) ^^ { (str:String) => Integer.decode(str).intValue() }
