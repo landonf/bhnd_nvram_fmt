@@ -14,7 +14,7 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 0
+	DEBUG = 1
 
 	# Maximum revision
 	REV_MAX = 65535
@@ -68,13 +68,13 @@ BEGIN {
 	ST_NONE		= "NONE"	# default state
 
 	# Property types
-	PROP_T_FMT	= "fmt"
+	PROP_T_SFMT	= "sfmt"
 	PROP_T_ALL1	= "all1"
 
 	# Internal variables used for parser state
 	# tracking
 	STATE_TYPE	= "_state_type"
-	STATE_DESC	= "_state_block_name"
+	STATE_IDENT	= "_state_block_name"
 	STATE_LINENO	= "_state_first_line"
 	STATE_ISBLOCK	= "_state_is_block"
 
@@ -410,14 +410,14 @@ function parse_revdesc (result)
 #
 # Push a new parser state.
 #
-# The name may be null, in which case the STATE_DESC variable will not be
+# The name may be null, in which case the STATE_IDENT variable will not be
 # defined in this scope
 #
 function push_state (type, name, block) {
 	depth++
 	push(STATE_LINENO, NR)
 	if (name != null)
-		push(STATE_DESC, name)
+		push(STATE_IDENT, name)
 	push(STATE_TYPE, type)
 	push(STATE_ISBLOCK, block)
 }
@@ -437,7 +437,7 @@ function pop_state () {
 #
 # Find opening brace and push a new parser state for a brace-delimited block.
 #
-# The name may be null, in which case the STATE_DESC variable will not be
+# The name may be null, in which case the STATE_IDENT variable will not be
 # defined in this scope
 #
 function open_block (type, name)
@@ -561,13 +561,18 @@ function allow_def (type)
 	error("unknown type '" type "'")
 }
 
-# variable srom descriptor
-$1 == ST_SROM_DEF && allow_def(ST_SROM_DEF) {
+# close any previous srom revision descriptor
+$1 == "srom" && in_state(ST_SROM_DEF) {
+	pop_state()
+}
+
+# open a new srom revision descriptor
+$1 == "srom" && allow_def(ST_SROM_DEF) {
 	# parse revision descriptor
 	parse_revdesc(rev_desc)
 
 	# assign revision id
-	vid = g(STATE_DESC)
+	vid = g(STATE_IDENT)
 	rev = vars[vid,NUM_REVS] ""
 	revk = subkey(vid, REV, rev)
 	vars[vid,NUM_REVS]++
@@ -584,7 +589,12 @@ $1 == ST_SROM_DEF && allow_def(ST_SROM_DEF) {
 	vars[revk,REV_NUM_OFFS] = 0
 
 	debug("srom " rev_desc[REV_START] "-" rev_desc[REV_END] " {")
-	open_block($1, null)
+	push_state(ST_SROM_DEF, null, 0)
+
+	# seek to the first offset definition
+	do {
+		shiftf(1)
+	} while ($1 !~ SROM_OFF_REGEX && NF > 0)
 }
 
 #
@@ -606,18 +616,27 @@ function type_array_len (type)
 #
 function parse_offset_segment (revk, offk)
 {
-	vid = g(STATE_DESC)
+	vid = g(STATE_IDENT)
 
-	# handle missing explicit type
-	type = $1
-	offset = $2
-	shiftf(2)
+	# use explicit type if specified, otherwise use the variable's
+	# common type
+	if ($1 !~ HEX_REGEX) {
+		type = $1
+		if (type !~ TYPES_REGEX)
+			error("unknown field type '" type "'")
 
-	if (type !~ TYPES_REGEX)
-		error("unknown field type '" type "'")
+		shiftf(1)
+	} else {
+		type = vars[vid,VAR_TYPE]
+	}
 
+	# read offset value
+	offset = $1
 	if (offset !~ HEX_REGEX)
 		error("invalid offset value '" offset "'")
+	shiftf(1)
+
+
 
 	# extract byte count[] and width
 	if (match(type, ARRAY_REGEX"$") > 0) {
@@ -679,7 +698,7 @@ function parse_offset_segment (revk, offk)
 
 # revision offset definition
 $1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEF) {
-	vid = g(STATE_DESC)
+	vid = g(STATE_IDENT)
 
 	# fetch rev id/key defined by our parent block
 	rev = g("rev_id")
@@ -758,8 +777,8 @@ $1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEF) {
 
 # variable parameters
 $1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_state(ST_VAR_BLOCK) {
-	vid = g(STATE_DESC)
-	if ($1 == PROP_T_FMT) {
+	vid = g(STATE_IDENT)
+	if ($1 == PROP_T_SFMT) {
 		if (!$2 in FMT)
 			error("invalid fmt '" $2 "'")
 
@@ -799,7 +818,5 @@ $1 && allow_def(ST_VAR_BLOCK) {
 
 # Generic parse failure
 {
-	print ($1 ~ SROM_OFF_REGEX)
-	print $1
 	error("unrecognized statement")
 }
