@@ -55,6 +55,8 @@ private:
 	vector<cis_layout> _cis_layouts;
 
 	unordered_map<string, shared_ptr<var>> _srom_tbl;
+	unordered_set<string> _struct_vars;
+	vector<struct_defn> _struct_defs;
 	unordered_map<string, shared_ptr<cis_vstr>> _cis_vstr_tbl;
 	unordered_multimap<string, cis_layout> _cis_layout_tbl;
 	unordered_multimap<string, phy_chain> _pavars;
@@ -115,9 +117,11 @@ public:
 	vector<shared_ptr<var_set>> var_sets ();
 	
 	nvram_map (const vector<shared_ptr<var>> &srom_vars,
+		   const vector<struct_defn> &struct_defs,
+		   const unordered_set<string> &struct_vars,
 		   const vector<shared_ptr<cis_vstr>> &cis_vstrs,
 		   const vector<nvram::cis_tag> &cis_consts,
-		   const vector<cis_layout> &cis_layouts) : _srom_vars(srom_vars), _cis_vstrs(cis_vstrs), _cis_consts(cis_consts), _cis_layouts(cis_layouts)
+		   const vector<cis_layout> &cis_layouts) : _srom_vars(srom_vars), _struct_vars(struct_vars), _struct_defs(struct_defs), _cis_vstrs(cis_vstrs), _cis_consts(cis_consts), _cis_layouts(cis_layouts)
 	{
 		for (const auto &v : srom_vars)
 			_srom_tbl.insert({v->name(), v});

@@ -1840,3 +1840,137 @@ u8 txidxcap5g {
 	srom >= 11	u16 0x1AC (&0xFF0, >>4)
 }
 
+struct phy_chains[] {
+	srom 4-7	[0x080, 0x0AE, 0x0DC, 0x10A]
+	srom 8-10	[0x0C0, 0x0E0, 0x100, 0x120]
+	srom >= 11	[0x0D8, 0x100, 0x128]
+
+	u8 rxgains5ghtrelnabypa {
+		srom >= 11	0x8 (&0x80, >>7)
+	}
+	u8 rxgains5ghelnagaina {
+		srom >= 11	0x8 (&0x7)
+	}
+	u8 rxgains5gelnagaina {
+		srom >= 11	0xA (&0x7)
+	}
+	u8 rxgains5gmtrelnabypa {
+		srom >= 11	0x9 (&0x80, >>7)
+	}
+	u8 rxgains2gtrelnabypa {
+		srom >= 11	0xB (&0x80, >>7)
+	}
+	u8 rxgains5gmtrisoa {
+		srom >= 11	0x9 (&0x78, >>3)
+	}
+	u8 rxgains5gmelnagaina {
+		srom >= 11	0x9 (&0x7)
+	}
+	u8[4] maxp5ga {
+		srom 4-7	u8 0xB
+		srom 8-10	u8 0x9
+		srom >= 11	u8 0xD, u8 0xC, u8 0xF, u8 0xE
+	}
+	u16 pa5gw2a {
+		srom 4-7	0x12
+		srom 8-10	0x10
+	}
+	u16 pa5ghw1a {
+		srom 4-7	0x20
+		srom 8-10	0x1A
+	}
+	u8 rxgains2gelnagaina {
+		srom >= 11	0xB (&0x7)
+	}
+	u16 pa5glw3a {
+		srom 4-7	0x1C
+	}
+	u16 pa5glw1a {
+		srom 4-7	0x18
+		srom 8-10	0x14
+	}
+	u16 pa5gw1a {
+		srom 4-7	0x10
+		srom 8-10	0xE
+	}
+	u16 pa5glw0a {
+		srom 4-7	0x16
+		srom 8-10	0x12
+	}
+	u16 pa5gw3a {
+		srom 4-7	0x14
+	}
+	u16[3] pa2ga {
+		srom >= 11	0x2
+	}
+	u16 pa5glw2a {
+		srom 4-7	0x1A
+		srom 8-10	0x16
+	}
+	u16 pa5ghw3a {
+		srom 4-7	0x24
+	}
+	u16 pa5gw0a {
+		srom 4-7	0xE
+		srom 8-10	0xC
+	}
+	u8 maxp2ga {
+		srom 4-7	0x1
+		srom 8-10	0x1
+		srom >= 11	0x1
+	}
+	u16[12] pa5ga {
+		srom >= 11	0x10
+	}
+	u8 maxp5gha {
+		srom 4-7	0xD
+		srom 8-10	0xB
+	}
+	u8 rxgains5gtrisoa {
+		srom >= 11	0xA (&0x78, >>3)
+	}
+	u16 pa5ghw2a {
+		srom 4-7	0x22
+		srom 8-10	0x1C
+	}
+	u16 pa5ghw0a {
+		srom 4-7	0x1E
+		srom 8-10	0x18
+	}
+	u8 rxgains5gtrelnabypa {
+		srom >= 11	0xA (&0x80, >>7)
+	}
+	u16 pa2gw3a {
+		srom 4-7	0x8
+	}
+	u16 pa2gw2a {
+		srom 4-7	0x6
+		srom 8-10	0x6
+	}
+	u16 pa2gw1a {
+		srom 4-7	0x4
+		srom 8-10	0x4
+	}
+	u16 pa2gw0a {
+		srom 4-7	0x2
+		srom 8-10	0x2
+	}
+	u8 rxgains2gtrisoa {
+		srom >= 11	0xB (&0x78, >>3)
+	}
+	u8 maxp5gla {
+		srom 4-7	0xC
+		srom 8-10	0xA
+	}
+	u8 rxgains5ghtrisoa {
+		srom >= 11	0x8 (&0x78, >>3)
+	}
+	u8 itt5ga {
+		srom 4-7	0xA
+		srom 8-10	0x8
+	}
+	u8 itt2ga {
+		srom 4-7	0x0
+		srom 8-10	0x0
+	}
+}

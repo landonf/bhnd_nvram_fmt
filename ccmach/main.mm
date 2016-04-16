@@ -771,6 +771,10 @@ public:
         };
         
         unordered_map<string, shared_ptr<nvram::var>> path_var_tbl;
+        unordered_map<string, shared_ptr<nvram::var>> st_path_var_tbl;
+        unordered_set<string> struct_vars;
+        bool path_first_run = true;
+        nvram::struct_defn phy_chains("phy_chains", make_shared<vector<tuple<nvram::compat_range, vector<size_t>>>>(), make_shared<vector<shared_ptr<nvram::var>>>());
         for (const auto &v : path_vars) {
             for (auto cfg = pathcfgs; cfg->path_pfx != nil; cfg++) {
                 PLClangCursor *maxCursor = _c->find_symbol(cfg->path_num);
@@ -780,22 +784,33 @@ public:
                 uint32_t max = _c->tokens_literal_u32(_c->get_tokens(maxCursor));
                 
                 shared_ptr<nvram::var> newv;
+                shared_ptr<nvram::var> st_newv;
+                vector<size_t> base_offs;
                 bool add_var = false;
+                bool path_cfg_first = true;
+
                 for (uint32_t i = 0; i < max; i++) {
                     NSString *path = [NSString stringWithFormat: @"%s%u", cfg->path_pfx, i];
                     PLClangCursor *c = _c->find_symbol(path.UTF8String);
                     if (c == nil)
                         errx(EXIT_FAILURE, "missing %s", path.UTF8String);
                     uint32_t struct_base = _c->tokens_literal_u32(_c->get_tokens(c)) * sizeof(uint16_t);
+                    base_offs.push_back(struct_base);
 
                     for (const auto &sp : *v->sprom_offsets()) {
                         if (sp.compat().first() >= cfg->compat.first() && sp.compat().first() <= cfg->compat.last()) {
                             auto values = make_shared<vector<nvram::value>>();
+                            auto st_values = make_shared<vector<nvram::value>>();
+
                             for (const auto &val : *sp.values()) {
                                 auto segs = make_shared<vector<nvram::value_seg>>();
+                                auto st_segs = make_shared<vector<nvram::value_seg>>();
+
                                 for (const auto &seg : *val.segments()) {
+                                    st_segs->push_back(seg.offset(seg.offset()));
                                     segs->push_back(seg.offset(seg.offset() + struct_base));
                                 }
+                                st_values->emplace_back(st_segs);
                                 values->emplace_back(segs);
                             }
                             
@@ -803,18 +818,38 @@ public:
                             if (path_var_tbl.count(name) == 0) {
                                 add_var = true;
                                 newv = make_shared<nvram::var>(v->name(name).sprom_offsets(make_shared<vector<nvram::nv_offset>>()));
+                                st_newv = make_shared<nvram::var>(v->sprom_offsets(make_shared<vector<nvram::nv_offset>>()));
                                 path_var_tbl.insert({name, newv});
+                                st_path_var_tbl.insert({v->name(), st_newv});
                             } else {
                                 newv = path_var_tbl.at(name);
+                                st_newv = st_path_var_tbl.at(v->name());
                             }
                             newv->sprom_offsets()->emplace_back(sp.compat(), values);
+                            
+                            if (path_cfg_first)
+                                st_newv->sprom_offsets()->emplace_back(sp.compat(), st_values);
                         }
                     }
                     
-                    if (add_var)
+                    if (add_var) {
                         vars.push_back(newv);
+                        if (struct_vars.count(v->name()) == 0) {
+                            struct_vars.insert(v->name());
+                            phy_chains.variables()->push_back(st_newv);
+                        }
+                    }
+                    
+                    path_cfg_first = false;
+                }
+                
+                if (path_first_run && base_offs.size() > 0) {
+                    phy_chains.base_addrs()->push_back({cfg->compat, base_offs});
+                    base_offs.clear();
                 }
             }
+            
+            path_first_run = false;
         }
 
         sort(vars.begin(), vars.end(), [](const shared_ptr<nvram::var> &lhs, shared_ptr<nvram::var> &rhs) {
@@ -947,7 +982,9 @@ public:
         auto cis_layouts = nvram::parse_layouts(_c);
 
         /* Construct map */
-        nvram::nvram_map m(vars, cis_vstrs, cis_constants, cis_layouts);
+        auto struct_defs = vector<nvram::struct_defn>();
+        struct_defs.push_back(phy_chains);
+        nvram::nvram_map m(vars, struct_defs, struct_vars, cis_vstrs, cis_constants, cis_layouts);
         
         /* Report SROM/CIS differences */
         if (diag)

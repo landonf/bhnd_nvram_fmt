@@ -100,6 +100,60 @@ void genmap::emit_offset (const string &src, const string &vtype, const nv_offse
 
 }
 
+void genmap::emit_var(const shared_ptr<var> &v, compat_range range, bool skip_rdesc) {
+	size_t num_offs = 0;
+	for (const auto &sp : *v->sprom_offsets()) {
+		if (sp.compat().overlaps(range))
+			num_offs++;
+	}
+	
+	if (num_offs == 0)
+		return;
+	
+	string vtype = to_string(v->decoded_type());
+	if (v->decoded_count() > 1)
+		vtype += "[" + to_string(v->decoded_count()) + "]";
+	
+	if (v->flags() & nvram::FLAG_MFGINT)
+		vtype = "private " + vtype;
+	
+	if ((1) /*always add newline*/|| num_offs > 1 || v->sfmt() != SFMT_HEX || v->flags() & FLAG_NOALL1) {
+		prints("%s %s", vtype.c_str(), v->name().c_str(), ^{
+			if (v->sfmt() != SFMT_HEX)
+				println("sfmt\t%s", to_string(v->sfmt()).c_str());
+			
+			if (v->flags() & FLAG_NOALL1)
+				println("all1\tignore");
+			
+#if 0
+			for (const auto &cis : *v->cis_offsets())
+				emit_offset("cis\t", vtype, cis, range, skip_rdesc, true);
+#endif
+			for (const auto &sp : *v->sprom_offsets()) {
+				if (!sp.compat().overlaps(range))
+					continue;
+				
+				emit_offset("srom", vtype, sp, range, skip_rdesc, true);
+			}
+		});
+	} else {
+		print("%s\t%s\t\t{ ", vtype.c_str(), v->name().c_str());
+		
+#if 0
+		for (const auto &cis : *v->cis_offsets())
+			emit_offset("cis\t", vtype, cis, range, skip_rdesc, false);
+#endif
+		for (const auto &sp : *v->sprom_offsets()) {
+			if (!sp.compat().overlaps(range))
+				continue;
+			
+			emit_offset("srom", vtype, sp, range, skip_rdesc, false);
+		}
+		
+		printf(" }\n");
+	}
+}
+
 void genmap::generate(const compat_range &range) {
     auto vsets = _nv.var_sets();
     for (const auto &vs : vsets) {
@@ -119,10 +173,10 @@ void genmap::generate(const compat_range &range) {
         if (!sprommmmed)
             continue;
 
-        
+	    
         if (vs->comment().size() > 0 && vs->comment() != vs->name())
             println("# %s", [@(vs->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);
-        
+	    
         NSString *sectName = @(vs->name().c_str());
         if ([sectName hasPrefix: @"HNBU_"])
             sectName = [[sectName substringFromIndex: 5] lowercaseString];
@@ -151,62 +205,45 @@ void genmap::generate(const compat_range &range) {
 #endif
       
             for (const auto &v : *vs->vars()) {
-                size_t num_offs = 0;
-                for (const auto &sp : *v->sprom_offsets()) {
-                    if (sp.compat().overlaps(range))
-                        num_offs++;
-                }
-                
-                if (num_offs == 0)
-                    continue;
-
-                string vtype = to_string(v->decoded_type());
-                if (v->decoded_count() > 1)
-                    vtype += "[" + to_string(v->decoded_count()) + "]";
-                
-                if (v->flags() & nvram::FLAG_MFGINT)
-                    vtype = "private " + vtype;
-                
-                if (1 /*always add newline*/|| num_offs > 1 || v->sfmt() != SFMT_HEX || v->flags() & FLAG_NOALL1) {
-                    prints("%s %s", vtype.c_str(), v->name().c_str(), ^{
-                        if (v->sfmt() != SFMT_HEX)
-                            println("sfmt\t%s", to_string(v->sfmt()).c_str());
-                        
-                        if (v->flags() & FLAG_NOALL1)
-                            println("all1\tignore");
-
-    #if 0
-                        for (const auto &cis : *v->cis_offsets())
-                            emit_offset("cis\t", vtype, cis, range, skip_rdesc, true);
-    #endif
-                        for (const auto &sp : *v->sprom_offsets()) {
-                            if (!sp.compat().overlaps(range))
-                                continue;
-                            
-                            emit_offset("srom", vtype, sp, range, skip_rdesc, true);
-                        }
-                    });
-                } else {
-                    print("%s\t%s\t\t{ ", vtype.c_str(), v->name().c_str());
-
-#if 0
-                    for (const auto &cis : *v->cis_offsets())
-                        emit_offset("cis\t", vtype, cis, range, skip_rdesc, false);
-#endif
-                    for (const auto &sp : *v->sprom_offsets()) {
-                        if (!sp.compat().overlaps(range))
-                            continue;
-                        
-                        emit_offset("srom", vtype, sp, range, skip_rdesc, false);
-                    }
-                    
-                    printf(" }\n");
-                }
+		    /* Skip struct vars */
+		    if (_nv._struct_vars.count(v->name()) > 0) {
+			    continue;
+		    }
+		    emit_var(v, range, skip_rdesc);
             }
 
         //});
         printf("\n");
     }
+	
+	
+	/* Emit structs */
+	for (const auto &sdef : _nv._struct_defs) {
+		bool skip_rdesc = false;
+
+		prints("struct %s[]", sdef.name().c_str(), ^{
+			for (const auto &bas : *sdef.base_addrs()) {
+				const auto &compat = std::get<0>(bas);
+				const auto &addrs = std::get<1>(bas);
+				print("srom %s\t[", compat.description().c_str());
+				size_t addr_count = 0;
+				for (const auto &addr : addrs) {
+					printf("0x%03zX", addr);
+					addr_count++;
+					if (addr_count < addrs.size())
+						printf(", ");
+				}
+				printf("]\n");
+			}
+			printf("\n");
+			
+			// TODO: group by varset and emit comments?
+			for (const auto &v : *sdef.variables()) {
+				emit_var(v, range, skip_rdesc);
+			}
+		});
+
+	}
 }
 
 }

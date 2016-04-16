@@ -81,9 +81,9 @@ enum {
 
 /** A symbolic constant definition */
 PL_RECORD_STRUCT(symbolic_constant,
-                 (string, name),
-                 (uint32, value)
-                 );
+    (string, name),
+    (uint32, value)
+);
 
 /** SPROM revision compatibility declaration */
 class compat_range {
@@ -151,7 +151,6 @@ public:
             return "";
     }
 };
-
 
 /** SPROM value segment descriptor */
 class value_seg {
@@ -578,6 +577,13 @@ public:
         return t;
     }
 };
+
+/** Struct definition */
+PL_RECORD_STRUCT(struct_defn,
+    (string, name),
+    ((shared_ptr<vector<tuple<compat_range, vector<size_t>>>>), base_addrs),
+    (shared_ptr<vector<shared_ptr<var>>>, variables)
+);
 
 /** NVRAM struct / CIS tuple */
 class var_set {

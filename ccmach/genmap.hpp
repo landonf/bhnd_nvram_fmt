@@ -19,6 +19,7 @@ private:
     int _depth = 0;
     
     void emit_offset (const string &src, const string &vtype, const nv_offset &sp, const compat_range &range, bool skip_rdesc, bool tnl);
+    void emit_var(const shared_ptr<var> &v, compat_range range, bool skip_rdesc);
 
 public:
     int print(const char *fmt, ...);
