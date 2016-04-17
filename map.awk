@@ -14,7 +14,7 @@ BEGIN {
 	symbols[depth,"_file"] = FILENAME
 
 	# Enable debug output
-	DEBUG = 0
+	DEBUG = 1
 
 	# Maximum revision
 	REV_MAX = 65535
@@ -62,20 +62,22 @@ BEGIN {
 	IDENT_REGEX	= "^[A-Za-z_][A-Za-z0-9_]*,?$"
 	SROM_OFF_REGEX	= "("TYPES_REGEX"|"HEX_REGEX")"
 
-	# Block types
-	BLOCK_T_STRUCT	= "struct"
-	BLOCK_T_VAR	= "var"
-	BLOCK_T_SROM	= "srom"
-	BLOCK_T_NONE	= "NONE"
+	# Parser states types
+	ST_STRUCT_BLOCK	= "struct"	# struct block
+	ST_VAR_BLOCK	= "var"		# variable block
+	ST_SROM_DEFN	= "srom"	# srom offset defn
+	ST_NONE		= "NONE"	# default state
 
 	# Property types
-	PROP_T_FMT	= "fmt"
+	PROP_T_SFMT	= "sfmt"
 	PROP_T_ALL1	= "all1"
 
-	# Internal variable names
-	BLOCK_TYPE	= "_block_type"
-	BLOCK_NAME	= "_block_name"
-	BLOCK_START	= "_block_start"
+	# Internal variables used for parser state
+	# tracking
+	STATE_TYPE	= "_state_type"
+	STATE_IDENT	= "_state_block_name"
+	STATE_LINENO	= "_state_first_line"
+	STATE_ISBLOCK	= "_state_is_block"
 
 	# Common array keys
 	DEF_LINE	= "def_line"
@@ -150,7 +152,7 @@ function gen_var_head (v, suffix)
 function gen_var_rev_body (v, revk, base_addr)
 {
 	if (base_addr != null)
-		base_addr = base_addr"+"
+		base_addr = base_addr" + "
 	else
 		base_addr = ""
 
@@ -274,6 +276,7 @@ function gen_struct_var (v)
 	}
 }
 
+
 END {
 	# skip completion handling if exiting from an error
 	if (_EARLY_EXIT)
@@ -281,7 +284,7 @@ END {
 
 	# check for complete block closure
 	if (depth > 0) {
-		block_start = g(BLOCK_START)
+		block_start = g(STATE_LINENO)
 		errorx("missing '}' for block opened on line " block_start "")
 	}
 
@@ -473,20 +476,42 @@ function parse_revdesc (result)
 }
 
 #
-# Find opening brace and adjust block depth.
+# Push a new parser state.
 #
-# The name may be null, in which case the BLOCK_NAME variable will not be
+# The name may be null, in which case the STATE_IDENT variable will not be
+# defined in this scope
+#
+function push_state (type, name, block) {
+	depth++
+	push(STATE_LINENO, NR)
+	if (name != null)
+		push(STATE_IDENT, name)
+	push(STATE_TYPE, type)
+	push(STATE_ISBLOCK, block)
+}
+
+#
+# Pop the top of the parser state stack.
+#
+function pop_state () {
+	# drop all symbols defined at this depth
+	for (s in symbols) {
+		if (s ~ "^"depth"[^0-9]")
+			delete symbols[s]
+	}
+	depth--
+}
+
+#
+# Find opening brace and push a new parser state for a brace-delimited block.
+#
+# The name may be null, in which case the STATE_IDENT variable will not be
 # defined in this scope
 #
 function open_block (type, name)
 {
 	if ($0 ~ "{" || getline_matching("^[ \t]*{") > 0) {
-		depth++
-		push(BLOCK_START, NR)
-		if (name != null)
-			push(BLOCK_NAME, name)
-		push(BLOCK_TYPE, type)
-
+		push_state(type, name, 1)
 		sub("^[^{]+{", "", $0)
 		return
 	}
@@ -495,22 +520,22 @@ function open_block (type, name)
 }
 
 #
-# Find closing brace and adjust block depth.
+# Find closing brace and pop parser states until the first
+# brace-delimited block is discarded.
 #
 function close_block ()
 {
 	if ($0 !~ "}")
 		error("internal error - no closing brace")
 
-	# drop all symbols defined at this depth
-	for (s in symbols) {
-		if (s ~ "^"depth"[^0-9]")
-			delete symbols[s]
-	}
+	# pop states until we exit the first enclosing block
+	do {
+		_closed_block = g(STATE_ISBLOCK)
+		pop_state()
+	} while (!_closed_block)
 
 	# strip everything prior to the block closure
 	sub("^[^}]*}", "", $0)
-	depth--
 }
 
 # Internal symbol table lookup function. Returns the symbol depth if
@@ -570,21 +595,21 @@ function set (name, value, scope)
 }
 
 # Evaluates to true if immediately within a block scope of the given type
-function in_block (type)
+function in_state (type)
 {
-	if (!is_defined(BLOCK_TYPE))
-		return (type == BLOCK_T_NONE)
+	if (!is_defined(STATE_TYPE))
+		return (type == ST_NONE)
 
-	return (type == g(BLOCK_TYPE))
+	return (type == g(STATE_TYPE))
 }
 
 # Evaluates to true if within an immediate or non-immediate block scope of the
 # given type
-function in_nested_block (type)
+function in_nested_state (type)
 {
 	for (i = 0; i < depth; i++) {
-		if ((depth-i,BLOCK_TYPE) in symbols) {
-			if (symbols[depth-i,BLOCK_TYPE] == type)
+		if ((depth-i,STATE_TYPE) in symbols) {
+			if (symbols[depth-i,STATE_TYPE] == type)
 				return (1)
 		}
 	}
@@ -595,19 +620,19 @@ function in_nested_block (type)
 # the current scope
 function allow_def (type)
 {
-	if (type == BLOCK_T_VAR) {
-		return (in_block(BLOCK_T_NONE) || in_block(BLOCK_T_STRUCT))
-	} else if (type == BLOCK_T_STRUCT) {
-		return (in_block(BLOCK_T_NONE))
-	} else if (type == BLOCK_T_SROM) {
-		return (in_block(BLOCK_T_VAR) || in_block(BLOCK_T_STRUCT))
+	if (type == ST_VAR_BLOCK) {
+		return (in_state(ST_NONE) || in_state(ST_STRUCT_BLOCK))
+	} else if (type == ST_STRUCT_BLOCK) {
+		return (in_state(ST_NONE))
+	} else if (type == ST_SROM_DEFN) {
+		return (in_state(ST_VAR_BLOCK) || in_state(ST_STRUCT_BLOCK))
 	}
 
 	error("unknown type '" type "'")
 }
 
 # struct definition
-$1 == BLOCK_T_STRUCT && allow_def($1) {
+$1 == ST_STRUCT_BLOCK && allow_def($1) {
 	name = $2
 
 	# Remove array[] specifier
@@ -626,12 +651,12 @@ $1 == BLOCK_T_STRUCT && allow_def($1) {
 
 	# Open the block 
 	debug("struct " name " {")
-	open_block(BLOCK_T_STRUCT, name)
+	open_block(ST_STRUCT_BLOCK, name)
 }
 
 # struct srom descriptor
-$1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) && in_block(BLOCK_T_STRUCT) {
-	sid = g(BLOCK_NAME)
+$1 == ST_SROM_DEFN && allow_def(ST_SROM_DEFN) && in_state(ST_STRUCT_BLOCK) {
+	sid = g(STATE_IDENT)
 
 	# parse revision descriptor
 	rev_desc[REV_START] = 0
@@ -665,13 +690,18 @@ $1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) && in_block(BLOCK_T_STRUCT) {
 	next
 }
 
-# variable srom descriptor
-$1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
+# close any previous srom revision descriptor
+$1 == ST_SROM_DEFN && in_state(ST_SROM_DEFN) {
+	pop_state()
+}
+
+# open a new srom revision descriptor
+$1 == ST_SROM_DEFN && allow_def(ST_SROM_DEFN) {
 	# parse revision descriptor
 	parse_revdesc(rev_desc)
 
 	# assign revision id
-	vid = g(BLOCK_NAME)
+	vid = g(STATE_IDENT)
 	rev = vars[vid,NUM_REVS] ""
 	revk = subkey(vid, REV, rev)
 	vars[vid,NUM_REVS]++
@@ -688,7 +718,12 @@ $1 == BLOCK_T_SROM && allow_def(BLOCK_T_SROM) {
 	vars[revk,REV_NUM_OFFS] = 0
 
 	debug("srom " rev_desc[REV_START] "-" rev_desc[REV_END] " {")
-	open_block($1, null)
+	push_state(ST_SROM_DEFN, null, 0)
+
+	# seek to the first offset definition
+	do {
+		shiftf(1)
+	} while ($1 !~ SROM_OFF_REGEX && NF > 0)
 }
 
 #
@@ -710,18 +745,27 @@ function type_array_len (type)
 #
 function parse_offset_segment (revk, offk)
 {
-	vid = g(BLOCK_NAME)
+	vid = g(STATE_IDENT)
 
-	# handle missing explicit type
-	type = $1
-	offset = $2
-	shiftf(2)
+	# use explicit type if specified, otherwise use the variable's
+	# common type
+	if ($1 !~ HEX_REGEX) {
+		type = $1
+		if (type !~ TYPES_REGEX)
+			error("unknown field type '" type "'")
 
-	if (type !~ TYPES_REGEX)
-		error("unknown field type '" type "'")
+		shiftf(1)
+	} else {
+		type = vars[vid,VAR_TYPE]
+	}
 
+	# read offset value
+	offset = $1
 	if (offset !~ HEX_REGEX)
 		error("invalid offset value '" offset "'")
+	shiftf(1)
+
+
 
 	# extract byte count[] and width
 	if (match(type, ARRAY_REGEX"$") > 0) {
@@ -782,8 +826,8 @@ function parse_offset_segment (revk, offk)
 }
 
 # revision offset definition
-$1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
-	vid = g(BLOCK_NAME)
+$1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEFN) {
+	vid = g(STATE_IDENT)
 
 	# fetch rev id/key defined by our parent block
 	rev = g("rev_id")
@@ -817,7 +861,7 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 
 # variable definition
 (($1 == "private" && $2 ~ TYPES_REGEX) || $1 ~ TYPES_REGEX) &&
-    allow_def(BLOCK_T_VAR) \
+    allow_def(ST_VAR_BLOCK) \
 {
 	# check for 'private' flag
 	if ($1 == "private") {
@@ -855,23 +899,23 @@ $1 ~ SROM_OFF_REGEX && in_block(BLOCK_T_SROM) {
 	vars[name,VAR_ARRAY] = array
 	vars[name,VAR_FMT] = "hex" # default if not specified
 
-	open_block(BLOCK_T_VAR, name)
+	open_block(ST_VAR_BLOCK, name)
 
-	if (in_nested_block("struct")) {
+	debug("type=" DTYPE[base_type])
+
+	if (in_nested_state(ST_STRUCT_BLOCK)) {
 		# Fetch the enclosing struct's name
-		sid = g(BLOCK_NAME, 1)
+		sid = g(STATE_IDENT, 1)
 
 		# Mark as a struct-based variable
 		vars[name,VAR_STRUCT] = sid
 	}
-
-	debug("type=" DTYPE[base_type])
 }
 
 # variable parameters
-$1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block(BLOCK_T_VAR) {
-	vid = g(BLOCK_NAME)
-	if ($1 == PROP_T_FMT) {
+$1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_state(ST_VAR_BLOCK) {
+	vid = g(STATE_IDENT)
+	if ($1 == PROP_T_SFMT) {
 		if (!$2 in FMT)
 			error("invalid fmt '" $2 "'")
 
@@ -891,8 +935,8 @@ $1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block(BLOCK_T_VAR) {
 }
 
 # Close blocks
-/}/ && !in_block(BLOCK_T_NONE) {
-	while (!in_block(BLOCK_T_NONE) && $0 ~ "}") {
+/}/ && !in_state(ST_NONE) {
+	while (!in_state(ST_NONE) && $0 ~ "}") {
 		close_block();
 		debug("}")
 	}
@@ -900,18 +944,16 @@ $1 ~ IDENT_REGEX && $2 ~ IDENT_REGEX && in_block(BLOCK_T_VAR) {
 }
 
 # Report unbalanced '}'
-/}/ && in_block(BLOCK_T_NONE) {
+/}/ && in_state(ST_NONE) {
 	error("extra '}'")
 }
 
 # Invalid variable type
-$1 && allow_def(BLOCK_T_VAR) {
+$1 && allow_def(ST_VAR_BLOCK) {
 	error("unknown type '" $1 "'")
 }
 
 # Generic parse failure
 {
-	print ($1 ~ SROM_OFF_REGEX)
-	print $1
 	error("unrecognized statement")
 }
