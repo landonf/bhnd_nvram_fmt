@@ -170,6 +170,11 @@ void genmap::generate(const compat_range &range) {
                 break;
         }
 
+	/* XXX: CIS varsets that duplicate SROM variables defined more completely in
+	 * newer CIS varset */
+	if (vs->name() == "HNBU_ANT5G" || vs->name() == "HNBU_OFDMPO5G")
+		sprommmmed = false;
+	    
         if (!sprommmmed)
             continue;
 
@@ -209,6 +214,11 @@ void genmap::generate(const compat_range &range) {
 		    if (_nv._struct_vars.count(v->name()) > 0) {
 			    continue;
 		    }
+		    
+		    /* XXX: duplicated in the CIS HNBU_SUBBAND5GVER tuple */
+		    if (vs->name() == "HNBU_ACPA_C0" && v->name() == "subband5gver")
+			    continue;
+		    
 		    emit_var(v, range, skip_rdesc);
             }
 

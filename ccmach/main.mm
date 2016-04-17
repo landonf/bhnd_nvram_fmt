@@ -773,6 +773,7 @@ public:
         unordered_map<string, shared_ptr<nvram::var>> path_var_tbl;
         unordered_map<string, shared_ptr<nvram::var>> st_path_var_tbl;
         unordered_set<string> struct_vars;
+        unordered_set<string> struct_vars_handled;
         bool path_first_run = true;
         nvram::struct_defn phy_chains("phy_chains", make_shared<vector<tuple<nvram::compat_range, vector<size_t>>>>(), make_shared<vector<shared_ptr<nvram::var>>>());
         for (const auto &v : path_vars) {
@@ -834,8 +835,10 @@ public:
                     
                     if (add_var) {
                         vars.push_back(newv);
-                        if (struct_vars.count(v->name()) == 0) {
-                            struct_vars.insert(v->name());
+                        struct_vars.insert(newv->name());
+
+                        if (struct_vars_handled.count(v->name()) == 0) {
+                            struct_vars_handled.insert(v->name());
                             phy_chains.variables()->push_back(st_newv);
                         }
                     }
