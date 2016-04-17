@@ -8,6 +8,8 @@
 
 #include "genmap.hpp"
 
+#define EXCLUDE_NON_SROM 1 /* until CIS lifts its ugly head? */
+
 namespace nvram {
 
 int genmap::vprint (const char *fmt, va_list args) {
@@ -106,9 +108,11 @@ void genmap::emit_var(const shared_ptr<var> &v, compat_range range, bool skip_rd
 		if (sp.compat().overlaps(range))
 			num_offs++;
 	}
-	
+
+#ifdef EXCLUDE_NON_SROM
 	if (num_offs == 0)
 		return;
+#endif
 	
 	string vtype = to_string(v->decoded_type());
 	if (v->decoded_count() > 1)
@@ -172,12 +176,18 @@ void genmap::generate(const compat_range &range) {
 
 	/* XXX: CIS varsets that duplicate SROM variables defined more completely in
 	 * newer CIS varset */
-	if (vs->name() == "HNBU_ANT5G" || vs->name() == "HNBU_OFDMPO5G")
+	if (vs->name() == "HNBU_ANT5G" || vs->name() == "HNBU_OFDMPO5G") {
+#ifdef EXCLUDE_NON_SROM
 		sprommmmed = false;
-	    
+#else
+		continue;
+#endif
+	}
+
+#ifdef EXCLUDE_NON_SROM
         if (!sprommmmed)
             continue;
-
+#endif
 	    
         if (vs->comment().size() > 0 && vs->comment() != vs->name())
             println("# %s", [@(vs->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);

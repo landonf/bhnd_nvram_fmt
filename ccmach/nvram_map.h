@@ -21,7 +21,7 @@ typedef enum {
 /** NVRAM data type string representations */
 typedef enum {
 	BHND_NVRAM_VFMT_HEX,		/**< hex string format */
-	BHND_NVRAM_VFMT_SDEC,		/**< signed decimal format */
+	BHND_NVRAM_VFMT_DEC,		/**< decimal string format */
 	BHND_NVRAM_VFMT_MACADDR,	/**< mac address (canonical form, hex octets,
 					     seperated with ':') */
 	BHND_NVRAM_VFMT_LEDDC,		/**< LED PWM duty-cycle (2 bytes -- on/off) */

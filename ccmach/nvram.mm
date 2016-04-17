@@ -57,7 +57,7 @@ string std::to_string(nvram::prop_type t) {
 string std::to_string(nvram::str_fmt f) {
     switch (f) {
             case SFMT_HEX:      return "hex";
-            case SFMT_DECIMAL:      return "sdec";
+            case SFMT_DECIMAL:      return "decimal";
             case SFMT_HEXBIN:      return "hexbin";
             case SFMT_MACADDR:      return "macaddr";
             case SFMT_CCODE:      return "ccode";

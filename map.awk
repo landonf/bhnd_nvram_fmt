@@ -21,7 +21,7 @@ BEGIN {
 
 	# Format Constants
 	FMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
-	FMT["sdec"]	= "BHND_NVRAM_VFMT_SDEC"
+	FMT["decimal"]	= "BHND_NVRAM_VFMT_DEC"
 	FMT["ccode"]	= "BHND_NVRAM_VFMT_CCODE"
 	FMT["macaddr"]	= "BHND_NVRAM_VFMT_MACADDR"
 	FMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"

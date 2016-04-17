@@ -301,51 +301,51 @@ u8 tssipos5g {
 
 # FEM config
 u8 femctrl {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAA (&0xF8, >>3)
 }
 u8 papdcap2g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAA (&0x4, >>2)
 }
 u8 tworangetssi2g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAA (&0x2, >>1)
 }
 u8 pdgain2g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	u16 0xAA (&0x1F0, >>4)
 }
 u8 epagain2g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAB (&0xE, >>1)
 }
 u8 tssiposslope2g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAB (&0x1)
 }
 u8 gainctrlsph {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAC (&0xF8, >>3)
 }
 u8 papdcap5g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAC (&0x4, >>2)
 }
 u8 tworangetssi5g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAC (&0x2, >>1)
 }
 u8 pdgain5g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	u16 0xAC (&0x1F0, >>4)
 }
 u8 epagain5g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAD (&0xE, >>1)
 }
 u8 tssiposslope5g {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0xAD (&0x1)
 }
 
@@ -546,36 +546,36 @@ u16 rawtempsense {
 }
 
 u8 noiselvl2ga0 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	0x1AB (&0x1F)
 	srom >= 11	0x1BD (&0x1F)
 }
 u8 noiselvl2ga1 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	u16 0x1AA (&0x3E0, >>5)
 	srom >= 11	u16 0x1BC (&0x3E0, >>5)
 }
 u8 noiselvl2ga2 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	0x1AA (&0x7C, >>2)
 	srom >= 11	0x1BC (&0x7C, >>2)
 }
 u8[4] noiselvl5ga0 {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	u8 0x1BF (&0x1F), u8 0x1C1 (&0x1F), u8 0x1C3 (&0x1F), u8 0x1C5 (&0x1F)
 }
 u8[4] noiselvl5ga1 {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	u16[4] 0x1BE (&0x3E0, >>5)
 }
 u8[4] noiselvl5ga2 {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	u8 0x1BE (&0x7C, >>2), u8 0x1C0 (&0x7C, >>2), u8 0x1C2 (&0x7C, >>2), u8 0x1C4 (&0x7C, >>2)
 }
 
 # paparambwver
 u8 paparambwver {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	0x190 (&0xF0, >>4)
 }
 
@@ -583,27 +583,27 @@ u8 paparambwver {
 # or 9 (sromrev > 1) bytes
 # 
 u16 pa0b0 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x5E
 	srom 8-10	0xC2
 }
 u16 pa0b1 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x60
 	srom 8-10	0xC4
 }
 u16 pa0b2 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x62
 	srom 8-10	0xC6
 }
 u8 pa0itssit {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x71
 	srom 8-10	0xC0
 }
 u8 pa0maxpwr {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x69
 	srom 8-10	0xC1
 }
@@ -614,67 +614,67 @@ u8 opo {
 
 # 5G PA params
 u16 pa1b0 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x6A
 	srom 8-10	0xCC
 }
 u16 pa1b1 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x6C
 	srom 8-10	0xCE
 }
 u16 pa1b2 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x6E
 	srom 8-10	0xD0
 }
 u16 pa1lob0 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x3C
 	srom 8-10	0xD2
 }
 u16 pa1lob1 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x3E
 	srom 8-10	0xD4
 }
 u16 pa1lob2 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x40
 	srom 8-10	0xD6
 }
 u16 pa1hib0 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x42
 	srom 8-10	0xD8
 }
 u16 pa1hib1 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x44
 	srom 8-10	0xDA
 }
 u16 pa1hib2 {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x46
 	srom 8-10	0xDC
 }
 u8 pa1itssit {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x70
 	srom 8-10	0xC8
 }
 u8 pa1maxpwr {
-	sfmt	sdec
+	sfmt	decimal
 	srom 1-3	0x68
 	srom 8-10	0xC9
 }
 u8 pa1lomaxpwr {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x3A
 	srom 8-10	0xCA
 }
 u8 pa1himaxpwr {
-	sfmt	sdec
+	sfmt	decimal
 	srom 2-3	0x3B
 	srom 8-10	0xCB
 }
@@ -1008,14 +1008,14 @@ u8 rxgainerr5gua2 {
 
 # 4328 2G RX power offset, 1 byte
 i8 rxpo2g {
-	sfmt	sdec
+	sfmt	decimal
 	srom 3	0x5B
 	srom 8-10	0xAD
 }
 
 # 4328 5G RX power offset, 1 byte
 i8 rxpo5g {
-	sfmt	sdec
+	sfmt	decimal
 	srom 3	0x5A
 	srom 8-10	0xAC
 }
@@ -1035,17 +1035,17 @@ u8 tempthresh {
 	srom >= 11	0xAE
 }
 u8 temps_period {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	0xBC (&0xF)
 	srom >= 11	0xB8 (&0xF)
 }
 u8 temps_hysteresis {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	0xBC (&0xF0, >>4)
 	srom >= 11	0xB8 (&0xF0, >>4)
 }
 u8 tempoffset {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	0xB3
 	srom >= 11	0xAF
 }
@@ -1062,7 +1062,7 @@ u8 tempsense_option {
 	srom >= 11	0xB2 (&0x3)
 }
 u8 phycal_tempdelta {
-	sfmt	sdec
+	sfmt	decimal
 	srom 8-10	0xBD
 	srom >= 11	0xB9
 }
@@ -1106,7 +1106,7 @@ u16 rpcal5gb3 {
 
 # 4 byte Crystal frequency in kilohertz
 u32 xtalfreq {
-	sfmt	sdec
+	sfmt	decimal
 	srom >= 11	u16 0xB4
 }
 
