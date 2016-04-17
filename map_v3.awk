@@ -63,8 +63,9 @@ BEGIN {
 	SROM_OFF_REGEX	= "("TYPES_REGEX"|"HEX_REGEX")"
 
 	# Parser states types
+	ST_STRUCT_BLOCK	= "struct"	# struct block
 	ST_VAR_BLOCK	= "var"		# variable block
-	ST_SROM_DEF	= "srom"	# srom offset defn
+	ST_SROM_DEFN	= "srom"	# srom offset defn
 	ST_NONE		= "NONE"	# default state
 
 	# Property types
@@ -104,6 +105,7 @@ BEGIN {
 	VAR_NAME	= "v_name"
 	VAR_TYPE	= "v_type"
 	VAR_FMT		= "v_fmt"
+	VAR_STRUCT	= "v_parent_struct"
 	VAR_PRIVATE	= "v_private"
 	VAR_ARRAY	= "v_array"
 	VAR_IGNALL1	= "v_ignall1"
@@ -150,7 +152,7 @@ function gen_var_head (v, suffix)
 function gen_var_rev_body (v, revk, base_addr)
 {
 	if (base_addr != null)
-		base_addr = base_addr"+"
+		base_addr = base_addr" + "
 	else
 		base_addr = ""
 
@@ -213,6 +215,68 @@ function gen_var_tail (v, num_revs)
 	printi("}, " num_revs "},\n")
 }
 
+# generate a complete set of variable definitions for struct variable `v`.
+function gen_struct_var (v)
+{
+	st = vars[v,VAR_STRUCT]
+	st_max_off = 0
+
+	# determine the total number of variables to generate
+	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
+		srevk = subkey(st, REV, srev"")
+		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
+			if (off > st_max_off)
+				st_max_off = off
+		}
+	}
+
+	# generate variables for each defined struct offset
+	for (off = 0; off < st_max_off; off++) {
+		st_rev_count = 0
+		gen_var_head(v, off"")
+
+		for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
+			srevk = subkey(st, REV, srev"")
+
+			# Skip offsets not defined for this revision
+			if (off > structs[srevk,REV_NUM_OFFS])
+				continue
+
+			offk = subkey(srevk, OFF, off"")
+			base_addr = structs[offk,SEG_ADDR]
+
+			for (vrev = 0; vrev < vars[v,NUM_REVS]; vrev++) {
+				vrevk = subkey(v, REV, vrev"")
+				v_start = vars[vrevk,REV_START]
+				v_end = vars[vrevk,REV_END]
+				s_start = structs[srevk,REV_START]
+				s_end = structs[srevk,REV_END]
+
+				# XXX we don't support computing the union
+				# of partially overlapping ranges
+				if ((v_start < s_start && v_end >= s_start) ||
+				    (v_start <= s_end && v_end > s_end))
+				{
+					errorx("partially overlapping " \
+					    "revision ranges are not supported")
+				}
+
+				# skip variables revs that are not within
+				# the struct offset's compatibility range
+				if (v_start < s_start || v_start > s_end ||
+				    v_end < s_start || v_end > s_end)
+					continue
+
+				st_rev_count++
+				gen_var_rev_body(v, vrevk, base_addr)
+			}
+		}
+
+		gen_var_tail(v, st_rev_count)
+	}
+}
+
+
 END {
 	# skip completion handling if exiting from an error
 	if (_EARLY_EXIT)
@@ -228,9 +292,13 @@ END {
 	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
 	output_depth = 1
 	for (v in var_names) {
-		gen_var_head(v)
-		gen_var_body(v)
-		gen_var_tail(v, vars[v,NUM_REVS])
+		if (vars[v,VAR_STRUCT] != null) {
+			gen_struct_var(v)
+		} else {
+			gen_var_head(v)
+			gen_var_body(v)
+			gen_var_tail(v, vars[v,NUM_REVS])
+		}
 	}
 	output_depth = 0
 	printf("};\n")
@@ -553,21 +621,82 @@ function in_nested_state (type)
 function allow_def (type)
 {
 	if (type == ST_VAR_BLOCK) {
+		return (in_state(ST_NONE) || in_state(ST_STRUCT_BLOCK))
+	} else if (type == ST_STRUCT_BLOCK) {
 		return (in_state(ST_NONE))
-	} else if (type == ST_SROM_DEF) {
-		return (in_state(ST_VAR_BLOCK))
+	} else if (type == ST_SROM_DEFN) {
+		return (in_state(ST_VAR_BLOCK) || in_state(ST_STRUCT_BLOCK))
 	}
 
 	error("unknown type '" type "'")
 }
 
+# struct definition
+$1 == ST_STRUCT_BLOCK && allow_def($1) {
+	name = $2
+
+	# Remove array[] specifier
+	if (sub(/\[\]$/, "", name) == 0)
+		error("expected '" name "[]', not '" name "'")
+
+	if (name !~ IDENT_REGEX || name ~ TYPES_REGEX)
+		error("invalid identifier '" name "'")
+
+	# Add top-level struct entry 
+	if ((name,DEF_LINE) in structs) 
+		error("struct identifier '" name "' previously defined on " \
+		    "line " structs[name,DEF_LINE])
+	structs[name,DEF_LINE] = NR
+	structs[name,NUM_REVS] = 0
+
+	# Open the block 
+	debug("struct " name " {")
+	open_block(ST_STRUCT_BLOCK, name)
+}
+
+# struct srom descriptor
+$1 == ST_SROM_DEFN && allow_def(ST_SROM_DEFN) && in_state(ST_STRUCT_BLOCK) {
+	sid = g(STATE_IDENT)
+
+	# parse revision descriptor
+	rev_desc[REV_START] = 0
+	parse_revdesc(rev_desc)
+
+	# assign revision id
+	rev = structs[sid,NUM_REVS] ""
+	revk = subkey(sid, REV, rev)
+	structs[sid,NUM_REVS]++
+
+	# init basic revision state
+	structs[revk,REV_START] = rev_desc[REV_START]
+	structs[revk,REV_END] = rev_desc[REV_END]
+
+	if (match($0, "\\[[^]]*\\]") <= 0)
+		error("expected base address array")
+
+	addrs_str = substr($0, RSTART+1, RLENGTH-2)
+	num_offs = split(addrs_str, addrs, ",[ \t]*")
+	structs[revk, REV_NUM_OFFS] = num_offs
+	for (i = 1; i <= num_offs; i++) {
+		offk = subkey(revk, OFF, (i-1) "")
+
+		if (addrs[i] !~ HEX_REGEX)
+			error("invalid base address '" addrs[i] "'")
+
+		structs[offk,SEG_ADDR] = addrs[i]
+	}
+
+	debug("struct_srom " structs[revk,REV_START] "... [" addrs_str "]")
+	next
+}
+
 # close any previous srom revision descriptor
-$1 == "srom" && in_state(ST_SROM_DEF) {
+$1 == ST_SROM_DEFN && in_state(ST_SROM_DEFN) {
 	pop_state()
 }
 
 # open a new srom revision descriptor
-$1 == "srom" && allow_def(ST_SROM_DEF) {
+$1 == ST_SROM_DEFN && allow_def(ST_SROM_DEFN) {
 	# parse revision descriptor
 	parse_revdesc(rev_desc)
 
@@ -589,7 +718,7 @@ $1 == "srom" && allow_def(ST_SROM_DEF) {
 	vars[revk,REV_NUM_OFFS] = 0
 
 	debug("srom " rev_desc[REV_START] "-" rev_desc[REV_END] " {")
-	push_state(ST_SROM_DEF, null, 0)
+	push_state(ST_SROM_DEFN, null, 0)
 
 	# seek to the first offset definition
 	do {
@@ -697,7 +826,7 @@ function parse_offset_segment (revk, offk)
 }
 
 # revision offset definition
-$1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEF) {
+$1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEFN) {
 	vid = g(STATE_IDENT)
 
 	# fetch rev id/key defined by our parent block
@@ -773,6 +902,14 @@ $1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEF) {
 	open_block(ST_VAR_BLOCK, name)
 
 	debug("type=" DTYPE[base_type])
+
+	if (in_nested_state(ST_STRUCT_BLOCK)) {
+		# Fetch the enclosing struct's name
+		sid = g(STATE_IDENT, 1)
+
+		# Mark as a struct-based variable
+		vars[name,VAR_STRUCT] = sid
+	}
 }
 
 # variable parameters
