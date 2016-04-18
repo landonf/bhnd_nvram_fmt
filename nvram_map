@@ -1,3 +1,35 @@
+#-
+# Copyright (c) 2015-2016 Landon Fuller <landon@landonf.org>
+# Copyright (C) 2008-2015, Broadcom Corporation.
+# All Rights Reserved.
+# 
+# The contents of this file (variable names, descriptions, and offsets) were
+# extracted or derived from Broadcom's ISC-licensed sources.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+# SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+# OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+# CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#
+# $FreeBSD$
+
+#
+# NVRAM variable definitions and revision-specific SPROM offsets.
+#
+# Processed by nvram_map_gen.awk to produce bhnd_nvram_map.h
+#
+# NOTE: file was originally generated automatically by using libclang
+# to analyze and extract format information and descriptions from Broadcom's
+# available ISC-licensed CIS and SROM code and associated headers.
+#
+
 # Antennas available
 u8 aa2g {
 	srom 1-3	0x5C (&0x30, >>4)
@@ -29,8 +61,6 @@ u16[12] pa5gbw4080a0 {
 u16[12] pa5gbw4080a1 {
 	srom >= 11	u16 0xB6, u16 0xBC, u16 0xCE, u16 0xD4, u16[8] 0x128
 }
-
-# ACPHY PA parameters: chain 0
 
 # ACPHY PA trimming parameters: CCK
 u16[3] pa2gccka0 {
@@ -154,17 +184,17 @@ u8 aga2 {
 	srom >= 11	0xA7
 }
 
-# board flags (2 or 4 bytes)
+# board flags
 u32 boardflags {
-	srom 1	u16 0x72
-	srom 2	u16 0x72 | u16 0x38 (<<16)
-	srom 3	u16 0x72 | u16 0x7A (<<16)
-	srom 4	0x44
+	srom 1		u16 0x72
+	srom 2		u16 0x72 | u16 0x38 (<<16)
+	srom 3		u16 0x72 | u16 0x7A (<<16)
+	srom 4		0x44
 	srom 5-7	0x4A
 	srom >= 8	0x84
 }
 u32 boardflags2 {
-	srom 4	0x48
+	srom 4		0x48
 	srom 5-7	0x4E
 	srom >= 8	0x88
 }
@@ -175,8 +205,8 @@ u32 boardflags3 {
 # board serial number, independent of mac addr
 u16 boardnum {
 	srom 1-2	0x4C
-	srom 3	0x4E
-	srom 4	0x50
+	srom 3		0x4E
+	srom 4		0x50
 	srom 5-7	0x56
 	srom 8-10	0x90
 	srom >= 11	0x94
@@ -196,7 +226,7 @@ u16 boardtype {
 
 # Default country code (sromrev == 1)
 u8 cc {
-	srom 1	0x5C (&0xF)
+	srom 1		0x5C (&0xF)
 }
 
 # 2 bytes each
@@ -216,9 +246,9 @@ u16 cckbw20ul2gpo {
 # in rev 2
 # 
 char[2] ccode {
-	sfmt	ccode
+	sfmt ccode
 	srom 0-3	0x76
-	srom 4	0x52
+	srom 4		0x52
 	srom 5-7	0x44
 	srom 8-10	0x92
 	srom >= 11	0x96
@@ -244,7 +274,7 @@ u16 antswitch {
 	srom >= 11	u8 0xA8
 }
 
-# Two 16bit values: PCI vendor & device id
+# PCI device id
 private u16 devid {
 	srom >= 8	u16 0x60
 }
@@ -257,7 +287,7 @@ u8 elna5g {
 	srom 8-10	0xBA
 }
 
-# 2 or 4 byte: 11n frontend specification
+# 11n front-end specification
 u8 antswctl2g {
 	srom 8-10	0xAE (&0xF8, >>3)
 }
@@ -291,57 +321,57 @@ u8 tssipos5g {
 
 # FEM config
 u8 femctrl {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAA (&0xF8, >>3)
 }
 u8 papdcap2g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAA (&0x4, >>2)
 }
 u8 tworangetssi2g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAA (&0x2, >>1)
 }
 u8 pdgain2g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	u16 0xAA (&0x1F0, >>4)
 }
 u8 epagain2g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAB (&0xE, >>1)
 }
 u8 tssiposslope2g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAB (&0x1)
 }
 u8 gainctrlsph {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAC (&0xF8, >>3)
 }
 u8 papdcap5g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAC (&0x4, >>2)
 }
 u8 tworangetssi5g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAC (&0x2, >>1)
 }
 u8 pdgain5g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	u16 0xAC (&0x1F0, >>4)
 }
 u8 epagain5g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAD (&0xE, >>1)
 }
 u8 tssiposslope5g {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0xAD (&0x1)
 }
 
-# 2 bytes; LED duty cycle
+# LED duty cycle
 u8[2] leddc {
-	sfmt	leddc
+	sfmt leddc
 	all1	ignore
 	srom 3	0x7C
 	srom 4	0x5A
@@ -354,7 +384,7 @@ u8[2] leddc {
 u8 ledbh0 {
 	all1	ignore
 	srom 1-3	0x65
-	srom 4	0x57
+	srom 4		0x57
 	srom 5-7	0x77
 	srom 8-10	0x97
 	srom >= 11	0x9B
@@ -362,7 +392,7 @@ u8 ledbh0 {
 u8 ledbh1 {
 	all1	ignore
 	srom 1-3	0x64
-	srom 4	0x56
+	srom 4		0x56
 	srom 5-7	0x76
 	srom 8-10	0x96
 	srom >= 11	0x9A
@@ -370,7 +400,7 @@ u8 ledbh1 {
 u8 ledbh2 {
 	all1	ignore
 	srom 1-3	0x67
-	srom 4	0x59
+	srom 4		0x59
 	srom 5-7	0x79
 	srom 8-10	0x99
 	srom >= 11	0x9D
@@ -378,7 +408,7 @@ u8 ledbh2 {
 u8 ledbh3 {
 	all1	ignore
 	srom 1-3	0x66
-	srom 4	0x58
+	srom 4		0x58
 	srom 5-7	0x78
 	srom 8-10	0x98
 	srom >= 11	0x9C
@@ -434,9 +464,9 @@ u32 legofdmbw20ul5ghpo {
 
 # mac addr override for the standard CIS LAN_NID
 u8[48] macaddr {
-	sfmt	macaddr
-	srom 3	0x4A
-	srom 4	0x4C
+	sfmt macaddr
+	srom 3		0x4A
+	srom 4		0x4C
 	srom 5-7	0x52
 	srom 8-10	0x8C
 	srom >= 11	0x90
@@ -536,36 +566,36 @@ u16 rawtempsense {
 }
 
 u8 noiselvl2ga0 {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	0x1AB (&0x1F)
 	srom >= 11	0x1BD (&0x1F)
 }
 u8 noiselvl2ga1 {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	u16 0x1AA (&0x3E0, >>5)
 	srom >= 11	u16 0x1BC (&0x3E0, >>5)
 }
 u8 noiselvl2ga2 {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	0x1AA (&0x7C, >>2)
 	srom >= 11	0x1BC (&0x7C, >>2)
 }
 u8[4] noiselvl5ga0 {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	u8 0x1BF (&0x1F), u8 0x1C1 (&0x1F), u8 0x1C3 (&0x1F), u8 0x1C5 (&0x1F)
 }
 u8[4] noiselvl5ga1 {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	u16[4] 0x1BE (&0x3E0, >>5)
 }
 u8[4] noiselvl5ga2 {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	u8 0x1BE (&0x7C, >>2), u8 0x1C0 (&0x7C, >>2), u8 0x1C2 (&0x7C, >>2), u8 0x1C4 (&0x7C, >>2)
 }
 
 # paparambwver
 u8 paparambwver {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	0x190 (&0xF0, >>4)
 }
 
@@ -573,27 +603,27 @@ u8 paparambwver {
 # or 9 (sromrev > 1) bytes
 # 
 u16 pa0b0 {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x5E
 	srom 8-10	0xC2
 }
 u16 pa0b1 {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x60
 	srom 8-10	0xC4
 }
 u16 pa0b2 {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x62
 	srom 8-10	0xC6
 }
 u8 pa0itssit {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x71
 	srom 8-10	0xC0
 }
 u8 pa0maxpwr {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x69
 	srom 8-10	0xC1
 }
@@ -604,67 +634,67 @@ u8 opo {
 
 # 5G PA params
 u16 pa1b0 {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x6A
 	srom 8-10	0xCC
 }
 u16 pa1b1 {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x6C
 	srom 8-10	0xCE
 }
 u16 pa1b2 {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x6E
 	srom 8-10	0xD0
 }
 u16 pa1lob0 {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x3C
 	srom 8-10	0xD2
 }
 u16 pa1lob1 {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x3E
 	srom 8-10	0xD4
 }
 u16 pa1lob2 {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x40
 	srom 8-10	0xD6
 }
 u16 pa1hib0 {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x42
 	srom 8-10	0xD8
 }
 u16 pa1hib1 {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x44
 	srom 8-10	0xDA
 }
 u16 pa1hib2 {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x46
 	srom 8-10	0xDC
 }
 u8 pa1itssit {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x70
 	srom 8-10	0xC8
 }
 u8 pa1maxpwr {
-	sfmt	decimal
+	sfmt decimal
 	srom 1-3	0x68
 	srom 8-10	0xC9
 }
 u8 pa1lomaxpwr {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x3A
 	srom 8-10	0xCA
 }
 u8 pa1himaxpwr {
-	sfmt	decimal
+	sfmt decimal
 	srom 2-3	0x3B
 	srom 8-10	0xCB
 }
@@ -701,19 +731,19 @@ u8 pdoffset2g40mvalid {
 	srom >= 11	0xC8 (&0x80, >>7)
 }
 
-# 2 bytes: 40Mhz channel 2g/5g power offset
+# 40Mhz channel 2g/5g power offset
 u16 bw40po {
 	srom 4-7	0x18E
 	srom 8	0x196
 }
 
-# 2 bytes: 40Mhz channel dup 2g/5g power offset
+# 40Mhz channel dup 2g/5g power offset
 u16 bwduppo {
 	srom 4-7	0x190
 	srom 8	0x198
 }
 
-# 6 or 18 bytes: cck2g/ofdm2g/ofdm5g power offset
+# cck2g/ofdm2g/ofdm5g power offset
 u16 cck2gpo {
 	srom 4-7	0x138
 	srom 8	0x140
@@ -735,13 +765,13 @@ u32 ofdm5ghpo {
 	srom 8	0x14E
 }
 
-# 2 bytes: cdd2g/5g power offset
+# cdd2g/5g power offset
 u16 cddpo {
 	srom 4-7	0x18A
 	srom 8	0x192
 }
 
-# 8 bytes: mcs2g power offset
+# mcs2g power offset
 u16 mcs2gpo0 {
 	srom 4-7	0x14A
 	srom 8	0x152
@@ -775,7 +805,7 @@ u16 mcs2gpo7 {
 	srom 8	0x160
 }
 
-# 16 bytes: mcs5g low-high band power offset
+# mcs5g low-high band power offset
 u16 mcs5glpo0 {
 	srom 4-7	0x16A
 	srom 8	0x172
@@ -841,7 +871,7 @@ u16 mcs5ghpo7 {
 	srom 8	0x190
 }
 
-# 8 bytes: mcs5g mid band power offset
+# mcs5g mid band power offset
 u16 mcs5gpo0 {
 	srom 4-7	0x15A
 	srom 8	0x162
@@ -875,13 +905,12 @@ u16 mcs5gpo7 {
 	srom 8	0x170
 }
 
-# 2 bytes: stbc2g/5g power offset
+# stbc2g/5g power offset
 u16 stbcpo {
 	srom 4-7	0x18C
 	srom 8	0x194
 }
 
-# 1 byte;
 u8 regrev {
 	srom 3	0x78
 	srom 4	0x55
@@ -988,21 +1017,20 @@ u8 rxgainerr5gua2 {
 	srom 8-10	0x1A2 (&0xF8, >>3)
 }
 
-# 4328 2G RX power offset, 1 byte
+# 4328 2G RX power offset
 i8 rxpo2g {
-	sfmt	decimal
+	sfmt decimal
 	srom 3	0x5B
 	srom 8-10	0xAD
 }
 
-# 4328 5G RX power offset, 1 byte
+# 4328 5G RX power offset
 i8 rxpo5g {
-	sfmt	decimal
+	sfmt decimal
 	srom 3	0x5A
 	srom 8-10	0xAC
 }
 
-# subband5gver
 u16 subband5gver {
 	srom 8-10	u8 0x1A5 (&0x7)
 	srom >= 11	0xD6
@@ -1017,17 +1045,17 @@ u8 tempthresh {
 	srom >= 11	0xAE
 }
 u8 temps_period {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	0xBC (&0xF)
 	srom >= 11	0xB8 (&0xF)
 }
 u8 temps_hysteresis {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	0xBC (&0xF0, >>4)
 	srom >= 11	0xB8 (&0xF0, >>4)
 }
 u8 tempoffset {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	0xB3
 	srom >= 11	0xAF
 }
@@ -1044,7 +1072,7 @@ u8 tempsense_option {
 	srom >= 11	0xB2 (&0x3)
 }
 u8 phycal_tempdelta {
-	sfmt	decimal
+	sfmt decimal
 	srom 8-10	0xBD
 	srom >= 11	0xB9
 }
@@ -1086,9 +1114,9 @@ u16 rpcal5gb3 {
 	srom >= 11	0x18C
 }
 
-# 4 byte Crystal frequency in kilohertz
+# Crystal frequency in kilohertz
 u32 xtalfreq {
-	sfmt	decimal
+	sfmt decimal
 	srom >= 11	u16 0xB4
 }
 
@@ -1142,12 +1170,11 @@ u8 txpid5gla3 {
 	srom 4-7	0x6C
 }
 
-# SROM variables not supported by CIS
 u16 cckPwrOffset {
 	srom 10	0x1B4
 }
 u8[48] et1macaddr {
-	sfmt	macaddr
+	sfmt macaddr
 	srom 0-2	0x54
 }
 u8 eu_edthresh2g {
@@ -1169,12 +1196,13 @@ u8 hw_iqcal_en {
 	srom 8-10	0xB9 (&0x20, >>5)
 }
 u8[48] il0macaddr {
-	sfmt	macaddr
+	sfmt macaddr
 	srom 0-2	0x48
 }
 u8 iqcal_swp_dis {
 	srom 8-10	0xB9 (&0x10, >>4)
 }
+
 u8 noisecaloffset {
 	srom 8-9	0x1B5
 }
@@ -1217,9 +1245,11 @@ u8 noiselvl5gua1 {
 u8 noiselvl5gua2 {
 	srom 8-10	0x1B2 (&0x7C, >>2)
 }
+
 u8 pcieingress_war {
 	srom 8-10	0x1A7 (&0xF)
 }
+
 u8 pdoffsetcckma0 {
 	srom >= 11	0x18F (&0xF)
 }
@@ -1229,6 +1259,7 @@ u8 pdoffsetcckma1 {
 u8 pdoffsetcckma2 {
 	srom >= 11	0x18E (&0xF)
 }
+
 u8 sar2g {
 	srom 9-10	0x1A9
 	srom >= 11	0x1BB
@@ -1237,18 +1268,22 @@ u8 sar5g {
 	srom 9-10	0x1A8
 	srom >= 11	0x1BA
 }
+
 u16 subvid {
 	srom >= 2	0x6
 }
+
 u32[5] swctrlmap_2g {
 	srom 10	u32[4] 0x1B8, u16 0x1C8
 }
+
 u16 tssifloor2g {
 	srom >= 11	0xBE (&0x3FF)
 }
 u16[4] tssifloor5g {
 	srom >= 11	0xC0 (&0x3FF)
 }
+
 u8 txidxcap2g {
 	srom >= 11	u16 0x1A8 (&0xFF0, >>4)
 }
@@ -1256,12 +1291,25 @@ u8 txidxcap5g {
 	srom >= 11	u16 0x1AC (&0xFF0, >>4)
 }
 
+#
+# Any variables defined within a `struct` block will be interpreted relative to
+# the provided array of SPROM base addresses; this is used to define
+# a common layout defined at the given base addresses.
+#
+# To produce SPROM variable names matching those used in the Broadcom HND
+# ASCII 'key=value\0' NVRAM, the index number of the variable's
+# struct instance will be appended (e.g., given a variable of noiselvl5ga, the
+# generated variable instances will be named noiselvl5ga0, noiselvl5ga1,
+# noiselvl5ga2, noiselvl5ga3 ...)
+#
+
+# PHY chain[0-4] parameters
 struct phy_chains[] {
 	srom 4-7	[0x080, 0x0AE, 0x0DC, 0x10A]
 	srom 8-10	[0x0C0, 0x0E0, 0x100, 0x120]
 	srom >= 11	[0x0D8, 0x100, 0x128]
 
-	# ACPHY PA parameters: chain 0
+	# AC-PHY PA parameters
 	u8[4] maxp5ga {
 		srom 4-7	u8 0xB
 		srom 8-10	u8 0x9
@@ -1277,10 +1325,9 @@ struct phy_chains[] {
 	}
 	u16[12] pa5ga {
 		srom >= 11	0x10
-	}
-	
+	}	
 
-	# ACPHY rxgains: chain 0
+	# AC-PHY rxgains
 	u8 rxgains5ghtrelnabypa {
 		srom >= 11	0x8 (&0x80, >>7)
 	}
@@ -1317,9 +1364,8 @@ struct phy_chains[] {
 	u8 rxgains5ghtrisoa {
 		srom >= 11	0x8 (&0x78, >>3)
 	}
-	
 
-	# 8 or 30 bytes: 11n pa paramater for chain 0
+	# 11n PA parameters
 	u16 pa5gw2a {
 		srom 4-7	0x12
 		srom 8-10	0x10
@@ -1396,6 +1442,4 @@ struct phy_chains[] {
 		srom 4-7	0x0
 		srom 8-10	0x0
 	}
-	
-
 }
