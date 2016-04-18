@@ -164,7 +164,7 @@ void genmap::generate(const compat_range &range) {
         bool sprommmmed = false;
         for (const auto &v : *vs->vars()) {
             for (const auto &so : *v->sprom_offsets()) {
-                if (so.compat().overlaps(range)) {
+                if (so.compat().overlaps(range) && _nv._struct_vars.count(v->name()) == 0) {
                     sprommmmed = true;
                     break;
                 }
