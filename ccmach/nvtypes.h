@@ -597,6 +597,10 @@ class var_set {
 public:
     bool hasCommonCompatRange ();
     compat_range getCommonCompatRange ();
+    
+    bool hasUsefulComment () {
+        return comment().size() > 0;
+    }
 };
 
 class phy {

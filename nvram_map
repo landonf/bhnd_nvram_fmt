@@ -32,10 +32,6 @@ u16[12] pa5gbw4080a1 {
 
 # ACPHY PA parameters: chain 0
 
-# ACPHY PA parameters: chain 1
-
-# ACPHY PA parameters: chain 2
-
 # ACPHY PA trimming parameters: CCK
 u16[3] pa2gccka0 {
 	srom >= 11	0x102
@@ -118,12 +114,6 @@ u16 dot11agduphrpo {
 u16 dot11agduplrpo {
 	srom >= 11	0x1B4
 }
-
-# ACPHY rxgains: chain 0
-
-# ACPHY rxgains: chain 1
-
-# ACPHY rxgains: chain 2
 
 # Antenna gain
 u8 ag0 {
@@ -678,14 +668,6 @@ u8 pa1himaxpwr {
 	srom 2-3	0x3B
 	srom 8-10	0xCB
 }
-
-# 8 or 30 bytes: 11n pa paramater for chain 0
-
-# 8 or 30 bytes: 11n pa paramater for chain 1
-
-# 8 or 30 bytes: 11n pa paramater for chain 2
-
-# 8 or 30 bytes: 11n pa paramater for chain 3
 
 u16 pdoffset40ma0 {
 	srom >= 11	0xCA
@@ -1279,6 +1261,26 @@ struct phy_chains[] {
 	srom 8-10	[0x0C0, 0x0E0, 0x100, 0x120]
 	srom >= 11	[0x0D8, 0x100, 0x128]
 
+	# ACPHY PA parameters: chain 0
+	u8[4] maxp5ga {
+		srom 4-7	u8 0xB
+		srom 8-10	u8 0x9
+		srom >= 11	u8 0xD, u8 0xC, u8 0xF, u8 0xE
+	}
+	u16[3] pa2ga {
+		srom >= 11	0x2
+	}
+	u8 maxp2ga {
+		srom 4-7	0x1
+		srom 8-10	0x1
+		srom >= 11	0x1
+	}
+	u16[12] pa5ga {
+		srom >= 11	0x10
+	}
+	
+
+	# ACPHY rxgains: chain 0
 	u8 rxgains5ghtrelnabypa {
 		srom >= 11	0x8 (&0x80, >>7)
 	}
@@ -1300,11 +1302,24 @@ struct phy_chains[] {
 	u8 rxgains5gmelnagaina {
 		srom >= 11	0x9 (&0x7)
 	}
-	u8[4] maxp5ga {
-		srom 4-7	u8 0xB
-		srom 8-10	u8 0x9
-		srom >= 11	u8 0xD, u8 0xC, u8 0xF, u8 0xE
+	u8 rxgains2gelnagaina {
+		srom >= 11	0xB (&0x7)
 	}
+	u8 rxgains5gtrisoa {
+		srom >= 11	0xA (&0x78, >>3)
+	}
+	u8 rxgains5gtrelnabypa {
+		srom >= 11	0xA (&0x80, >>7)
+	}
+	u8 rxgains2gtrisoa {
+		srom >= 11	0xB (&0x78, >>3)
+	}
+	u8 rxgains5ghtrisoa {
+		srom >= 11	0x8 (&0x78, >>3)
+	}
+	
+
+	# 8 or 30 bytes: 11n pa paramater for chain 0
 	u16 pa5gw2a {
 		srom 4-7	0x12
 		srom 8-10	0x10
@@ -1312,9 +1327,6 @@ struct phy_chains[] {
 	u16 pa5ghw1a {
 		srom 4-7	0x20
 		srom 8-10	0x1A
-	}
-	u8 rxgains2gelnagaina {
-		srom >= 11	0xB (&0x7)
 	}
 	u16 pa5glw3a {
 		srom 4-7	0x1C
@@ -1334,9 +1346,6 @@ struct phy_chains[] {
 	u16 pa5gw3a {
 		srom 4-7	0x14
 	}
-	u16[3] pa2ga {
-		srom >= 11	0x2
-	}
 	u16 pa5glw2a {
 		srom 4-7	0x1A
 		srom 8-10	0x16
@@ -1348,20 +1357,9 @@ struct phy_chains[] {
 		srom 4-7	0xE
 		srom 8-10	0xC
 	}
-	u8 maxp2ga {
-		srom 4-7	0x1
-		srom 8-10	0x1
-		srom >= 11	0x1
-	}
-	u16[12] pa5ga {
-		srom >= 11	0x10
-	}
 	u8 maxp5gha {
 		srom 4-7	0xD
 		srom 8-10	0xB
-	}
-	u8 rxgains5gtrisoa {
-		srom >= 11	0xA (&0x78, >>3)
 	}
 	u16 pa5ghw2a {
 		srom 4-7	0x22
@@ -1370,9 +1368,6 @@ struct phy_chains[] {
 	u16 pa5ghw0a {
 		srom 4-7	0x1E
 		srom 8-10	0x18
-	}
-	u8 rxgains5gtrelnabypa {
-		srom >= 11	0xA (&0x80, >>7)
 	}
 	u16 pa2gw3a {
 		srom 4-7	0x8
@@ -1389,15 +1384,9 @@ struct phy_chains[] {
 		srom 4-7	0x2
 		srom 8-10	0x2
 	}
-	u8 rxgains2gtrisoa {
-		srom >= 11	0xB (&0x78, >>3)
-	}
 	u8 maxp5gla {
 		srom 4-7	0xC
 		srom 8-10	0xA
-	}
-	u8 rxgains5ghtrisoa {
-		srom >= 11	0x8 (&0x78, >>3)
 	}
 	u8 itt5ga {
 		srom 4-7	0xA
@@ -1407,4 +1396,6 @@ struct phy_chains[] {
 		srom 4-7	0x0
 		srom 8-10	0x0
 	}
+	
+
 }

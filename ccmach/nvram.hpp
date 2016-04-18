@@ -72,12 +72,6 @@ private:
 		}
 	}
 	
-	void alpha_sort (std::vector<string> &v) {
-		sort(v.begin(), v.end(), [](const string &lhs, string &rhs) {
-			return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
-		});
-	}
-	
 	const cis_layout &get_layout (const symbolic_constant &tag, ftl::maybe<symbolic_constant> &hnbu_tag) {
 		for (const auto &l : _cis_layouts) {
 			if (l.code() == tag && l.hnbu_tag() == hnbu_tag)
@@ -115,6 +109,12 @@ private:
 	}
 public:
 	vector<shared_ptr<var_set>> var_sets ();
+	
+	static void alpha_sort (std::vector<string> &v) {
+		sort(v.begin(), v.end(), [](const string &lhs, string &rhs) {
+			return ([@(lhs.c_str()) compare: @(rhs.c_str()) options: NSCaseInsensitiveSearch|NSNumericSearch] == NSOrderedAscending);
+		});
+	}
 	
 	nvram_map (const vector<shared_ptr<var>> &srom_vars,
 		   const vector<struct_defn> &struct_defs,

@@ -101,6 +101,21 @@ void genmap::emit_offset (const string &src, const string &vtype, const nv_offse
         printf("\n");
 
 }
+	
+shared_ptr<var_set> genmap::find_structvar_set(const shared_ptr<var> &v) {
+	auto vsets = _nv.var_sets();
+	auto vset_vname = v->name() + "0";
+	
+	for (const auto &vs : vsets) {
+		for (const auto &vsvar : *vs->vars()) {
+			if (vsvar->name() == vset_vname)
+				return (vs);
+		}
+	}
+
+	/* var missing a vset! */
+	abort();
+}
 
 void genmap::emit_var(const shared_ptr<var> &v, compat_range range, bool skip_rdesc) {
 	size_t num_offs = 0;
@@ -157,6 +172,10 @@ void genmap::emit_var(const shared_ptr<var> &v, compat_range range, bool skip_rd
 		printf(" }\n");
 	}
 }
+	
+static string formatComment (const string &comment) {
+	return string("# ") + [@(comment.c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String;
+}
 
 void genmap::generate(const compat_range &range) {
     auto vsets = _nv.var_sets();
@@ -189,9 +208,9 @@ void genmap::generate(const compat_range &range) {
             continue;
 #endif
 	    
-        if (vs->comment().size() > 0 && vs->comment() != vs->name())
-            println("# %s", [@(vs->comment().c_str()) stringByReplacingOccurrencesOfString:@"\n" withString:@"\n# "].UTF8String);
-	    
+        if (vs->hasUsefulComment())
+            println("%s", formatComment(vs->comment()).c_str());
+
         NSString *sectName = @(vs->name().c_str());
         if ([sectName hasPrefix: @"HNBU_"])
             sectName = [[sectName substringFromIndex: 5] lowercaseString];
@@ -242,6 +261,10 @@ void genmap::generate(const compat_range &range) {
 		bool skip_rdesc = false;
 
 		prints("struct %s[]", sdef.name().c_str(), ^{
+			vector<string> vset_names;
+			unordered_map<string, shared_ptr<var_set>> vsets;
+			unordered_map<string, shared_ptr<vector<shared_ptr<var>>>> var_vset;
+			
 			for (const auto &bas : *sdef.base_addrs()) {
 				const auto &compat = std::get<0>(bas);
 				const auto &addrs = std::get<1>(bas);
@@ -256,11 +279,36 @@ void genmap::generate(const compat_range &range) {
 				printf("]\n");
 			}
 			printf("\n");
-			
-			// TODO: group by varset and emit comments?
+
+			/* Map struct variables to real variable sets */
 			for (const auto &v : *sdef.variables()) {
-				emit_var(v, range, skip_rdesc);
+				const auto &vs = find_structvar_set(v);
+				
+				if (vsets.count(vs->name()) == 0) {
+					vsets.insert({vs->name(), vs});
+					var_vset.insert({vs->name(), make_shared<vector<shared_ptr<var>>>()});
+					vset_names.push_back(vs->name());
+				}
+				
+				var_vset.at(vs->name())->push_back(v);
 			}
+
+			/* Emit variables grouped by vset */
+			_nv.alpha_sort(vset_names);
+			for (const auto &vsname : vset_names) {
+				const auto &vs = vsets.at(vsname);
+				const auto &vars = var_vset.at(vsname);
+				
+				if (vs->hasUsefulComment())
+					println("%s", formatComment(vs->comment()).c_str());
+				
+				for (const auto &v : *vars) {
+					emit_var(v, range, skip_rdesc);
+				}
+				
+				println("\n");
+			}
+
 		});
 
 	}
