@@ -1,8 +1,34 @@
 #!/usr/bin/awk -f
 
 #-
-#Copyright...
-
+# Copyright (c) 2015-2016 Landon Fuller <landon@landonf.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer,
+#    without modification.
+# 2. Redistributions in binary form must reproduce at minimum a disclaimer
+#    similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+#    redistribution must be conditioned upon including a substantially
+#    similar Disclaimer requirement for further binary redistribution.
+#
+# NO WARRANTY
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF NONINFRINGEMENT, MERCHANTIBILITY
+# AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+# THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY,
+# OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+# THE POSSIBILITY OF SUCH DAMAGES.
+# 
+# $FreeBSD$
 
 BEGIN {
 	if (ARGC != 2)
@@ -17,7 +43,7 @@ BEGIN {
 	DEBUG = 0
 
 	# Maximum revision
-	REV_MAX = 65535
+	REV_MAX = 255
 
 	# Format Constants
 	FMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
@@ -104,6 +130,7 @@ BEGIN {
 	# Variable array keys
 	VAR_NAME	= "v_name"
 	VAR_TYPE	= "v_type"
+	VAR_BASE_TYPE	= "v_base_type"
 	VAR_FMT		= "v_fmt"
 	VAR_STRUCT	= "v_parent_struct"
 	VAR_PRIVATE	= "v_private"
@@ -118,7 +145,7 @@ NR == 1 {
 	print " * generated from", FILENAME
 	print " */"
 	print ""
-	print "#include \"ccmach/nvram_map.h\""
+	print "#include <dev/bhnd/nvram/nvramvar.h>"
 }
 
 # return the flag definition for variable `v`
@@ -133,15 +160,18 @@ function gen_var_flags (v)
 
 	if (vars[v,VAR_IGNALL1])
 		_flags[_num_flags++] = "BHND_NVRAM_VF_IGNALL1"
+		
+	if (_num_flags == 0)
+		_flags[_num_flags++] = "0"
 
-	return (join(_flags, ", ", _num_flags))
+	return (join(_flags, "|", _num_flags))
 }
 
 # open a bhnd_nvram_var definition for `v`, with optional name `suffix`.
 function gen_var_head (v, suffix)
 {
 	printi("{\"" v suffix "\", ")
-	printf("%s, ", DTYPE[vars[v,VAR_TYPE]])
+	printf("%s, ", DTYPE[vars[v,VAR_BASE_TYPE]])
 	printf("%s, ", FMT[vars[v,VAR_FMT]])
 	printf("%s, ", gen_var_flags(v))
 	printf("(struct bhnd_sprom_var[]) {\n")
@@ -176,7 +206,7 @@ function gen_var_rev_body (v, revk, base_addr)
 			printf("{%s, %s, %s, %s},\n",
 			    base_addr vars[segk,SEG_ADDR],
 			    vars[segk,SEG_WIDTH],
-    			    vars[segk,SEG_SHIFT],
+			    vars[segk,SEG_SHIFT],
 			    vars[segk,SEG_MASK])
 			num_offs_written++
 		}
@@ -289,7 +319,7 @@ END {
 	}
 
 	# generate output
-	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
+	printf("static const struct bhnd_nvram_var bhnd_nvram_vars[] = {\n")
 	output_depth = 1
 	for (v in var_names) {
 		if (vars[v,VAR_STRUCT] != null) {
@@ -894,6 +924,7 @@ $1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEFN) {
 	vars[name,VAR_NAME] = name
 	vars[name,DEF_LINE] = NR
 	vars[name,VAR_TYPE] = type
+	vars[name,VAR_BASE_TYPE] = base_type
 	vars[name,NUM_REVS] = 0
 	vars[name,VAR_PRIVATE] = private
 	vars[name,VAR_ARRAY] = array
