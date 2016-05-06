@@ -1,9 +1,34 @@
-#!/usr/bin/env LC_ALL=C /usr/bin/awk -f
-# Note: LC_ALL is required to gaurantee stable sort ordering
+#!/usr/bin/awk -f
 
 #-
-#Copyright...
-
+# Copyright (c) 2015-2016 Landon Fuller <landon@landonf.org>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer,
+#    without modification.
+# 2. Redistributions in binary form must reproduce at minimum a disclaimer
+#    similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+#    redistribution must be conditioned upon including a substantially
+#    similar Disclaimer requirement for further binary redistribution.
+#
+# NO WARRANTY
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF NONINFRINGEMENT, MERCHANTIBILITY
+# AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+# THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR SPECIAL, EXEMPLARY,
+# OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+# THE POSSIBILITY OF SUCH DAMAGES.
+# 
+# $FreeBSD$
 
 BEGIN {
 	if (ARGC != 2)
@@ -13,6 +38,7 @@ BEGIN {
 
 	depth = 0
 	symbols[depth,"_file"] = FILENAME
+	num_output_vars = 0
 
 	# Seed rand()
 	srand()
@@ -21,7 +47,7 @@ BEGIN {
 	DEBUG = 0
 
 	# Maximum revision
-	REV_MAX = 65535
+	REV_MAX = 255
 
 	# Format Constants
 	FMT["hex"]	= "BHND_NVRAM_VFMT_HEX"
@@ -31,12 +57,12 @@ BEGIN {
 	FMT["led_dc"]	= "BHND_NVRAM_VFMT_LEDDC"
 
 	# Data Type Constants
-	DTYPE["u8"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["u16"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["u32"]	= "BHND_NVRAM_DT_UINT"
-	DTYPE["i8"]	= "BHND_NVRAM_DT_SINT"
-	DTYPE["i16"]	= "BHND_NVRAM_DT_SINT"
-	DTYPE["i32"]	= "BHND_NVRAM_DT_SINT"
+	DTYPE["u8"]	= "BHND_NVRAM_DT_UINT8"
+	DTYPE["u16"]	= "BHND_NVRAM_DT_UINT16"
+	DTYPE["u32"]	= "BHND_NVRAM_DT_UINT32"
+	DTYPE["i8"]	= "BHND_NVRAM_DT_INT8"
+	DTYPE["i16"]	= "BHND_NVRAM_DT_INT16"
+	DTYPE["i32"]	= "BHND_NVRAM_DT_INT32"
 	DTYPE["char"]	= "BHND_NVRAM_DT_CHAR"
 
 	# Default masking for standard types
@@ -46,6 +72,7 @@ BEGIN {
 	TMASK["i8"]	= TMASK["u8"]
 	TMASK["i16"]	= TMASK["u16"]
 	TMASK["i32"]	= TMASK["u32"]
+	TMASK["char"]	= TMASK["u8"]
 
 	# Byte sizes for standard types
 	TSIZE["u8"]	= "1"
@@ -101,13 +128,15 @@ BEGIN {
 
 	# Segment array keys
 	SEG_ADDR	= "seg_addr"
-	SEG_WIDTH	= "seg_width"
+	SEG_COUNT	= "seg_count"
+	SEG_TYPE	= "seg_type"
 	SEG_MASK	= "seg_mask"
 	SEG_SHIFT	= "seg_shift"
 
 	# Variable array keys
 	VAR_NAME	= "v_name"
 	VAR_TYPE	= "v_type"
+	VAR_BASE_TYPE	= "v_base_type"
 	VAR_FMT		= "v_fmt"
 	VAR_STRUCT	= "v_parent_struct"
 	VAR_PRIVATE	= "v_private"
@@ -122,7 +151,7 @@ NR == 1 {
 	print " * generated from", FILENAME
 	print " */"
 	print ""
-	print "#include \"ccmach/nvram_map.h\""
+	print "#include <dev/bhnd/nvram/nvramvar.h>"
 }
 
 # return the flag definition for variable `v`
@@ -137,29 +166,16 @@ function gen_var_flags (v)
 
 	if (vars[v,VAR_IGNALL1])
 		_flags[_num_flags++] = "BHND_NVRAM_VF_IGNALL1"
+		
+	if (_num_flags == 0)
+		_flags[_num_flags++] = "0"
 
-	return (join(_flags, ", ", _num_flags))
+	return (join(_flags, "|", _num_flags))
 }
 
-# open a bhnd_nvram_var definition for `v`, with optional name `suffix`.
-function gen_var_head (v, suffix)
+# emit the bhnd_sprom_offsets for a given variable revision key
+function emit_var_sprom_offsets (v, revk)
 {
-	printi("{\"" v suffix "\", ")
-	printf("%s, ", DTYPE[vars[v,VAR_TYPE]])
-	printf("%s, ", FMT[vars[v,VAR_FMT]])
-	printf("%s, ", gen_var_flags(v))
-	printf("(struct bhnd_sprom_var[]) {\n")
-	output_depth++
-}
-
-# generate a bhnd_sprom_var definition for the given variable revision key
-function gen_var_rev_body (v, revk, base_addr)
-{
-	if (base_addr != null)
-		base_addr = base_addr" + "
-	else
-		base_addr = ""
-
 	printi()
 	printf("{{%u, %u}, (struct bhnd_sprom_offset[]) {\n",
 	    vars[revk,REV_START],
@@ -176,87 +192,123 @@ function gen_var_rev_body (v, revk, base_addr)
 		for (seg = 0; seg < num_segs; seg++) {
 			segk = subkey(offk, OFF_SEG, seg"")
 
-			printi()
-			printf("{%s, %s, %s, %s},\n",
-			    base_addr vars[segk,SEG_ADDR],
-			    vars[segk,SEG_WIDTH],
-			    vars[segk,SEG_SHIFT],
-			    vars[segk,SEG_MASK])
-			num_offs_written++
+			for (seg_n = 0; seg_n < vars[segk,SEG_COUNT]; seg_n++) {
+				seg_addr = vars[segk,SEG_ADDR]
+				seg_addr += TSIZE[vars[segk,SEG_TYPE]] * seg_n
+
+				printi()
+				printf("{%s, %s, %s, %s, %s},\n",
+				seg_addr,
+				(seg > 0) ? "true" : "false",
+				DTYPE[vars[segk,SEG_TYPE]],
+				vars[segk,SEG_SHIFT],
+				vars[segk,SEG_MASK])
+				num_offs_written++
+			}
 		}
-	}
-
-	# Check for overflow of the variable's declared type
-	if (vars[v,VAR_ARRAY])
-		max_elem_count = type_array_len(vars[v,VAR_TYPE])
-	else
-		max_elem_count = 1
-
-	if (TODO && vars[revk,REV_NUM_ELEMS] > max_elem_count) {
-		_err_line = vars[revk,DEF_LINE]
-		errorx(vars[v,VAR_NAME] " srom definition of " vars[revk,REV_NUM_ELEMS] \
-		    " elements on line " _err_line " overflows type " \
-		    vars[v,VAR_TYPE])
 	}
 
 	output_depth--
 	printi("}, " num_offs_written "},\n")
 }
 
-# generate an array of bhnd_sprom_var definitions for `v`
-function gen_var_body (v)
+# emit the bhnd_nvram_var definition for variable name `v`
+function emit_var_defn (v)
 {
+	printi("{\"" v suffix "\", ")
+	printf("%s, ", DTYPE[vars[v,VAR_BASE_TYPE]])
+	printf("%s, ", FMT[vars[v,VAR_FMT]])
+	printf("%s, ", gen_var_flags(v))
+	printf("(struct bhnd_sprom_var[]) {\n")
+	output_depth++
+
 	for (rev = 0; rev < vars[v,NUM_REVS]; rev++) {
 		revk = subkey(v, REV, rev"")
-		gen_var_rev_body(v, revk)
+		emit_var_sprom_offsets(v, revk)
+	}
+
+	output_depth--
+	printi("}, " vars[v,NUM_REVS] "},\n")
+}
+
+# generate a set of var offset definitions for struct variable `st_vid`
+function gen_struct_var_offsets (vid, revk, st_vid, st_revk, base_addr)
+{
+	# Copy all offsets to the new variable
+	for (offset = 0; offset < vars[v,REV_NUM_OFFS]; offset++) {
+		st_offk = subkey(st_revk, OFF, offset"")
+		offk = subkey(revk, OFF, offset"")
+
+		# Copy all segments to the new variable, applying base
+		# address adjustment
+		num_segs = vars[st_offk,OFF_NUM_SEGS]
+		vars[offk,OFF_NUM_SEGS] = num_segs
+
+		for (seg = 0; seg < num_segs; seg++) {
+			st_segk = subkey(st_offk, OFF_SEG, seg"")
+			segk = subkey(offk, OFF_SEG, seg"")
+
+			vars[segk,SEG_ADDR]	= vars[st_segk,SEG_ADDR] + \
+			    base_addr""
+			vars[segk,SEG_COUNT]	= vars[st_segk,SEG_COUNT]
+			vars[segk,SEG_TYPE]	= vars[st_segk,SEG_TYPE]
+			vars[segk,SEG_MASK]	= vars[st_segk,SEG_MASK]
+			vars[segk,SEG_SHIFT]	= vars[st_segk,SEG_SHIFT]
+		}
 	}
 }
 
-# close a bhnd_nvram_var definition for `v`
-function gen_var_tail (v, num_revs)
+# generate a complete set of variable definitions for struct variable `st_vid`.
+function gen_struct_vars (st_vid)
 {
-	output_depth--
-	printi("}, " num_revs "},\n")
-}
-
-# generate a complete set of variable definitions for struct variable `v`.
-function gen_struct_var (v)
-{
-	st = vars[v,VAR_STRUCT]
+	st = vars[st_vid,VAR_STRUCT]
 	st_max_off = 0
 
 	# determine the total number of variables to generate
-	for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
-		srevk = subkey(st, REV, srev"")
+	for (st_rev = 0; st_rev < structs[st,NUM_REVS]; st_rev++) {
+		srevk = subkey(st, REV, st_rev"")
 		for (off = 0; off < structs[srevk,REV_NUM_OFFS]; off++) {
 			if (off > st_max_off)
 				st_max_off = off
 		}
 	}
 
-	# generate variables for each defined struct offset
+	# generate variable records for each defined struct offset
 	for (off = 0; off < st_max_off; off++) {
-		st_rev_count = 0
-		gen_var_head(v, off"")
+		# Construct basic variable definition
+		v = st_vid off""
+		vars[v,VAR_TYPE]	= vars[st_vid,VAR_TYPE]
+		vars[v,VAR_BASE_TYPE]	= vars[st_vid,VAR_BASE_TYPE]
+		vars[v,VAR_FMT]		= vars[st_vid,VAR_FMT]
+		vars[v,VAR_PRIVATE]	= vars[st_vid,VAR_PRIVATE]
+		vars[v,VAR_ARRAY]	= vars[st_vid,VAR_ARRAY]
+		vars[v,VAR_IGNALL1]	= vars[st_vid,VAR_IGNALL1]
+		vars[v,NUM_REVS]	= 0
 
+		# Add to output variable list
+		output_vars[num_output_vars++] = v
+
+		# Construct revision / offset entries
 		for (srev = 0; srev < structs[st,NUM_REVS]; srev++) {
-			srevk = subkey(st, REV, srev"")
+			# Struct revision key
+			st_revk = subkey(st, REV, srev"")
 
 			# Skip offsets not defined for this revision
-			if (off > structs[srevk,REV_NUM_OFFS])
+			if (off > structs[st_revk,REV_NUM_OFFS])
 				continue
 
-			offk = subkey(srevk, OFF, off"")
+			# Strut offset key and associated base address */
+			offk = subkey(st_revk, OFF, off"")
 			base_addr = structs[offk,SEG_ADDR]
 
-			for (vrev = 0; vrev < vars[v,NUM_REVS]; vrev++) {
-				vrevk = subkey(v, REV, vrev"")
-				v_start = vars[vrevk,REV_START]
-				v_end = vars[vrevk,REV_END]
-				s_start = structs[srevk,REV_START]
-				s_end = structs[srevk,REV_END]
+			for (vrev = 0; vrev < vars[st_vid,NUM_REVS]; vrev++) {
+				st_var_revk = subkey(st_vid, REV, vrev"")
+				v_start	= vars[st_var_revk,REV_START]
+				v_end	= vars[st_var_revk,REV_END]
+				s_start	= structs[st_revk,REV_START]
+				s_end	= structs[st_revk,REV_END]
 
-				# XXX we don't support computing the union
+				# We don't support computing the union
 				# of partially overlapping ranges
 				if ((v_start < s_start && v_end >= s_start) ||
 				    (v_start <= s_end && v_end > s_end))
@@ -271,44 +323,53 @@ function gen_struct_var (v)
 				    v_end < s_start || v_end > s_end)
 					continue
 
-				st_rev_count++
-				gen_var_rev_body(v, vrevk, base_addr)
+				# Generate the new revision record
+				rev = vars[v,NUM_REVS] ""
+				revk = subkey(v, REV, rev)
+				vars[v,NUM_REVS]++
+
+				vars[revk,DEF_LINE]	= vars[st_revk,DEF_LINE]
+				vars[revk,REV_START]	= v_start
+				vars[revk,REV_END]	= v_end
+				vars[revk,REV_NUM_OFFS] = \
+				    vars[st_var_revk,REV_NUM_OFFS]
+
+				gen_struct_var_offsets(v, revk, st_vid, st_revk,
+				    base_addr)
 			}
 		}
-
-		gen_var_tail(v, st_rev_count)
 	}
 }
 
 
 END {
-	# skip completion handling if exiting from an error
+	# Skip completion handling if exiting from an error
 	if (_EARLY_EXIT)
 		exit 1
 
-	# check for complete block closure
+	# Check for complete block closure
 	if (depth > 0) {
 		block_start = g(STATE_LINENO)
 		errorx("missing '}' for block opened on line " block_start "")
 	}
-	
-	# produce a stable sort to allow binary search
-	# over the output
-	sort(var_names, var_sorting)
 
-	# generate output
-	printf("const struct bhnd_nvram_var nvram_vars[] = {\n")
-	output_depth = 1
-	for (vidx = 0; vidx in var_sorting; vidx++) {
-		v = var_sorting[vidx]
+	# Generate concrete variable definitions for all struct variables
+	for (v in var_names) {
 		if (vars[v,VAR_STRUCT] != null) {
-			gen_struct_var(v)
+			gen_struct_vars(v)
 		} else {
-			gen_var_head(v)
-			gen_var_body(v)
-			gen_var_tail(v, vars[v,NUM_REVS])
+			output_vars[num_output_vars++] = v
 		}
 	}
+
+	# Apply lexicographical sorting. To support more effecient table
+	# searching, we guarantee a stable sort order (using C collation).
+	sort(output_vars)
+
+	printf("static const struct bhnd_nvram_var bhnd_nvram_vars[] = {\n")
+	output_depth = 1
+	for (i = 0; i < num_output_vars; i++)
+		emit_var_defn(output_vars[i])
 	output_depth = 0
 	printf("};\n")
 }
@@ -320,6 +381,7 @@ END {
 function usage ()
 {
 	print "usage: bhnd_nvram_map.awk <input map>"
+	_EARLY_EXIT = 1
 	exit 1
 }
 
@@ -339,52 +401,59 @@ function join (array, sep, count)
 }
 
 #
-# Sort the array keys using standard awk comparison operators,
-# returning a new array mapping sort order to key.
+# Sort a contiguous integer-indexed array, using standard awk comparison
+# operators over its values.
 #
-function sort (array, output) {
-	# produce an indexed array
-	_sort_idx = 0
-	for (_sort_key in array)
-		output[_sort_idx++] = _sort_key
+function sort (array) {
+	# determine array size
+	_sort_alen = 0
+
+	for (_ssort_key in array)
+		_sort_alen++
+
+	if (_sort_alen <= 1)
+		return
 
 	# perform sort
-	_qsort(output, 1, _sort_idx)
+	_qsort(array, 0, _sort_alen-1)
 }
 
-function _qsort (array, left, right)
+function _qsort (array, first, last)
 {
+	if (first >= last)
+		return
+
 	# select pivot element
-	_qp_idx = left + int((right-left+1) * rand())
-	_qp = array[_qp_idx]
+	_qpivot = int(first + int((last-first+1) * rand()))
+	_qleft = first
+	_qright = last
+
+	_qpivot_val = array[_qpivot]
 
 	# partition
-	_ql = left
-	_qr = right
-	while (_ql <= _qr) {
-		while (array[_ql] < _qp)
-			_ql++
+	while (_qleft <= _qright) {
+		while (array[_qleft] < _qpivot_val)
+			_qleft++
 
-		while (array[_qr] > _qp)
-			_qr--
+		while (array[_qright] > _qpivot_val)
+			_qright--
 
 		# swap
-		if (_ql <= _qr) {
-			_qlval = array[_ql]
-			array[_ql] = array[_qr]
-			array[_qr] = _qlval
+		if (_qleft <= _qright) {
+			_qleft_val = array[_qleft]
+			_qright_val = array[_qright]
+			
+			array[_qleft] = _qright_val
+			array[_qright] = _qleft_val
 
-			_ql++
-			_qr--
+			_qleft++
+			_qright--
 		}
 	}
-	
-	# sort the partitions
-	if (left < _qr)
-		_qsort(array, left, _qr)
 
-	if (_ql > right)
-		_qsort(array, _ql, right)
+	# sort the partitions
+	_qsort(array, first, _qright)
+	_qsort(array, _qleft, last)
 }
 
 #
@@ -821,11 +890,8 @@ function parse_offset_segment (revk, offk)
 	offset = $1
 	if (offset !~ HEX_REGEX)
 		error("invalid offset value '" offset "'")
-	shiftf(1)
 
-
-
-	# extract byte count[] and width
+	# extract byte count[], base type, and width
 	if (match(type, ARRAY_REGEX"$") > 0) {
 		count = int(substr(type, RSTART+1, RLENGTH-2))
 		type = substr(type, 1, RSTART-1)
@@ -866,21 +932,19 @@ function parse_offset_segment (revk, offk)
 		}
 	}
 
-	for (_oi = 0; _oi < count; _oi++) {
-		# assign segment id
-		seg = vars[offk,OFF_NUM_SEGS] ""
-		segk = subkey(offk, OFF_SEG, seg)
-		vars[offk,OFF_NUM_SEGS]++
+	# assign segment id
+	seg = vars[offk,OFF_NUM_SEGS] ""
+	segk = subkey(offk, OFF_SEG, seg)
+	vars[offk,OFF_NUM_SEGS]++
 
-		vars[segk,SEG_ADDR]	= offset + (width * _oi)
-		vars[segk,SEG_WIDTH]	= width
-		vars[segk,SEG_MASK]	= mask
-		vars[segk,SEG_SHIFT]	= shift
+	vars[segk,SEG_ADDR]	= offset + (width * _oi)
+	vars[segk,SEG_COUNT]	= count
+	vars[segk,SEG_TYPE]	= type
+	vars[segk,SEG_MASK]	= mask
+	vars[segk,SEG_SHIFT]	= shift
 
-		debug("{"vars[segk,SEG_ADDR]", "width", "mask", "shift"}" \
-		   _comma)
-	}
-
+	debug("{"vars[segk,SEG_ADDR]", "type", "mask", "shift"}" \
+		_comma)
 }
 
 # revision offset definition
@@ -952,6 +1016,7 @@ $1 ~ SROM_OFF_REGEX && in_state(ST_SROM_DEFN) {
 	vars[name,VAR_NAME] = name
 	vars[name,DEF_LINE] = NR
 	vars[name,VAR_TYPE] = type
+	vars[name,VAR_BASE_TYPE] = base_type
 	vars[name,NUM_REVS] = 0
 	vars[name,VAR_PRIVATE] = private
 	vars[name,VAR_ARRAY] = array
